@@ -188,6 +188,21 @@
   .win-badge{font-size:11px;color:var(--pitch);margin-left:2px}
   .side.away .win-badge{margin-left:0;margin-right:2px}
 
+  /* ----- score steppers ----- */
+  .score-row{
+    grid-column:2;display:flex;align-items:center;justify-content:center;gap:4px;
+    padding:2px 0 0;font:700 13px/1 ui-monospace,monospace;color:var(--ink)
+  }
+  .score-row .sbtn{
+    width:22px;height:22px;border:1px solid var(--line);border-radius:5px;
+    background:#fff;color:var(--muted);font:700 13px/1 system-ui;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    padding:0;line-height:1
+  }
+  .score-row .sbtn:active{background:#f0f0ea}
+  .score-row .sval{width:18px;text-align:center}
+  .score-row .sdash{color:var(--muted);margin:0 2px}
+
   footer{max-width:560px;margin:20px auto 0;padding:0 14px;color:var(--muted);font-size:11px;line-height:1.55}
   footer code{background:#ececdf;padding:1px 4px;border-radius:4px}
   .asof{color:var(--pitch-dk);font-weight:600}
@@ -217,7 +232,7 @@
   </div>
   <div class="bar-wrap">
     <div class="bar">
-      <p id="hint">Probable winners shown below.<br>Tap to change — board updates live.</p>
+      <p id="hint">Probable winners shown.<br>Tap to change. Board updates live.</p>
       <div class="bar__btns">
         <button class="btn btn--pitch" id="probable">Probable<br>Picks</button>
         <button class="btn btn--share" id="share">Share<br>My Picks</button>
@@ -232,7 +247,7 @@
 
 <footer>
   <p class="asof">Standings as of end of Matchday 2 (Jun 23, 2026), both rounds complete. The 24 Matchday-3 games remain.</p>
-  <p><b>How it works:</b> win = 3, draw = 1, loss = 0. Tied teams are ordered by points, then goal difference, then goals scored (carried from results already played — your win/draw/loss picks don't set a scoreline, so they add points only). The 8 best third-placed teams across all groups take the final 8 slots. A <b>🔒</b> means a team is mathematically through regardless of remaining results.</p>
+  <p><b>How it works:</b> win = 3, draw = 1, loss = 0. Pick a winner then adjust the scoreline with the steppers — goal difference updates live. Tied teams are ordered by points → GD → goals scored. The 8 best third-placed teams take the final 8 R32 slots. A <b>🔒</b> means a team is mathematically through regardless of remaining results.</p>
   <p>Each group is colour-coded A–L; that colour follows a team into the third-place row so you can see where it came from. Edit the <code>TEAMS</code> / <code>PLAYED</code> / <code>FIXTURES</code> blocks in the source to correct any result.</p>
 </footer>
 
@@ -332,16 +347,33 @@ function cmpRaw(A,B,ca,cb,extra){
   return (B.pts-A.pts) || (B.gd-A.gd) || (B.gf-A.gf) || ((seedIndex[ca]??0)-(seedIndex[cb]??0));
 }
 
-// add picks (points only) onto a fresh copy of base stats
+// add picks (points + goals) onto a fresh copy of base stats
 function statsWith(picks){
   const s={}; for(const c in BASE) s[c]={...BASE[c]};
   for(const id in picks){
     const p=picks[id]; if(!p) continue;
     const [,, h,a]=fixById[id];
-    if(p==="H") s[h].pts+=3; else if(p==="A") s[a].pts+=3; else {s[h].pts++; s[a].pts++;}
+    const r = typeof p==="object" ? p.r : p;
+    const hs = typeof p==="object" ? p.hs : (r==="H"?1:r==="D"?0:0);
+    const as_ = typeof p==="object" ? p.as : (r==="A"?1:r==="D"?0:0);
+    if(r==="H") s[h].pts+=3; else if(r==="A") s[a].pts+=3; else {s[h].pts++; s[a].pts++;}
+    s[h].gf+=hs; s[h].ga+=as_; s[a].gf+=as_; s[a].ga+=hs;
+    s[h].gd=s[h].gf-s[h].ga; s[a].gd=s[a].gf-s[a].ga;
   }
   return s;
 }
+
+// helper: get result string from a pick (handles old string format and new object format)
+function pickResult(p){ return !p ? "" : typeof p==="object" ? p.r : p; }
+function pickScores(p){
+  if(!p) return null;
+  if(typeof p==="object") return {hs:p.hs, as:p.as};
+  if(p==="H") return {hs:1,as:0};
+  if(p==="A") return {hs:0,as:1};
+  return {hs:0,as:0};
+}
+function makePick(r,hs,as){ return {r,hs,as}; }
+function defaultPick(r){ return r==="H"?{r,hs:1,as:0}:r==="A"?{r,hs:0,as:1}:{r,hs:0,as:0}; }
 
 function standings(picks){
   const s=statsWith(picks), tables={};
@@ -392,16 +424,37 @@ function savePicks(p){
   try{ localStorage.setItem("fifa26_picks",JSON.stringify(p)); }catch(e){}
 }
 function loadPicks(){
-  try{ const v=localStorage.getItem("fifa26_picks"); return v?JSON.parse(v):{}; }catch(e){ return {}; }
+  try{
+    const v=localStorage.getItem("fifa26_picks"); if(!v) return {};
+    const p=JSON.parse(v);
+    // migrate old string picks to object format
+    for(const id in p){ if(typeof p[id]==="string") p[id]=defaultPick(p[id]); }
+    return p;
+  }catch(e){ return {}; }
 }
 function encodePicks(p){
-  return FIX_IDS.map(id=>({H:"H",A:"A",D:"D"}[p[id]])||"_").join("");
+  // format: result chars + "." + score pairs (hs,as;hs,as;...)
+  const results=FIX_IDS.map(id=>{const v=p[id]; return v?pickResult(v):"_";}).join("");
+  const scores=FIX_IDS.map(id=>{const v=p[id]; if(!v) return ""; const sc=pickScores(v); return sc.hs+","+sc.as;}).join(";");
+  return results+"."+scores;
 }
 function decodePicks(str){
   const p={};
-  FIX_IDS.forEach((id,i)=>{
-    const c=str[i]; if(c==="H"||c==="A"||c==="D") p[id]=c;
-  });
+  // support old format (24 chars, no dot) and new format (results.scores)
+  if(str.indexOf(".")===-1){
+    FIX_IDS.forEach((id,i)=>{
+      const c=str[i]; if(c==="H"||c==="A"||c==="D") p[id]=defaultPick(c);
+    });
+  } else {
+    const [results,scores]=str.split(".");
+    const sc=scores.split(";");
+    FIX_IDS.forEach((id,i)=>{
+      const c=results[i]; if(c==="H"||c==="A"||c==="D"){
+        const pair=sc[i]?sc[i].split(",").map(Number):[0,0];
+        p[id]={r:c,hs:pair[0]||0,as:pair[1]||0};
+      }
+    });
+  }
   return p;
 }
 function toast(msg){
@@ -414,7 +467,7 @@ function toast(msg){
 function initPicks(){
   const params=new URLSearchParams(window.location.search);
   const pp=params.get("p");
-  if(pp && pp.length===FIX_IDS.length){
+  if(pp && pp.length>=FIX_IDS.length){
     const p=decodePicks(pp);
     // clean URL without reload
     window.history.replaceState({},"",window.location.pathname);
@@ -444,7 +497,7 @@ const PROBABLE = {
 let picks=initPicks();
 // first visit: start with probable picks so the board is populated
 if(!Object.values(picks).some(Boolean)){
-  for(const id in PROBABLE) picks[id]=PROBABLE[id];
+  for(const id in PROBABLE) picks[id]=defaultPick(PROBABLE[id]);
   savePicks(picks);
 }
 
@@ -493,7 +546,7 @@ function renderBoard(){
   }).join("");
 
   document.getElementById("lockN").textContent=LOCKED.size;
-  document.getElementById("fillN").textContent=Object.values(picks).filter(Boolean).length;
+  document.getElementById("fillN").textContent=Object.values(picks).filter(v=>v&&pickResult(v)).length;
 }
 
 function gteam(rk,code,s,full){
@@ -510,9 +563,9 @@ function gteam(rk,code,s,full){
     </div>`;
 }
 
-function side(code,pick,which,pts){
-  const sel=pick===which;
-  const dim=pick && !sel;
+function side(code,r,which,pts){
+  const sel=r===which;
+  const dim=r && !sel;
   const badge = sel ? '<span class="win-badge">✓</span>' : '';
   return `<button class="side ${which==='A'?'away':''} ${sel?'sel':''} ${dim?'dim':''}" data-pick="${which}">
       ${flag(code)}
@@ -527,14 +580,27 @@ function renderFixtures(){
     <section class="day">
       <h2 class="day__h">${day.date}<span class="tag">${day.note}</span></h2>
       ${day.ms.map(([id,g,h,a])=>{
-        const p=picks[id]||"";
+        const p=picks[id];
+        const r=pickResult(p);
+        const sc=pickScores(p);
         return `<div class="match" data-id="${id}">
           <div class="match__grp">${g}</div>
           <div class="pick">
-            ${side(h,p,"H",s[h].pts)}
-            <button class="draw ${p==='D'?'sel':''} ${p&&p!=='D'?'dim':''}" data-pick="D">DRAW<small>tie</small></button>
-            ${side(a,p,"A",s[a].pts)}
+            ${side(h,r,"H",s[h].pts)}
+            <button class="draw ${r==='D'?'sel':''} ${r&&r!=='D'?'dim':''}" data-pick="D">DRAW<small>tie</small></button>
+            ${side(a,r,"A",s[a].pts)}
           </div>
+          ${r&&r!=='D'?`<div class="score-row">
+            <button class="sbtn" data-sc="hm">−</button><span class="sval">${sc.hs}</span>
+            <button class="sbtn" data-sc="hp">+</button>
+            <span class="sdash">–</span>
+            <button class="sbtn" data-sc="am">−</button><span class="sval">${sc.as}</span>
+            <button class="sbtn" data-sc="ap">+</button>
+          </div>`:''}${r==='D'?`<div class="score-row">
+            <button class="sbtn" data-sc="dm">−</button>
+            <span class="sval">${sc.hs}</span><span class="sdash">–</span><span class="sval">${sc.as}</span>
+            <button class="sbtn" data-sc="dp">+</button>
+          </div>`:''}
         </div>`;
       }).join("")}
     </section>`).join("");
@@ -542,26 +608,49 @@ function renderFixtures(){
 
 /* one delegated listener handles every pick */
 fixturesEl.addEventListener("click",e=>{
+  // score stepper buttons
+  const sc=e.target.closest("[data-sc]");
+  if(sc){
+    const id=e.target.closest(".match").dataset.id;
+    const p=picks[id]; if(!p) return;
+    const act=sc.dataset.sc;
+    let {r,hs,as}=p;
+    if(act==="hp"&&hs<15) hs++;
+    else if(act==="hm"&&hs>0) hs--;
+    else if(act==="ap"&&as<15) as++;
+    else if(act==="am"&&as>0) as--;
+    else if(act==="dp"&&hs<15){hs++;as++;}
+    else if(act==="dm"&&hs>0){hs--;as--;}
+    // enforce win/draw constraints
+    if(r==="H"&&hs<=as) hs=as+1;
+    if(r==="A"&&as<=hs) as=hs+1;
+    if(r==="D") as=hs;
+    picks[id]={r,hs,as};
+    savePicks(picks); renderFixtures(); renderBoard();
+    return;
+  }
+  // result pick buttons
   const btn=e.target.closest("[data-pick]"); if(!btn) return;
   const id=e.target.closest(".match").dataset.id;
   const want=btn.dataset.pick;
-  picks[id] = (picks[id]===want) ? null : want;   // tap again to clear
+  const cur=pickResult(picks[id]);
+  picks[id] = (cur===want) ? null : defaultPick(want);
   savePicks(picks); renderFixtures(); renderBoard();
 });
 
 document.getElementById("probable").addEventListener("click",()=>{
-  for(const id in PROBABLE) picks[id]=PROBABLE[id];
+  for(const id in PROBABLE) picks[id]=defaultPick(PROBABLE[id]);
   savePicks(picks); renderFixtures(); renderBoard();
 });
 
 document.getElementById("reset").addEventListener("click",()=>{
-  if(!Object.values(picks).some(Boolean)) return;
+  if(!Object.values(picks).some(v=>v&&pickResult(v))) return;
   if(!confirm("Clear all picks?")) return;
   picks={}; savePicks(picks); renderFixtures(); renderBoard();
 });
 
 document.getElementById("share").addEventListener("click",()=>{
-  const n=Object.values(picks).filter(Boolean).length;
+  const n=Object.values(picks).filter(v=>v&&pickResult(v)).length;
   if(!n){ toast("Make some picks first!"); return; }
   const url=window.location.origin+window.location.pathname+"?p="+encodePicks(picks);
   navigator.clipboard.writeText(url).then(
