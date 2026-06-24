@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Road to 32 · World Cup 2026 What-If</title>
+<style>
+  :root{
+    --ink:#0d1b14;          /* near-black green ink */
+    --paper:#f6f5ef;        /* warm paper */
+    --line:#d9d7cc;         /* hairline */
+    --pitch:#1f9d57;        /* qualification green */
+    --pitch-dk:#13713d;
+    --board:#0a1f15;        /* LED board bg */
+    --board-stripe:#0e2a1c;
+    --chalk:#e9f3ec;        /* board text */
+    --muted:#7e8b82;
+    --gold:#e8b53a;         /* group winner */
+    --silver:#9fb6c9;       /* runner-up */
+    --bronze:#cf915a;       /* third place */
+    --pick:#1f9d57;
+    --pickdraw:#5b6e7e;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{
+    background:var(--paper);color:var(--ink);
+    font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    padding-bottom:48px;
+  }
+  .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+
+  /* ---------- sticky qualification board ---------- */
+  .board{
+    position:sticky;top:0;z-index:50;
+    background:
+      repeating-linear-gradient(90deg,var(--board) 0 14px,var(--board-stripe) 14px 28px);
+    color:var(--chalk);
+    padding:8px 8px 6px;
+    box-shadow:0 6px 14px -8px rgba(0,0,0,.6);
+    border-bottom:2px solid var(--pitch);
+  }
+  .board__head{
+    display:flex;align-items:baseline;justify-content:space-between;
+    padding:0 2px 6px;
+  }
+  .board__title{font-weight:800;letter-spacing:.04em;font-size:13px;text-transform:uppercase}
+  .board__title b{color:var(--pitch)}
+  .board__count{font-size:11px;color:#bcd2c2}
+  .board__count strong{color:var(--gold)}
+
+  /* scroll region holding the group cards + thirds */
+  .boardbody{max-height:50vh;overflow:auto;padding-right:2px}
+
+  /* ----- 12 colour-coded group cards (top 24) ----- */
+  .groups{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+  .gcard{
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+    border-top:2px solid var(--gc);border-radius:7px;overflow:hidden
+  }
+  .gcard__h{
+    font:800 10px/1 ui-monospace,monospace;color:var(--gc);
+    padding:3px 6px 1px;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center
+  }
+  .gcard__h .lkmark{font-size:8px}
+  .gteam{display:flex;align-items:center;gap:4px;padding:2px 6px 2px 5px}
+  .gteam:last-child{padding-bottom:3px}
+  .gteam .rk{font:800 8px/1 ui-monospace,monospace;color:var(--gc);width:6px;flex:none;opacity:.85}
+  .gteam .flag{width:17px;height:13px;flex:none}
+  .gteam .cd{font:700 11px/1 ui-monospace,monospace;color:var(--chalk);letter-spacing:.02em}
+  .gteam .pt{margin-left:auto;font:700 10px/1 ui-monospace,monospace;color:#acc2b6;flex:none}
+  .gteam.prov{opacity:.55}
+
+  /* ----- best-eight third-place chips ----- */
+  .thirds-h{
+    display:flex;align-items:center;gap:7px;margin:9px 2px 5px;
+    font:800 9px/1 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:#9fb3a7
+  }
+  .thirds-h::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.12)}
+  .thirds{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+  .tchip{
+    display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);border-left:3px solid var(--gc);
+    border-radius:6px;padding:3px 5px
+  }
+  .tchip .gg{font:800 8px/1 ui-monospace,monospace;color:var(--gc);flex:none}
+  .tchip .flag{width:16px;height:12px;flex:none}
+  .tchip .cd{font:700 11px/1 ui-monospace,monospace;color:var(--chalk)}
+  .tchip .pt{margin-left:auto;font:700 9px/1 ui-monospace,monospace;color:#acc2b6;flex:none}
+  .tchip.cut{opacity:.3}                  /* below the qualification line */
+
+  .board__legend{display:flex;gap:10px;flex-wrap:wrap;padding:6px 2px 0;font-size:9.5px;color:#9fb3a7}
+  .board__legend i{font-style:normal}
+  .dot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:3px;vertical-align:middle}
+
+  /* ---------- controls ---------- */
+  .bar{
+    display:flex;gap:8px;align-items:center;justify-content:space-between;
+    padding:10px 12px 4px;max-width:560px;margin:0 auto;
+  }
+  .bar p{margin:0;font-size:12px;color:var(--muted)}
+  .btn{
+    font:600 12px/1 system-ui;border:1px solid var(--line);background:#fff;
+    color:var(--ink);padding:7px 11px;border-radius:8px;cursor:pointer
+  }
+  .btn:active{transform:translateY(1px)}
+
+  /* ---------- fixtures ---------- */
+  main{max-width:560px;margin:0 auto;padding:4px 10px}
+  .day{margin-top:14px}
+  .day__h{
+    display:flex;align-items:center;gap:8px;margin:0 2px 7px;
+    font:800 12px/1 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--pitch-dk)
+  }
+  .day__h::after{content:"";flex:1;height:1px;background:var(--line)}
+  .day__h .tag{color:var(--muted);font-weight:600;letter-spacing:0;text-transform:none}
+
+  .match{
+    display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:center;
+    background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:8px 9px;margin-bottom:7px;
+  }
+  .match__grp{
+    font:800 11px/1 ui-monospace,monospace;color:#fff;background:var(--ink);
+    border-radius:5px;text-align:center;padding:5px 0;align-self:stretch;
+    display:flex;align-items:center;justify-content:center
+  }
+  .pick{display:grid;grid-template-columns:1fr auto 1fr;gap:5px;align-items:stretch}
+  .side{
+    display:flex;align-items:center;gap:6px;border:1.5px solid var(--line);
+    background:#fff;border-radius:8px;padding:7px 8px;cursor:pointer;min-width:0;
+    transition:border-color .12s,background .12s;
+  }
+  .side.away{flex-direction:row-reverse;text-align:right}
+  .flag{display:inline-block;border-radius:2px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.14)}
+  .side .flag{width:26px;height:19px;flex:none}
+  .side .cd{font:700 13px/1 ui-monospace,monospace;letter-spacing:.02em}
+  .side .nm{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .side .stack{min-width:0;display:flex;flex-direction:column;gap:1px}
+  .draw{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border:1.5px solid var(--line);background:#fff;border-radius:8px;
+    padding:0 9px;cursor:pointer;color:var(--muted);
+    font:700 10px/1.1 ui-monospace,monospace
+  }
+  .draw small{font-size:8px;font-weight:600;opacity:.8}
+  .side.sel{border-color:var(--pick);background:rgba(31,157,87,.10)}
+  .side.sel .cd{color:var(--pitch-dk)}
+  .draw.sel{border-color:var(--pickdraw);background:rgba(91,110,126,.12);color:#3c4a55}
+  .side.dim,.draw.dim{opacity:.5}
+  .win-badge{font-size:11px;color:var(--pitch);margin-left:2px}
+  .side.away .win-badge{margin-left:0;margin-right:2px}
+
+  footer{max-width:560px;margin:20px auto 0;padding:0 14px;color:var(--muted);font-size:11px;line-height:1.55}
+  footer code{background:#ececdf;padding:1px 4px;border-radius:4px}
+  .asof{color:var(--pitch-dk);font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="board" id="board">
+  <div class="board__head">
+    <div class="board__title">Road to&nbsp;<b>32</b></div>
+    <div class="board__count"><strong id="lockN">0</strong> qualified · <span id="fillN">0</span>/<span id="totN">24</span> picks</div>
+  </div>
+  <div class="boardbody">
+    <div class="groups" id="groups"></div>
+    <div class="thirds-h">Best 8 third-placed → final R32 spots</div>
+    <div class="thirds" id="thirds"></div>
+  </div>
+  <div class="board__legend">
+    <i><span class="dot" style="background:#acc2b6"></span>1 = winner · 2 = runner-up</i>
+    <i>🔒 already qualified</i>
+    <i>faded third = misses the cut</i>
+  </div>
+</header>
+
+<div class="bar">
+  <p id="hint">Pick a winner in each match below — the board updates live.</p>
+  <button class="btn" id="reset">Clear picks</button>
+</div>
+
+<main id="fixtures"></main>
+
+<footer>
+  <p class="asof">Standings as of end of Matchday 2 (Jun 23, 2026), both rounds complete. The 24 Matchday-3 games remain.</p>
+  <p><b>How it works:</b> win = 3, draw = 1, loss = 0. Tied teams are ordered by points, then goal difference, then goals scored (carried from results already played — your win/draw/loss picks don't set a scoreline, so they add points only). The 8 best third-placed teams across all groups take the final 8 slots. A <b>🔒</b> means a team is mathematically through regardless of remaining results.</p>
+  <p>Each group is colour-coded A–L; that colour follows a team into the third-place row so you can see where it came from. Edit the <code>TEAMS</code> / <code>PLAYED</code> / <code>FIXTURES</code> blocks in the source to correct any result.</p>
+</footer>
+
+<script>
+/* =================== DATA =================== */
+const TEAMS = {
+  MEX:{n:"Mexico",iso:"mx",g:"A"}, KOR:{n:"South Korea",iso:"kr",g:"A"}, CZE:{n:"Czechia",iso:"cz",g:"A"}, RSA:{n:"South Africa",iso:"za",g:"A"},
+  CAN:{n:"Canada",iso:"ca",g:"B"}, SUI:{n:"Switzerland",iso:"ch",g:"B"}, BIH:{n:"Bosnia & Herz.",iso:"ba",g:"B"}, QAT:{n:"Qatar",iso:"qa",g:"B"},
+  BRA:{n:"Brazil",iso:"br",g:"C"}, MAR:{n:"Morocco",iso:"ma",g:"C"}, SCO:{n:"Scotland",iso:"gb-sct",g:"C"}, HAI:{n:"Haiti",iso:"ht",g:"C"},
+  USA:{n:"United States",iso:"us",g:"D"}, AUS:{n:"Australia",iso:"au",g:"D"}, PAR:{n:"Paraguay",iso:"py",g:"D"}, TUR:{n:"Türkiye",iso:"tr",g:"D"},
+  GER:{n:"Germany",iso:"de",g:"E"}, CIV:{n:"Ivory Coast",iso:"ci",g:"E"}, ECU:{n:"Ecuador",iso:"ec",g:"E"}, CUW:{n:"Curaçao",iso:"cw",g:"E"},
+  NED:{n:"Netherlands",iso:"nl",g:"F"}, JPN:{n:"Japan",iso:"jp",g:"F"}, SWE:{n:"Sweden",iso:"se",g:"F"}, TUN:{n:"Tunisia",iso:"tn",g:"F"},
+  EGY:{n:"Egypt",iso:"eg",g:"G"}, IRN:{n:"Iran",iso:"ir",g:"G"}, BEL:{n:"Belgium",iso:"be",g:"G"}, NZL:{n:"New Zealand",iso:"nz",g:"G"},
+  ESP:{n:"Spain",iso:"es",g:"H"}, URU:{n:"Uruguay",iso:"uy",g:"H"}, CPV:{n:"Cabo Verde",iso:"cv",g:"H"}, KSA:{n:"Saudi Arabia",iso:"sa",g:"H"},
+  FRA:{n:"France",iso:"fr",g:"I"}, NOR:{n:"Norway",iso:"no",g:"I"}, SEN:{n:"Senegal",iso:"sn",g:"I"}, IRQ:{n:"Iraq",iso:"iq",g:"I"},
+  ARG:{n:"Argentina",iso:"ar",g:"J"}, AUT:{n:"Austria",iso:"at",g:"J"}, ALG:{n:"Algeria",iso:"dz",g:"J"}, JOR:{n:"Jordan",iso:"jo",g:"J"},
+  POR:{n:"Portugal",iso:"pt",g:"K"}, COL:{n:"Colombia",iso:"co",g:"K"}, COD:{n:"DR Congo",iso:"cd",g:"K"}, UZB:{n:"Uzbekistan",iso:"uz",g:"K"},
+  ENG:{n:"England",iso:"gb-eng",g:"L"}, GHA:{n:"Ghana",iso:"gh",g:"L"}, CRO:{n:"Croatia",iso:"hr",g:"L"}, PAN:{n:"Panama",iso:"pa",g:"L"}
+};
+
+/* Real flag images (work everywhere, incl. Windows where flag emoji don't render) */
+const FLAG_BASE = "https://flagcdn.com";
+function flag(code, cls){
+  const t = TEAMS[code];
+  return `<img class="flag ${cls||''}" src="${FLAG_BASE}/${t.iso}.svg" alt="${code}" loading="lazy" decoding="async">`;
+}
+
+/* matches already played (used to seed points + goal diff) */
+const PLAYED = [
+  ["A","MEX",2,0,"RSA"],["A","KOR",2,1,"CZE"],["A","CZE",1,1,"RSA"],["A","MEX",1,0,"KOR"],
+  ["B","CAN",1,1,"BIH"],["B","SUI",1,1,"QAT"],["B","SUI",4,1,"BIH"],["B","CAN",6,0,"QAT"],
+  ["C","BRA",1,1,"MAR"],["C","SCO",1,0,"HAI"],["C","MAR",1,0,"SCO"],["C","BRA",3,0,"HAI"],
+  ["D","USA",4,1,"PAR"],["D","AUS",2,0,"TUR"],["D","USA",2,0,"AUS"],["D","PAR",1,0,"TUR"],
+  ["E","GER",7,1,"CUW"],["E","CIV",1,0,"ECU"],["E","GER",2,1,"CIV"],["E","ECU",0,0,"CUW"],
+  ["F","NED",2,2,"JPN"],["F","SWE",5,1,"TUN"],["F","NED",5,1,"SWE"],["F","JPN",4,0,"TUN"],
+  ["G","BEL",1,1,"EGY"],["G","IRN",2,2,"NZL"],["G","BEL",0,0,"IRN"],["G","EGY",3,1,"NZL"],
+  ["H","ESP",0,0,"CPV"],["H","KSA",1,1,"URU"],["H","ESP",4,0,"KSA"],["H","URU",2,2,"CPV"],
+  ["I","FRA",3,1,"SEN"],["I","NOR",4,1,"IRQ"],["I","FRA",3,0,"IRQ"],["I","NOR",3,2,"SEN"],
+  ["J","ARG",3,0,"ALG"],["J","AUT",3,1,"JOR"],["J","ARG",2,0,"AUT"],["J","ALG",2,1,"JOR"],
+  ["K","POR",1,1,"COD"],["K","COL",3,1,"UZB"],["K","POR",5,0,"UZB"],["K","COL",1,0,"COD"],
+  ["L","ENG",4,2,"CRO"],["L","GHA",1,0,"PAN"],["L","ENG",0,0,"GHA"],["L","CRO",1,0,"PAN"]
+];
+
+/* remaining matches the user picks, grouped by date */
+const FIXTURES = [
+  {date:"Wed · Jun 24", note:"Matchday 3", ms:[
+    ["a1","A","CZE","MEX"],["a2","A","RSA","KOR"],
+    ["b1","B","SUI","CAN"],["b2","B","BIH","QAT"],
+    ["c1","C","SCO","BRA"],["c2","C","MAR","HAI"]
+  ]},
+  {date:"Thu · Jun 25", note:"Matchday 3", ms:[
+    ["d1","D","TUR","USA"],["d2","D","PAR","AUS"],
+    ["e1","E","ECU","GER"],["e2","E","CUW","CIV"],
+    ["f1","F","JPN","SWE"],["f2","F","TUN","NED"]
+  ]},
+  {date:"Fri · Jun 26", note:"Matchday 3", ms:[
+    ["g1","G","EGY","IRN"],["g2","G","NZL","BEL"],
+    ["h1","H","CPV","KSA"],["h2","H","URU","ESP"],
+    ["i1","I","NOR","FRA"],["i2","I","SEN","IRQ"]
+  ]},
+  {date:"Sat · Jun 27", note:"Matchday 3", ms:[
+    ["j1","J","ALG","AUT"],["j2","J","JOR","ARG"],
+    ["k2","K","COL","POR"],["k3","K","COD","UZB"],
+    ["l1","L","PAN","ENG"],["l2","L","CRO","GHA"]
+  ]}
+];
+
+/* =================== ENGINE =================== */
+const GROUPS = "ABCDEFGHIJKL".split("");
+const allFix = FIXTURES.flatMap(d=>d.ms);          // [id,g,h,a]
+const fixById = Object.fromEntries(allFix.map(m=>[m[0],m]));
+const fixByGroup = Object.fromEntries(GROUPS.map(g=>[g,allFix.filter(m=>m[1]===g)]));
+
+// seed order = current standing within group, used as the final tiebreaker
+const seedIndex = {};
+
+function baseStats(){
+  const s={};
+  for(const c in TEAMS) s[c]={pts:0,gf:0,ga:0,gd:0};
+  for(const [g,h,hs,as_,a] of PLAYED){
+    s[h].gf+=hs; s[h].ga+=as_; s[a].gf+=as_; s[a].ga+=hs;
+    if(hs>as_) s[h].pts+=3; else if(hs<as_) s[a].pts+=3; else {s[h].pts++; s[a].pts++;}
+  }
+  for(const c in s) s[c].gd=s[c].gf-s[c].ga;
+  return s;
+}
+const BASE = baseStats();
+
+// establish seed order from base standings
+GROUPS.forEach(g=>{
+  const teams=Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
+  teams.sort((x,y)=>cmpRaw(BASE[x],BASE[y],x,y,0));
+  teams.forEach((c,i)=>seedIndex[c]=i);
+});
+
+function cmpRaw(A,B,ca,cb,extra){
+  return (B.pts-A.pts) || (B.gd-A.gd) || (B.gf-A.gf) || ((seedIndex[ca]??0)-(seedIndex[cb]??0));
+}
+
+// add picks (points only) onto a fresh copy of base stats
+function statsWith(picks){
+  const s={}; for(const c in BASE) s[c]={...BASE[c]};
+  for(const id in picks){
+    const p=picks[id]; if(!p) continue;
+    const [,, h,a]=fixById[id];
+    if(p==="H") s[h].pts+=3; else if(p==="A") s[a].pts+=3; else {s[h].pts++; s[a].pts++;}
+  }
+  return s;
+}
+
+function standings(picks){
+  const s=statsWith(picks), tables={};
+  GROUPS.forEach(g=>{
+    const teams=Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
+    teams.sort((x,y)=>cmpRaw(s[x],s[y],x,y));
+    tables[g]=teams;
+  });
+  // rank the 12 third-placed teams
+  const thirds=GROUPS.map(g=>tables[g][2]);
+  thirds.sort((x,y)=>cmpRaw(s[x],s[y],x,y));
+  return {tables, thirds, s};
+}
+
+/* ---- clinched: top-2 guaranteed no matter the scoreline (static) ----
+   A team is locked only if, across EVERY win/draw/loss combination of the
+   remaining games in its group, at most one other team can finish on equal-or-
+   higher points. That can't be undone by any goal difference, so it's a true
+   mathematical lock (matches the six teams FIFA lists as already qualified). */
+function clinchedTop2(){
+  const locked=new Set();
+  GROUPS.forEach(g=>{
+    const rem=fixByGroup[g], teams=Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
+    const safe=Object.fromEntries(teams.map(t=>[t,true]));
+    const N=Math.pow(3,rem.length);
+    for(let mask=0;mask<N;mask++){
+      const p=Object.fromEntries(teams.map(t=>[t,BASE[t].pts]));
+      let m=mask;
+      for(const [,,h,a] of rem){
+        const o=m%3; m=(m-o)/3;
+        if(o===0) p[h]+=3; else if(o===1) p[a]+=3; else {p[h]++; p[a]++;}
+      }
+      teams.forEach(t=>{
+        const above=teams.filter(u=>u!==t && p[u]>=p[t]).length;
+        if(above>1) safe[t]=false;
+      });
+    }
+    teams.forEach(t=>{ if(safe[t]) locked.add(t); });
+  });
+  return locked;
+}
+const LOCKED = clinchedTop2();
+
+/* =================== STATE + RENDER =================== */
+let picks={};
+
+/* 12 distinct hues, one per group (bright enough for the dark board) */
+const GC = {
+  A:"#ff5d5d", B:"#ff9838", C:"#ffcf3a", D:"#bfe04a", E:"#56d36b", F:"#37d3b0",
+  G:"#3fcfe6", H:"#48a6f5", I:"#6f86ff", J:"#a875ff", K:"#ee6ad6", L:"#ff6a9c"
+};
+
+const groupsEl=document.getElementById("groups");
+const thirdsEl=document.getElementById("thirds");
+const fixturesEl=document.getElementById("fixtures");
+
+function renderBoard(){
+  const {tables,thirds,s}=standings(picks);
+
+  groupsEl.innerHTML = GROUPS.map(g=>{
+    const w=tables[g][0], r=tables[g][1];
+    return `<div class="gcard" style="--gc:${GC[g]}">
+        <div class="gcard__h"><span>${g}</span>${(LOCKED.has(w)&&LOCKED.has(r))?'<span class="lkmark">🔒🔒</span>':''}</div>
+        ${gteam(1,w,s)}
+        ${gteam(2,r,s)}
+      </div>`;
+  }).join("");
+
+  thirdsEl.innerHTML = thirds.map((code,i)=>{
+    const g=TEAMS[code].g, cut=i>=8;
+    return `<div class="tchip ${cut?'cut':''}" style="--gc:${GC[g]}">
+        <span class="gg">${g}</span>${flag(code)}
+        <span class="cd">${code}</span><span class="pt">${s[code].pts}</span>
+      </div>`;
+  }).join("");
+
+  document.getElementById("lockN").textContent=LOCKED.size;
+  document.getElementById("fillN").textContent=Object.values(picks).filter(Boolean).length;
+}
+
+function gteam(rk,code,s){
+  const lock=LOCKED.has(code);
+  const prov = !lock;                         // not yet mathematically settled
+  return `<div class="gteam ${prov?'prov':''}">
+      <span class="rk">${rk}</span>${flag(code)}
+      <span class="cd">${code}</span>
+      <span class="pt">${s[code].pts}${lock?' 🔒':''}</span>
+    </div>`;
+}
+
+function side(code,pick,which,pts){
+  const sel=pick===which;
+  const dim=pick && !sel;
+  const badge = sel ? '<span class="win-badge">✓</span>' : '';
+  return `<button class="side ${which==='A'?'away':''} ${sel?'sel':''} ${dim?'dim':''}" data-pick="${which}">
+      ${flag(code)}
+      <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n} (${pts})</span></span>
+      ${badge}
+    </button>`;
+}
+
+function renderFixtures(){
+  const s=statsWith(picks);
+  fixturesEl.innerHTML = FIXTURES.map(day=>`
+    <section class="day">
+      <h2 class="day__h">${day.date}<span class="tag">${day.note}</span></h2>
+      ${day.ms.map(([id,g,h,a])=>{
+        const p=picks[id]||"";
+        return `<div class="match" data-id="${id}">
+          <div class="match__grp">${g}</div>
+          <div class="pick">
+            ${side(h,p,"H",s[h].pts)}
+            <button class="draw ${p==='D'?'sel':''} ${p&&p!=='D'?'dim':''}" data-pick="D">DRAW<small>tie</small></button>
+            ${side(a,p,"A",s[a].pts)}
+          </div>
+        </div>`;
+      }).join("")}
+    </section>`).join("");
+}
+
+/* one delegated listener handles every pick */
+fixturesEl.addEventListener("click",e=>{
+  const btn=e.target.closest("[data-pick]"); if(!btn) return;
+  const id=e.target.closest(".match").dataset.id;
+  const want=btn.dataset.pick;
+  picks[id] = (picks[id]===want) ? null : want;   // tap again to clear
+  renderFixtures(); renderBoard();
+});
+
+document.getElementById("reset").addEventListener("click",()=>{
+  picks={}; renderFixtures(); renderBoard();
+});
+
+renderFixtures();
+renderBoard();
+</script>
+</body>
+</html>
