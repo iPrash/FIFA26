@@ -4,6 +4,21 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-24 · 12:45 PM — Group Popups & Kick-off Times
+
+### Group Standings Popup
+- Tap any group card on the board or "Group X" link in the fixture headers to see a full standings table.
+- Popup shows all 4 teams with MP, W, D, L, GD, Pts — styled in the dark board theme with the group's colour accent.
+- Includes both played results and current picks in the W/D/L tallies.
+- Tap outside or ✕ to dismiss.
+
+### Kick-off Times
+- Fixtures now split by kick-off time slot (e.g. "Wed · Jun 24 · 3 PM ET") instead of just by day.
+- Each slot labelled with its group (e.g. "Matchday 3 · Group B").
+- Ordered chronologically within each day.
+
+---
+
 ## 2026-06-24 · 11:55 AM — Score Steppers
 
 ### Score Steppers

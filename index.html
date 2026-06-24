@@ -56,7 +56,7 @@
   .groups{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
   .gcard{
     background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-    border-top:2px solid var(--gc);border-radius:7px;overflow:hidden
+    border-top:2px solid var(--gc);border-radius:7px;overflow:hidden;cursor:pointer
   }
   .gcard__h{
     font:800 10px/1 ui-monospace,monospace;color:var(--gc);
@@ -151,6 +151,7 @@
   }
   .day__h::after{content:"";flex:1;height:1px;background:var(--line)}
   .day__h .tag{color:var(--muted);font-weight:600;letter-spacing:0;text-transform:none}
+  .day__h .grp-link{color:var(--pitch-dk);text-decoration:underline;text-decoration-style:dotted;cursor:pointer}
 
   .match{
     display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:center;
@@ -203,6 +204,33 @@
   .score-row .sval{width:18px;text-align:center}
   .score-row .sdash{color:var(--muted);margin:0 2px}
 
+  /* ----- group popup ----- */
+  .gpop-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .2s
+  }
+  .gpop-overlay.open{opacity:1;pointer-events:auto}
+  .gpop{
+    background:var(--board);color:var(--chalk);border-radius:12px;
+    padding:14px 16px;min-width:300px;max-width:90vw;
+    box-shadow:0 12px 40px rgba(0,0,0,.5);border-top:3px solid var(--gc)
+  }
+  .gpop__h{
+    font:800 14px/1 ui-monospace,monospace;color:var(--gc);
+    margin-bottom:10px;display:flex;justify-content:space-between;align-items:center
+  }
+  .gpop__close{
+    background:none;border:none;color:#9fb3a7;font-size:18px;cursor:pointer;padding:0 2px
+  }
+  .gpop table{width:100%;border-collapse:collapse;font:600 12px/1.6 ui-monospace,monospace}
+  .gpop th{color:#9fb3a7;font-weight:600;text-align:center;padding:2px 4px;font-size:10px}
+  .gpop th:first-child,.gpop td:first-child{text-align:left}
+  .gpop td{padding:3px 4px;text-align:center;border-top:1px solid rgba(255,255,255,.06)}
+  .gpop .tm{display:flex;align-items:center;gap:5px;text-align:left}
+  .gpop .tm .flag{width:20px;height:15px}
+  .gpop .pts-col{color:var(--gold);font-weight:800}
+
   footer{max-width:560px;margin:20px auto 0;padding:0 14px;color:var(--muted);font-size:11px;line-height:1.55}
   footer code{background:#ececdf;padding:1px 4px;border-radius:4px}
   .asof{color:var(--pitch-dk);font-weight:600}
@@ -242,6 +270,9 @@
   </div>
 </header>
 <div class="toast" id="toast"></div>
+<div class="gpop-overlay" id="gpopOverlay">
+  <div class="gpop" id="gpop"></div>
+</div>
 
 <main id="fixtures"></main>
 
@@ -293,25 +324,41 @@ const PLAYED = [
 
 /* remaining matches the user picks, grouped by date */
 const FIXTURES = [
-  {date:"Wed · Jun 24", note:"Matchday 3", ms:[
-    ["a1","A","CZE","MEX"],["a2","A","RSA","KOR"],
-    ["b1","B","SUI","CAN"],["b2","B","BIH","QAT"],
+  {date:"Wed · Jun 24 · 3 PM ET", note:"Matchday 3 · Group B", ms:[
+    ["b1","B","SUI","CAN"],["b2","B","BIH","QAT"]
+  ]},
+  {date:"Wed · Jun 24 · 6 PM ET", note:"Matchday 3 · Group C", ms:[
     ["c1","C","SCO","BRA"],["c2","C","MAR","HAI"]
   ]},
-  {date:"Thu · Jun 25", note:"Matchday 3", ms:[
-    ["d1","D","TUR","USA"],["d2","D","PAR","AUS"],
-    ["e1","E","ECU","GER"],["e2","E","CUW","CIV"],
+  {date:"Wed · Jun 24 · 9 PM ET", note:"Matchday 3 · Group A", ms:[
+    ["a1","A","CZE","MEX"],["a2","A","RSA","KOR"]
+  ]},
+  {date:"Thu · Jun 25 · 4 PM ET", note:"Matchday 3 · Group E", ms:[
+    ["e1","E","ECU","GER"],["e2","E","CUW","CIV"]
+  ]},
+  {date:"Thu · Jun 25 · 7 PM ET", note:"Matchday 3 · Group F", ms:[
     ["f1","F","JPN","SWE"],["f2","F","TUN","NED"]
   ]},
-  {date:"Fri · Jun 26", note:"Matchday 3", ms:[
-    ["g1","G","EGY","IRN"],["g2","G","NZL","BEL"],
-    ["h1","H","CPV","KSA"],["h2","H","URU","ESP"],
+  {date:"Thu · Jun 25 · 10 PM ET", note:"Matchday 3 · Group D", ms:[
+    ["d1","D","TUR","USA"],["d2","D","PAR","AUS"]
+  ]},
+  {date:"Fri · Jun 26 · 3 PM ET", note:"Matchday 3 · Group I", ms:[
     ["i1","I","NOR","FRA"],["i2","I","SEN","IRQ"]
   ]},
-  {date:"Sat · Jun 27", note:"Matchday 3", ms:[
-    ["j1","J","ALG","AUT"],["j2","J","JOR","ARG"],
-    ["k2","K","COL","POR"],["k3","K","COD","UZB"],
+  {date:"Fri · Jun 26 · 8 PM ET", note:"Matchday 3 · Group H", ms:[
+    ["h1","H","CPV","KSA"],["h2","H","URU","ESP"]
+  ]},
+  {date:"Fri · Jun 26 · 11 PM ET", note:"Matchday 3 · Group G", ms:[
+    ["g1","G","EGY","IRN"],["g2","G","NZL","BEL"]
+  ]},
+  {date:"Sat · Jun 27 · 5 PM ET", note:"Matchday 3 · Group L", ms:[
     ["l1","L","PAN","ENG"],["l2","L","CRO","GHA"]
+  ]},
+  {date:"Sat · Jun 27 · 7:30 PM ET", note:"Matchday 3 · Group K", ms:[
+    ["k2","K","COL","POR"],["k3","K","COD","UZB"]
+  ]},
+  {date:"Sat · Jun 27 · 10 PM ET", note:"Matchday 3 · Group J", ms:[
+    ["j1","J","ALG","AUT"],["j2","J","JOR","ARG"]
   ]}
 ];
 
@@ -531,7 +578,7 @@ function renderBoard(){
     const rows = full
       ? t.map((c,i)=>gteam(i+1,c,s,full)).join("")
       : gteam(1,t[0],s,false)+gteam(2,t[1],s,false);
-    return `<div class="gcard" style="--gc:${GC[g]}">
+    return `<div class="gcard" data-grp="${g}" style="--gc:${GC[g]}">
         <div class="gcard__h"><span>${g}</span>${(LOCKED.has(t[0])&&LOCKED.has(t[1]))?'<span class="lkmark">🔒🔒</span>':''}</div>
         ${rows}
       </div>`;
@@ -578,7 +625,7 @@ function renderFixtures(){
   const s=statsWith(picks);
   fixturesEl.innerHTML = FIXTURES.map(day=>`
     <section class="day">
-      <h2 class="day__h">${day.date}<span class="tag">${day.note}</span></h2>
+      <h2 class="day__h">${day.date}<span class="tag">${day.note.replace(/Group ([A-L])/,'<span class="grp-link" data-grp="$1">Group $1</span>')}</span></h2>
       ${day.ms.map(([id,g,h,a])=>{
         const p=picks[id];
         const r=pickResult(p);
@@ -657,6 +704,57 @@ document.getElementById("share").addEventListener("click",()=>{
     ()=>toast("Link copied! "+n+"/24 picks"),
     ()=>{ prompt("Copy this link:",url); }
   );
+});
+
+/* group popup */
+const gpopOverlay=document.getElementById("gpopOverlay");
+const gpopEl=document.getElementById("gpop");
+
+function showGroupPopup(g){
+  const s=statsWith(picks);
+  const teams=Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
+  teams.sort((x,y)=>cmpRaw(s[x],s[y],x,y));
+  // compute W/D/L from PLAYED + picks
+  const wdl={};
+  teams.forEach(c=>wdl[c]={w:0,d:0,l:0,mp:0});
+  for(const [pg,h,hs,as_,a] of PLAYED){
+    if(pg!==g) continue;
+    wdl[h].mp++; wdl[a].mp++;
+    if(hs>as_){wdl[h].w++;wdl[a].l++;}else if(hs<as_){wdl[a].w++;wdl[h].l++;}else{wdl[h].d++;wdl[a].d++;}
+  }
+  for(const id in picks){
+    const p=picks[id]; if(!p) continue;
+    const [,fg,h,a]=fixById[id]; if(fg!==g) continue;
+    const r=pickResult(p);
+    wdl[h].mp++; wdl[a].mp++;
+    if(r==="H"){wdl[h].w++;wdl[a].l++;}else if(r==="A"){wdl[a].w++;wdl[h].l++;}else{wdl[h].d++;wdl[a].d++;}
+  }
+  gpopEl.style.setProperty("--gc",GC[g]);
+  gpopEl.innerHTML=`
+    <div class="gpop__h"><span>Group ${g}</span><button class="gpop__close">✕</button></div>
+    <table>
+      <tr><th style="text-align:left">Team</th><th>MP</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>
+      ${teams.map((c,i)=>{
+        const st=s[c], w=wdl[c];
+        const gd=st.gd;
+        return `<tr>
+          <td><div class="tm">${i+1} ${flag(c)} ${TEAMS[c].n}</div></td>
+          <td>${w.mp}</td><td>${w.w}</td><td>${w.d}</td><td>${w.l}</td>
+          <td>${gd>0?"+"+gd:gd}</td><td class="pts-col">${st.pts}</td>
+        </tr>`;
+      }).join("")}
+    </table>`;
+  gpopOverlay.classList.add("open");
+}
+
+gpopOverlay.addEventListener("click",e=>{
+  if(e.target===gpopOverlay||e.target.closest(".gpop__close"))
+    gpopOverlay.classList.remove("open");
+});
+
+document.addEventListener("click",e=>{
+  const grpLink=e.target.closest("[data-grp]");
+  if(grpLink){ showGroupPopup(grpLink.dataset.grp); return; }
 });
 
 renderFixtures();
