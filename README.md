@@ -1,13 +1,14 @@
-# Road to 32 — World Cup 2026 What-If
+# FIFA26 — World Cup 2026 What-If
 
 A phone-first, single-file web app for playing out the final World Cup 2026 group-stage results and watching the Round-of-32 field fill in live. Pick a winner (or draw) for each remaining match and the qualification board at the top recomputes instantly: 12 group winners, 12 runners-up, and the 8 best third-placed teams.
 
-**Live:** https://iprash.github.io/road-to-32/
+**Live:** https://iprash.github.io/FIFA26/
 
 ## What it does
 
-- Sticky **qualification board** of 32 slots that updates as you pick.
-- Six teams show a 🔒 because they're already mathematically through, no matter the scoreline (Mexico, USA, Germany, France, Norway, Argentina as of MD2).
+- Sticky **qualification board**: 12 colour-coded group cards (each with that group's winner + runner-up) plus a row of the 8 best third-placed teams, all updating as you pick.
+- Each group A–L has its own colour, and a third-placed team carries its group's colour into the third-place row so you can see where it came from.
+- Seven teams already show a 🔒 because they're mathematically through, no matter the scoreline (Mexico, USA, Germany, Argentina, France, Norway, Colombia).
 - All remaining matches grouped by date with a tap-to-pick `HOME / DRAW / AWAY` control.
 - Win = 3, draw = 1, loss = 0. Total points shown next to each team, live.
 
