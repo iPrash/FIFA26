@@ -94,18 +94,33 @@
   .dot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:3px;vertical-align:middle}
 
   /* ---------- controls ---------- */
+  .bar-wrap{
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    margin:0 -8px -6px;padding:0 8px 6px;
+  }
   .bar{
     display:flex;gap:8px;align-items:center;justify-content:space-between;
-    padding:10px 12px 4px;max-width:560px;margin:0 auto;
+    padding:7px 12px;max-width:560px;margin:0 auto;
   }
-  .bar p{margin:0;font-size:12px;color:var(--muted)}
+  .bar p{margin:0;font-size:11px;line-height:1.35;color:var(--muted)}
   .btn{
-    font:600 12px/1 system-ui;border:1px solid var(--line);background:#fff;
-    color:var(--ink);padding:7px 11px;border-radius:8px;cursor:pointer
+    font:600 9px/1.15 system-ui;border:1px solid var(--line);background:#fff;
+    color:var(--ink);padding:5px 7px;border-radius:6px;cursor:pointer;
+    text-align:center;white-space:nowrap
   }
   .btn:active{transform:translateY(1px)}
   .btn--danger{border-color:#c0392b;color:#c0392b}
   .btn--pitch{border-color:var(--pitch);color:var(--pitch-dk)}
+  .btn--share{border-color:var(--silver);color:#3c5a70}
+  .bar__btns{display:flex;gap:5px;flex-shrink:0}
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:#fff;padding:8px 16px;border-radius:8px;
+    font:600 12px/1.3 system-ui;z-index:999;opacity:0;transition:opacity .3s;
+    pointer-events:none
+  }
+  .toast.show{opacity:1}
 
   /* ---------- fixtures ---------- */
   main{max-width:560px;margin:0 auto;padding:4px 10px}
@@ -175,13 +190,18 @@
     <i>🔒 already qualified</i>
     <i>faded third = misses the cut</i>
   </div>
+  <div class="bar-wrap">
+    <div class="bar">
+      <p id="hint">Probable winners shown below.<br>Tap any match to change — board updates live.</p>
+      <div class="bar__btns">
+        <button class="btn btn--pitch" id="probable">Probable<br>Picks</button>
+        <button class="btn btn--share" id="share">Share<br>My Picks</button>
+        <button class="btn btn--danger" id="reset">Clear<br>Picks</button>
+      </div>
+    </div>
+  </div>
 </header>
-
-<div class="bar">
-  <p id="hint">Pick a winner in each match below — the board updates live.</p>
-  <button class="btn btn--pitch" id="probable">Probable picks</button>
-  <button class="btn btn--danger" id="reset">Clear picks</button>
-</div>
+<div class="toast" id="toast"></div>
 
 <main id="fixtures"></main>
 
@@ -340,8 +360,68 @@ function clinchedTop2(){
 }
 const LOCKED = clinchedTop2();
 
+/* =================== PERSISTENCE =================== */
+const FIX_IDS = allFix.map(m=>m[0]);  // ordered fixture IDs for encoding
+
+function savePicks(p){
+  try{ localStorage.setItem("fifa26_picks",JSON.stringify(p)); }catch(e){}
+}
+function loadPicks(){
+  try{ const v=localStorage.getItem("fifa26_picks"); return v?JSON.parse(v):{}; }catch(e){ return {}; }
+}
+function encodePicks(p){
+  return FIX_IDS.map(id=>({H:"H",A:"A",D:"D"}[p[id]])||"_").join("");
+}
+function decodePicks(str){
+  const p={};
+  FIX_IDS.forEach((id,i)=>{
+    const c=str[i]; if(c==="H"||c==="A"||c==="D") p[id]=c;
+  });
+  return p;
+}
+function toast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),2200);
+}
+
+// load from URL params first (shared link), else localStorage
+function initPicks(){
+  const params=new URLSearchParams(window.location.search);
+  const pp=params.get("p");
+  if(pp && pp.length===FIX_IDS.length){
+    const p=decodePicks(pp);
+    // clean URL without reload
+    window.history.replaceState({},"",window.location.pathname);
+    toast("Loaded shared picks!");
+    return p;
+  }
+  return loadPicks();
+}
+
+/* probable outcomes for Matchday 3 (source: The Athletic, Jun 2026 model) */
+const PROBABLE = {
+  a1:"A", a2:"A",   // CZE vs MEX → MEX; RSA vs KOR → KOR
+  b1:"A", b2:"H",   // SUI vs CAN → CAN; BIH vs QAT → BIH
+  c1:"A", c2:"H",   // SCO vs BRA → BRA; MAR vs HAI → MAR
+  d1:"A", d2:"A",   // TUR vs USA → USA; PAR vs AUS → AUS
+  e1:"A", e2:"A",   // ECU vs GER → GER; CUW vs CIV → CIV
+  f1:"H", f2:"A",   // JPN vs SWE → JPN; TUN vs NED → NED
+  g1:"H", g2:"A",   // EGY vs IRN → EGY; NZL vs BEL → BEL
+  h1:"H", h2:"A",   // CPV vs KSA → CPV; URU vs ESP → ESP
+  i1:"A", i2:"H",   // NOR vs FRA → FRA; SEN vs IRQ → SEN
+  j1:"A", j2:"A",   // ALG vs AUT → AUT; JOR vs ARG → ARG
+  k2:"A", k3:"H",   // COL vs POR → POR; COD vs UZB → COD
+  l1:"A", l2:"H"    // PAN vs ENG → ENG; CRO vs GHA → CRO
+};
+
 /* =================== STATE + RENDER =================== */
-let picks={};
+let picks=initPicks();
+// first visit: start with probable picks so the board is populated
+if(!Object.values(picks).some(Boolean)){
+  for(const id in PROBABLE) picks[id]=PROBABLE[id];
+  savePicks(picks);
+}
 
 /* 12 distinct hues, one per group (bright enough for the dark board) */
 const GC = {
@@ -417,40 +497,34 @@ function renderFixtures(){
     </section>`).join("");
 }
 
-/* probable outcomes for Matchday 3 (source: The Athletic, Jun 2026 model) */
-const PROBABLE = {
-  a1:"A", a2:"A",   // CZE vs MEX → MEX; RSA vs KOR → KOR
-  b1:"A", b2:"H",   // SUI vs CAN → CAN; BIH vs QAT → BIH
-  c1:"A", c2:"H",   // SCO vs BRA → BRA; MAR vs HAI → MAR
-  d1:"A", d2:"A",   // TUR vs USA → USA; PAR vs AUS → AUS
-  e1:"A", e2:"A",   // ECU vs GER → GER; CUW vs CIV → CIV
-  f1:"H", f2:"A",   // JPN vs SWE → JPN; TUN vs NED → NED
-  g1:"H", g2:"A",   // EGY vs IRN → EGY; NZL vs BEL → BEL
-  h1:"H", h2:"A",   // CPV vs KSA → CPV; URU vs ESP → ESP
-  i1:"A", i2:"H",   // NOR vs FRA → FRA; SEN vs IRQ → SEN
-  j1:"A", j2:"A",   // ALG vs AUT → AUT; JOR vs ARG → ARG
-  k2:"A", k3:"H",   // COL vs POR → POR; COD vs UZB → COD
-  l1:"A", l2:"H"    // PAN vs ENG → ENG; CRO vs GHA → CRO
-};
-
 /* one delegated listener handles every pick */
 fixturesEl.addEventListener("click",e=>{
   const btn=e.target.closest("[data-pick]"); if(!btn) return;
   const id=e.target.closest(".match").dataset.id;
   const want=btn.dataset.pick;
   picks[id] = (picks[id]===want) ? null : want;   // tap again to clear
-  renderFixtures(); renderBoard();
+  savePicks(picks); renderFixtures(); renderBoard();
 });
 
 document.getElementById("probable").addEventListener("click",()=>{
   for(const id in PROBABLE) picks[id]=PROBABLE[id];
-  renderFixtures(); renderBoard();
+  savePicks(picks); renderFixtures(); renderBoard();
 });
 
 document.getElementById("reset").addEventListener("click",()=>{
   if(!Object.values(picks).some(Boolean)) return;
   if(!confirm("Clear all picks?")) return;
-  picks={}; renderFixtures(); renderBoard();
+  picks={}; savePicks(picks); renderFixtures(); renderBoard();
+});
+
+document.getElementById("share").addEventListener("click",()=>{
+  const n=Object.values(picks).filter(Boolean).length;
+  if(!n){ toast("Make some picks first!"); return; }
+  const url=window.location.origin+window.location.pathname+"?p="+encodePicks(picks);
+  navigator.clipboard.writeText(url).then(
+    ()=>toast("Link copied! "+n+"/24 picks"),
+    ()=>{ prompt("Copy this link:",url); }
+  );
 });
 
 renderFixtures();
