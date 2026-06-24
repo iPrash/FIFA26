@@ -4,7 +4,7 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
-## [Unreleased] — 2026-06-24
+## [26194e4] — 2026-06-24
 
 ### Score Steppers
 - Added optional per-match score steppers that appear when a pick is made.
