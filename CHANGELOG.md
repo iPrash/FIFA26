@@ -4,6 +4,13 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-24 · 1:30 PM — What's New Popup
+
+- On first visit (per version), a small overlay highlights recent features: group standings, score steppers, kick-off times.
+- Dismisses on "Got it" tap or clicking outside. Uses `localStorage` to show only once per version bump.
+
+---
+
 ## 2026-06-24 · 12:45 PM — Group Popups & Kick-off Times
 
 ### Group Standings Popup

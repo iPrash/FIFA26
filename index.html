@@ -208,6 +208,25 @@
   .score-row .sdash{color:var(--muted);margin:0 2px}
 
   /* ----- group popup ----- */
+  .wnew-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .2s
+  }
+  .wnew-overlay.open{opacity:1;pointer-events:auto}
+  .wnew{
+    background:var(--board);color:var(--chalk);border-radius:12px;
+    padding:16px 18px;max-width:min(88vw,340px);
+    box-shadow:0 12px 40px rgba(0,0,0,.5);border-top:3px solid var(--pitch);
+    text-align:left
+  }
+  .wnew h3{margin:0 0 10px;font:800 14px/1.2 ui-monospace,monospace;color:var(--pitch)}
+  .wnew ul{margin:0 0 14px;padding-left:18px;font:12px/1.6 system-ui,sans-serif;color:#cde0d3}
+  .wnew li{margin-bottom:4px}
+  .wnew button{
+    display:block;width:100%;padding:8px;border:none;border-radius:6px;
+    background:var(--pitch);color:#fff;font:700 13px/1 system-ui,sans-serif;cursor:pointer
+  }
   .gpop-overlay{
     position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
     display:flex;align-items:center;justify-content:center;
@@ -273,6 +292,9 @@
   </div>
 </header>
 <div class="toast" id="toast"></div>
+<div class="wnew-overlay" id="wnewOverlay">
+  <div class="wnew" id="wnew"></div>
+</div>
 <div class="gpop-overlay" id="gpopOverlay">
   <div class="gpop" id="gpop"></div>
 </div>
@@ -762,6 +784,33 @@ document.addEventListener("click",e=>{
 
 renderFixtures();
 renderBoard();
+
+/* ── What's New popup (shows once per version) ── */
+const WNEW_VER="v3";
+try{
+  if(localStorage.getItem("fifa26_seen")!==WNEW_VER){
+    const wo=document.getElementById("wnewOverlay");
+    document.getElementById("wnew").innerHTML=`
+      <h3>What's New</h3>
+      <ul>
+        <li><b>Group standings:</b> tap any group card or group link to see full table</li>
+        <li><b>Score steppers:</b> adjust predicted scores — goal difference now counts</li>
+        <li><b>Kick-off times</b> shown for every fixture slot</li>
+      </ul>
+      <button id="wnewOk">Got it</button>`;
+    wo.classList.add("open");
+    document.getElementById("wnewOk").addEventListener("click",()=>{
+      wo.classList.remove("open");
+      try{localStorage.setItem("fifa26_seen",WNEW_VER);}catch(e){}
+    });
+    wo.addEventListener("click",e=>{
+      if(e.target===wo){
+        wo.classList.remove("open");
+        try{localStorage.setItem("fifa26_seen",WNEW_VER);}catch(e){}
+      }
+    });
+  }
+}catch(e){}
 </script>
 </body>
 </html>
