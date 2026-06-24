@@ -89,6 +89,26 @@
   .tchip .pt{margin-left:auto;font:700 9px/1 ui-monospace,monospace;color:#acc2b6;flex:none}
   .tchip.cut{opacity:.3}                  /* below the qualification line */
 
+  /* toggle switch */
+  .toggle{display:flex;align-items:center;gap:5px;cursor:pointer}
+  .toggle__lbl{font:600 8px/1 ui-monospace,monospace;color:#9fb3a7;letter-spacing:.02em}
+  .toggle__lbl.active{color:var(--chalk)}
+  .toggle__track{
+    width:26px;height:14px;background:rgba(255,255,255,.18);border-radius:7px;
+    position:relative;transition:background .2s;flex:none
+  }
+  .toggle__track.on{background:var(--pitch)}
+  .toggle__knob{
+    position:absolute;top:2px;left:2px;width:10px;height:10px;
+    background:#fff;border-radius:50%;transition:left .2s
+  }
+  .toggle__track.on .toggle__knob{left:14px}
+
+  /* full-group extras */
+  .gteam .gd{font:600 9px/1 ui-monospace,monospace;color:#8aa;margin-left:2px;flex:none}
+  .gteam.elim{opacity:.35}
+  .groups.full{grid-template-columns:repeat(3,1fr)}
+
   .board__legend{display:flex;gap:10px;flex-wrap:wrap;padding:6px 2px 0;font-size:9.5px;color:#9fb3a7}
   .board__legend i{font-style:normal}
   .dot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:3px;vertical-align:middle}
@@ -178,6 +198,11 @@
 <header class="board" id="board">
   <div class="board__head">
     <div class="board__title">FIFA<b>26</b></div>
+    <div class="toggle" id="viewToggle">
+      <span class="toggle__lbl active" id="tLblW">Winners</span>
+      <div class="toggle__track" id="tTrack"><div class="toggle__knob"></div></div>
+      <span class="toggle__lbl" id="tLblF">Full Group</span>
+    </div>
     <div class="board__count"><strong id="lockN">0</strong> qualified · <span id="fillN">0</span>/<span id="totN">24</span> picks</div>
   </div>
   <div class="boardbody">
@@ -192,7 +217,7 @@
   </div>
   <div class="bar-wrap">
     <div class="bar">
-      <p id="hint">Probable winners shown below.<br>Tap any match to change — board updates live.</p>
+      <p id="hint">Probable winners shown below.<br>Tap to change — board updates live.</p>
       <div class="bar__btns">
         <button class="btn btn--pitch" id="probable">Probable<br>Picks</button>
         <button class="btn btn--share" id="share">Share<br>My Picks</button>
@@ -429,19 +454,33 @@ const GC = {
   G:"#3fcfe6", H:"#48a6f5", I:"#6f86ff", J:"#a875ff", K:"#ee6ad6", L:"#ff6a9c"
 };
 
+let viewMode="winners";  // "winners" or "full"
 const groupsEl=document.getElementById("groups");
 const thirdsEl=document.getElementById("thirds");
 const fixturesEl=document.getElementById("fixtures");
 
+document.getElementById("viewToggle").addEventListener("click",()=>{
+  viewMode=viewMode==="winners"?"full":"winners";
+  const full=viewMode==="full";
+  document.getElementById("tTrack").classList.toggle("on",full);
+  document.getElementById("tLblW").classList.toggle("active",!full);
+  document.getElementById("tLblF").classList.toggle("active",full);
+  renderBoard();
+});
+
 function renderBoard(){
   const {tables,thirds,s}=standings(picks);
+  const full=viewMode==="full";
+  groupsEl.classList.toggle("full",full);
 
   groupsEl.innerHTML = GROUPS.map(g=>{
-    const w=tables[g][0], r=tables[g][1];
+    const t=tables[g];
+    const rows = full
+      ? t.map((c,i)=>gteam(i+1,c,s,full)).join("")
+      : gteam(1,t[0],s,false)+gteam(2,t[1],s,false);
     return `<div class="gcard" style="--gc:${GC[g]}">
-        <div class="gcard__h"><span>${g}</span>${(LOCKED.has(w)&&LOCKED.has(r))?'<span class="lkmark">🔒🔒</span>':''}</div>
-        ${gteam(1,w,s)}
-        ${gteam(2,r,s)}
+        <div class="gcard__h"><span>${g}</span>${(LOCKED.has(t[0])&&LOCKED.has(t[1]))?'<span class="lkmark">🔒🔒</span>':''}</div>
+        ${rows}
       </div>`;
   }).join("");
 
@@ -457,12 +496,16 @@ function renderBoard(){
   document.getElementById("fillN").textContent=Object.values(picks).filter(Boolean).length;
 }
 
-function gteam(rk,code,s){
+function gteam(rk,code,s,full){
   const lock=LOCKED.has(code);
-  const prov = !lock;                         // not yet mathematically settled
-  return `<div class="gteam ${prov?'prov':''}">
+  const prov = !lock && rk<=2;
+  const elim = rk>2 && !lock;
+  const gd=s[code].gd;
+  const gdStr=gd>0?"+"+gd:gd===0?"0":""+gd;
+  return `<div class="gteam ${prov?'prov':''} ${elim&&full?'elim':''}">
       <span class="rk">${rk}</span>${flag(code)}
       <span class="cd">${code}</span>
+      ${full?'<span class="gd">'+gdStr+'</span>':''}
       <span class="pt">${lock?'🔒 ':''}${s[code].pts}</span>
     </div>`;
 }
