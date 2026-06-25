@@ -582,6 +582,12 @@ function clinchedTop2(){
   const clinched=new Set();
   GROUPS.forEach(g=>{
     const rem=fixByGroup[g].filter(([id])=>!locked[id]), teams=Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
+    if(rem.length===0){
+      // group complete — top 2 from actual standings are locked
+      const sorted=teams.slice().sort((a,b)=>(BASE[b].pts-BASE[a].pts)||(BASE[b].gd-BASE[a].gd)||(BASE[b].gf-BASE[a].gf));
+      clinched.add(sorted[0]); clinched.add(sorted[1]);
+      return;
+    }
     const safe=Object.fromEntries(teams.map(t=>[t,true]));
     const N=Math.pow(3,rem.length);
     for(let mask=0;mask<N;mask++){
