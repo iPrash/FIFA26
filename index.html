@@ -1228,8 +1228,7 @@ const tabBtns = document.querySelectorAll(".tab");
 tabBtns.forEach(btn=>{
   btn.addEventListener("click",()=>{
     const idx = parseInt(btn.dataset.panel);
-    const panel = panelsEl.children[idx];
-    panel.scrollIntoView({behavior:"smooth",block:"nearest",inline:"start"});
+    panelsEl.scrollTo({left: idx * panelsEl.offsetWidth, behavior:"smooth"});
   });
 });
 
