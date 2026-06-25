@@ -579,9 +579,9 @@ function standings(picks){
    higher points. That can't be undone by any goal difference, so it's a true
    mathematical lock (matches the six teams FIFA lists as already qualified). */
 function clinchedTop2(){
-  const locked=new Set();
+  const clinched=new Set();
   GROUPS.forEach(g=>{
-    const rem=fixByGroup[g], teams=Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
+    const rem=fixByGroup[g].filter(([id])=>!locked[id]), teams=Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
     const safe=Object.fromEntries(teams.map(t=>[t,true]));
     const N=Math.pow(3,rem.length);
     for(let mask=0;mask<N;mask++){
@@ -596,9 +596,9 @@ function clinchedTop2(){
         if(above>1) safe[t]=false;
       });
     }
-    teams.forEach(t=>{ if(safe[t]) locked.add(t); });
+    teams.forEach(t=>{ if(safe[t]) clinched.add(t); });
   });
-  return locked;
+  return clinched;
 }
 let LOCKED = clinchedTop2();
 
