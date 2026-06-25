@@ -4,6 +4,21 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-25 · 11:00 AM — Venues & Polish
+
+### Stadium Venues
+- Every group stage match now shows its stadium and city centered above the team cards (e.g. "BC Place, Vancouver").
+- All knockout bracket matches (R32 through Final) show venue with kick-off time on the same line (e.g. "3:00 PM ET · MetLife Stadium, New Jersey").
+- Bracket date headers now include day-of-week to match group stage format.
+
+### UI Tweaks
+- Date line reordered: time → group → matchday (was matchday → group).
+- Group letter badges softened from black to muted grey.
+- All times standardized to `:00` format for whole hours.
+- "Final" badge for completed matches repositioned into venue row.
+
+---
+
 ## 2026-06-25 · 10:00 AM — Help Button
 
 - Added `?` help button in the board header — opens a brief overlay explaining all major features (Probable Picks, picking, score steppers, completed matches, knockout bracket, group standings, sharing).

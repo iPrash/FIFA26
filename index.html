@@ -193,12 +193,17 @@
   .day__h .grp-link{color:var(--pitch-dk);text-decoration:underline;text-decoration-style:dotted;cursor:pointer}
 
   .match{
-    display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:center;
+    display:grid;grid-template-columns:22px 1fr;gap:2px;align-items:center;
     background:#fff;border:1px solid var(--line);border-radius:10px;
-    padding:8px 9px;margin-bottom:7px;
+    padding:2px 9px 8px;margin-bottom:7px;
+  }
+  .match__venue{
+    grid-column:1/-1;position:relative;text-align:center;
+    font:600 10px/1 ui-monospace,monospace;color:var(--muted);
+    padding:0;margin:0;min-height:14px;
   }
   .match__grp{
-    font:800 11px/1 ui-monospace,monospace;color:#fff;background:var(--ink);
+    font:800 11px/1 ui-monospace,monospace;color:#fff;background:var(--muted);
     border-radius:5px;text-align:center;padding:5px 0;align-self:stretch;
     display:flex;align-items:center;justify-content:center
   }
@@ -254,7 +259,7 @@
   .match--locked .side:last-child .lk-score{margin-right:auto;padding-left:2px}
   .match--locked .lk-sep{display:flex;align-items:center;justify-content:center;padding:0 4px}
   .match--locked .lk-sep hr{width:16px;border:none;border-top:2px solid var(--line);margin:0}
-  .locked-badge{font:700 8px/1 ui-monospace,monospace;color:var(--pitch);text-transform:uppercase;letter-spacing:.04em;position:absolute;top:2px;right:6px}
+  .locked-badge{font:700 9px/1 ui-monospace,monospace;color:var(--pitch);text-transform:uppercase;letter-spacing:.04em;position:absolute;right:0;top:50%;transform:translateY(-50%)}
 
   /* ---------- knockout bracket ---------- */
   .ko-inner{max-width:560px;margin:0 auto;padding:4px 10px}
@@ -270,13 +275,14 @@
   .ko__round-h::after{content:"";flex:1;height:1px;background:var(--line)}
   .ko__grid{display:grid;grid-template-columns:1fr;gap:5px}
   .ko__match{
-    display:flex;align-items:center;
+    display:flex;flex-direction:column;
     background:#fff;border:1px solid var(--line);border-radius:8px;
-    padding:5px 7px;font:600 11px/1.2 ui-monospace,monospace;
+    padding:2px 7px 5px;font:600 11px/1.2 ui-monospace,monospace;
     gap:0
   }
+  .ko__venue{font:600 9px/1 ui-monospace,monospace;color:var(--muted);text-align:center;padding:1px 0}
+  .ko__row{display:flex;align-items:center;gap:0}
   .ko__mn{color:var(--muted);font-size:9px;flex:none;width:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px}
-  .ko__time{font:600 7px/1 ui-monospace,monospace;color:var(--pitch-dk);white-space:nowrap}
   .ko__slot{
     display:flex;align-items:center;gap:4px;flex:1;min-width:0;
     padding:2px 4px;border-radius:4px
@@ -462,41 +468,41 @@ const PLAYED = [
 
 /* remaining matches the user picks, grouped by date */
 const FIXTURES = [
-  {date:"Wed · Jun 24 · 3 PM ET", note:"Matchday 3 · Group B", ms:[
-    ["b1","B","SUI","CAN"],["b2","B","BIH","QAT"]
+  {date:"Wed · Jun 24 · 3:00 PM ET", note:"Group B · Matchday 3", ms:[
+    ["b1","B","SUI","CAN","BC Place, Vancouver"],["b2","B","BIH","QAT","Lumen Field, Seattle"]
   ]},
-  {date:"Wed · Jun 24 · 6 PM ET", note:"Matchday 3 · Group C", ms:[
-    ["c1","C","SCO","BRA"],["c2","C","MAR","HAI"]
+  {date:"Wed · Jun 24 · 6:00 PM ET", note:"Group C · Matchday 3", ms:[
+    ["c1","C","SCO","BRA","Hard Rock Stadium, Miami"],["c2","C","MAR","HAI","Mercedes-Benz Stadium, Atlanta"]
   ]},
-  {date:"Wed · Jun 24 · 9 PM ET", note:"Matchday 3 · Group A", ms:[
-    ["a1","A","CZE","MEX"],["a2","A","RSA","KOR"]
+  {date:"Wed · Jun 24 · 9:00 PM ET", note:"Group A · Matchday 3", ms:[
+    ["a1","A","CZE","MEX","Estadio Azteca, Mexico City"],["a2","A","RSA","KOR","Estadio BBVA, Monterrey"]
   ]},
-  {date:"Thu · Jun 25 · 4 PM ET", note:"Matchday 3 · Group E", ms:[
-    ["e1","E","ECU","GER"],["e2","E","CUW","CIV"]
+  {date:"Thu · Jun 25 · 4:00 PM ET", note:"Group E · Matchday 3", ms:[
+    ["e1","E","ECU","GER","MetLife Stadium, East Rutherford"],["e2","E","CUW","CIV","Lincoln Financial Field, Philadelphia"]
   ]},
-  {date:"Thu · Jun 25 · 7 PM ET", note:"Matchday 3 · Group F", ms:[
-    ["f1","F","JPN","SWE"],["f2","F","TUN","NED"]
+  {date:"Thu · Jun 25 · 7:00 PM ET", note:"Group F · Matchday 3", ms:[
+    ["f1","F","JPN","SWE","AT&T Stadium, Arlington"],["f2","F","TUN","NED","Arrowhead Stadium, Kansas City"]
   ]},
-  {date:"Thu · Jun 25 · 10 PM ET", note:"Matchday 3 · Group D", ms:[
-    ["d1","D","TUR","USA"],["d2","D","PAR","AUS"]
+  {date:"Thu · Jun 25 · 10:00 PM ET", note:"Group D · Matchday 3", ms:[
+    ["d1","D","TUR","USA","SoFi Stadium, Los Angeles"],["d2","D","PAR","AUS","Levi's Stadium, Santa Clara"]
   ]},
-  {date:"Fri · Jun 26 · 3 PM ET", note:"Matchday 3 · Group I", ms:[
-    ["i1","I","NOR","FRA"],["i2","I","SEN","IRQ"]
+  {date:"Fri · Jun 26 · 3:00 PM ET", note:"Group I · Matchday 3", ms:[
+    ["i1","I","NOR","FRA","Gillette Stadium, Foxborough"],["i2","I","SEN","IRQ","BMO Field, Toronto"]
   ]},
-  {date:"Fri · Jun 26 · 8 PM ET", note:"Matchday 3 · Group H", ms:[
-    ["h1","H","CPV","KSA"],["h2","H","URU","ESP"]
+  {date:"Fri · Jun 26 · 8:00 PM ET", note:"Group H · Matchday 3", ms:[
+    ["h1","H","CPV","KSA","NRG Stadium, Houston"],["h2","H","URU","ESP","Estadio Akron, Guadalajara"]
   ]},
-  {date:"Fri · Jun 26 · 11 PM ET", note:"Matchday 3 · Group G", ms:[
-    ["g1","G","EGY","IRN"],["g2","G","NZL","BEL"]
+  {date:"Fri · Jun 26 · 11:00 PM ET", note:"Group G · Matchday 3", ms:[
+    ["g1","G","EGY","IRN","Lumen Field, Seattle"],["g2","G","NZL","BEL","BC Place, Vancouver"]
   ]},
-  {date:"Sat · Jun 27 · 5 PM ET", note:"Matchday 3 · Group L", ms:[
-    ["l1","L","PAN","ENG"],["l2","L","CRO","GHA"]
+  {date:"Sat · Jun 27 · 5:00 PM ET", note:"Group L · Matchday 3", ms:[
+    ["l1","L","PAN","ENG","MetLife Stadium, East Rutherford"],["l2","L","CRO","GHA","Lincoln Financial Field, Philadelphia"]
   ]},
-  {date:"Sat · Jun 27 · 7:30 PM ET", note:"Matchday 3 · Group K", ms:[
-    ["k2","K","COL","POR"],["k3","K","COD","UZB"]
+  {date:"Sat · Jun 27 · 7:30 PM ET", note:"Group K · Matchday 3", ms:[
+    ["k2","K","COL","POR","Hard Rock Stadium, Miami"],["k3","K","COD","UZB","Mercedes-Benz Stadium, Atlanta"]
   ]},
-  {date:"Sat · Jun 27 · 10 PM ET", note:"Matchday 3 · Group J", ms:[
-    ["j1","J","ALG","AUT"],["j2","J","JOR","ARG"]
+  {date:"Sat · Jun 27 · 10:00 PM ET", note:"Group J · Matchday 3", ms:[
+    ["j1","J","ALG","AUT","Arrowhead Stadium, Kansas City"],["j2","J","JOR","ARG","AT&T Stadium, Arlington"]
   ]}
 ];
 
@@ -678,17 +684,37 @@ const SF_MATCHES = [
 const FINAL_MATCH = {m:104, home:"W101", away:"W102"};
 const THIRD_PLACE = {m:103, home:"L101", away:"L102"};
 
+/* Knockout match venues */
+const KO_VENUES = {
+  73:"SoFi Stadium, Los Angeles",       74:"Gillette Stadium, Boston",
+  75:"Estadio BBVA, Monterrey",         76:"NRG Stadium, Houston",
+  77:"MetLife Stadium, New Jersey",      78:"AT&T Stadium, Dallas",
+  79:"Estadio Azteca, Mexico City",      80:"Mercedes-Benz Stadium, Atlanta",
+  81:"Levi's Stadium, Santa Clara",      82:"Lumen Field, Seattle",
+  83:"BMO Field, Toronto",              84:"SoFi Stadium, Los Angeles",
+  85:"BC Place, Vancouver",             86:"Hard Rock Stadium, Miami",
+  87:"Arrowhead Stadium, Kansas City",   88:"AT&T Stadium, Dallas",
+  89:"Lincoln Financial Field, Philadelphia", 90:"NRG Stadium, Houston",
+  91:"MetLife Stadium, New Jersey",      92:"Estadio Azteca, Mexico City",
+  93:"AT&T Stadium, Dallas",            94:"Lumen Field, Seattle",
+  95:"Mercedes-Benz Stadium, Atlanta",   96:"BC Place, Vancouver",
+  97:"Gillette Stadium, Boston",         98:"SoFi Stadium, Los Angeles",
+  99:"Hard Rock Stadium, Miami",        100:"Arrowhead Stadium, Kansas City",
+  101:"AT&T Stadium, Dallas",           102:"Mercedes-Benz Stadium, Atlanta",
+  103:"Hard Rock Stadium, Miami",        104:"MetLife Stadium, New Jersey"
+};
+
 /* Knockout match dates + ET kick-off times */
 const KO_DATES = {
-  73:"Jun 28 · 3 PM",   74:"Jun 29 · 4:30 PM", 75:"Jun 29 · 9 PM",   76:"Jun 29 · 1 PM",
-  77:"Jun 30 · 5 PM",   78:"Jun 30 · 1 PM",    79:"Jun 30 · 9 PM",   80:"Jul 1 · 12 PM",
-  81:"Jul 1 · 8 PM",    82:"Jul 1 · 4 PM",     83:"Jul 2 · 7 PM",    84:"Jul 2 · 3 PM",
-  85:"Jul 2 · 11 PM",   86:"Jul 3 · 6 PM",     87:"Jul 3 · 9:30 PM", 88:"Jul 3 · 2 PM",
-  89:"Jul 4 · 5 PM",    90:"Jul 4 · 1 PM",     91:"Jul 5 · 4 PM",    92:"Jul 5 · 8 PM",
-  93:"Jul 6 · 3 PM",    94:"Jul 6 · 8 PM",     95:"Jul 7 · 12 PM",   96:"Jul 7 · 4 PM",
-  97:"Jul 9 · 4 PM",    98:"Jul 10 · 3 PM",    99:"Jul 11 · 5 PM",   100:"Jul 11 · 9 PM",
-  101:"Jul 14 · 3 PM",  102:"Jul 15 · 3 PM",
-  103:"Jul 18 · 5 PM",  104:"Jul 19 · 3 PM"
+  73:"Sat · Jun 28 · 3:00 PM ET",    74:"Sun · Jun 29 · 4:30 PM ET", 75:"Sun · Jun 29 · 9:00 PM ET",    76:"Sun · Jun 29 · 1:00 PM ET",
+  77:"Mon · Jun 30 · 5:00 PM ET",    78:"Mon · Jun 30 · 1:00 PM ET",    79:"Mon · Jun 30 · 9:00 PM ET",    80:"Tue · Jul 1 · 12:00 PM ET",
+  81:"Tue · Jul 1 · 8:00 PM ET",     82:"Tue · Jul 1 · 4:00 PM ET",     83:"Wed · Jul 2 · 7:00 PM ET",     84:"Wed · Jul 2 · 3:00 PM ET",
+  85:"Wed · Jul 2 · 11:00 PM ET",    86:"Thu · Jul 3 · 6:00 PM ET",     87:"Thu · Jul 3 · 9:30 PM ET",  88:"Thu · Jul 3 · 2:00 PM ET",
+  89:"Fri · Jul 4 · 5:00 PM ET",     90:"Fri · Jul 4 · 1:00 PM ET",     91:"Sat · Jul 5 · 4:00 PM ET",     92:"Sat · Jul 5 · 8:00 PM ET",
+  93:"Sun · Jul 6 · 3:00 PM ET",     94:"Sun · Jul 6 · 8:00 PM ET",     95:"Mon · Jul 7 · 12:00 PM ET",    96:"Mon · Jul 7 · 4:00 PM ET",
+  97:"Wed · Jul 9 · 4:00 PM ET",     98:"Thu · Jul 10 · 3:00 PM ET",    99:"Fri · Jul 11 · 5:00 PM ET",   100:"Fri · Jul 11 · 9:00 PM ET",
+  101:"Mon · Jul 14 · 3:00 PM ET",  102:"Tue · Jul 15 · 3:00 PM ET",
+  103:"Fri · Jul 18 · 5:00 PM ET",  104:"Sat · Jul 19 · 3:00 PM ET"
 };
 
 /* ---- Knockout resolution engine ---- */
@@ -935,12 +961,13 @@ function renderFixtures(){
   const s=statsWith(picks);
   fixturesEl.innerHTML = FIXTURES.map(day=>`
     <section class="day">
-      <h2 class="day__h">${day.date}<span class="tag">${day.note.replace(/Group ([A-L])/,'<span class="grp-link" data-grp="$1">Group $1</span>')}</span></h2>
-      ${day.ms.map(([id,g,h,a])=>{
+      <h2 class="day__h">${day.date} · <span class="tag">${day.note.replace(/Group ([A-L])/,'<span class="grp-link" data-grp="$1">Group $1</span>')}</span></h2>
+      ${day.ms.map(([id,g,h,a,venue])=>{
         const lk=locked[id];
         const p=picks[id];
         const r=pickResult(p);
         const sc=pickScores(p);
+        const venueHtml = venue ? `<div class="match__venue"><span>${venue}</span>${lk?'<span class="locked-badge">Final</span>':''}</div>` : '';
         if(lk){
           // confirmed result — compact read-only display
           const isDraw = lk.s1===lk.s2;
@@ -958,17 +985,18 @@ function renderFixtures(){
               <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n} (${pts})</span></span>
               <span class="lk-score">${score}</span>
             </button>`;
-          return `<div class="match match--locked" data-id="${id}" style="position:relative">
+          return `<div class="match match--locked" data-id="${id}">
+            ${venueHtml}
             <div class="match__grp">${g}</div>
             <div class="pick">
               ${lkSide(h,lk.s1,hCls,s[h].pts,false)}
               <div class="lk-sep"><hr></div>
               ${lkSide(a,lk.s2,aCls,s[a].pts,true)}
             </div>
-            <span class="locked-badge">Final</span>
           </div>`;
         }
         return `<div class="match" data-id="${id}">
+          ${venueHtml}
           <div class="match__grp">${g}</div>
           <div class="pick">
             ${side(h,r,"H",s[h].pts)}
@@ -1003,8 +1031,8 @@ function koSlot(code, groupLetter, label){
 function parseKoDate(m){
   const s = KO_DATES[m] || "";
   const parts = s.split(" · ");
-  const date = parts[0] || s;
-  const time = parts[1] || "";
+  const date = parts.length >= 3 ? parts[0] + " · " + parts[1] : (parts[0] || s);
+  const time = parts.length >= 3 ? parts[2] : (parts[1] || "");
   // sortKey: convert time to minutes for ordering
   let mins = 0;
   if(time){
@@ -1051,8 +1079,13 @@ function renderBracket(){
   let html = "";
 
   // helper: match number + time label
-  function mnTime(m, time){
-    return `<span class="ko__mn">${m}${time?`<span class="ko__time">${time}</span>`:""}</span>`;
+  function mnTime(m){
+    return `<span class="ko__mn">${m}</span>`;
+  }
+  function koVenue(m, time){
+    const v = KO_VENUES[m];
+    const t = time ? `${time} · ` : "";
+    return v ? `<div class="ko__venue">${t}${v}</div>` : (time ? `<div class="ko__venue">${time}</div>` : "");
   }
 
   // R32
@@ -1062,10 +1095,11 @@ function renderBracket(){
     const hg = r.home ? TEAMS[r.home].g : null;
     const ag = r.away ? TEAMS[r.away].g : null;
     return `<div class="ko__match">
-      ${mnTime(match.m,time)}
+      ${koVenue(match.m,time)}
+      <div class="ko__row">${mnTime(match.m)}
       ${koSlot(r.home, hg, sl.home)}
       <span class="ko__vs">vs</span>
-      ${koSlot(r.away, ag, sl.away)}
+      ${koSlot(r.away, ag, sl.away)}</div>
     </div>`;
   });
 
@@ -1077,50 +1111,55 @@ function renderBracket(){
     const homeLabel = hr.home && hr.away ? `${hr.home}/${hr.away}` : match.home;
     const awayLabel = ar.home && ar.away ? `${ar.home}/${ar.away}` : match.away;
     return `<div class="ko__match">
-      ${mnTime(match.m,time)}
+      ${koVenue(match.m,time)}
+      <div class="ko__row">${mnTime(match.m)}
       <span class="ko__slot ko__slot--tbd"><span class="cd">${homeLabel}</span></span>
       <span class="ko__vs">vs</span>
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${awayLabel}</span></span>
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${awayLabel}</span></span></div>
     </div>`;
   });
 
   // QF
   html += koRoundHtml("Quarter-Finals", QF_MATCHES, (match,time)=>{
     return `<div class="ko__match">
-      ${mnTime(match.m,time)}
+      ${koVenue(match.m,time)}
+      <div class="ko__row">${mnTime(match.m)}
       <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
       <span class="ko__vs">vs</span>
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span>
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span></div>
     </div>`;
   });
 
   // SF
   html += koRoundHtml("Semi-Finals", SF_MATCHES, (match,time)=>{
     return `<div class="ko__match">
-      ${mnTime(match.m,time)}
+      ${koVenue(match.m,time)}
+      <div class="ko__row">${mnTime(match.m)}
       <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
       <span class="ko__vs">vs</span>
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span>
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span></div>
     </div>`;
   });
 
   // Final
   html += koRoundHtml("Final", [FINAL_MATCH], (match,time)=>{
     return `<div class="ko__match">
-      ${mnTime(match.m,time)}
+      ${koVenue(match.m,time)}
+      <div class="ko__row">${mnTime(match.m)}
       <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
       <span class="ko__vs">vs</span>
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span>
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span></div>
     </div>`;
   });
 
   // Third Place
   html += koRoundHtml("Third Place", [THIRD_PLACE], (match,time)=>{
     return `<div class="ko__match">
-      ${mnTime(match.m,time)}
+      ${koVenue(match.m,time)}
+      <div class="ko__row">${mnTime(match.m)}
       <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
       <span class="ko__vs">vs</span>
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span>
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span></div>
     </div>`;
   });
 
