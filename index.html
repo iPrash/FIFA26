@@ -214,11 +214,13 @@
     transition:border-color .12s,background .12s;
   }
   .side.away{flex-direction:row-reverse;text-align:right}
+  .match--locked .side.away{flex-direction:row}
   .flag{display:inline-block;border-radius:2px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.14)}
   .side .flag{width:26px;height:19px;flex:none}
   .side .cd{font:700 13px/1 ui-monospace,monospace;letter-spacing:.02em}
   .side .nm{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .side .stack{min-width:0;display:flex;flex-direction:column;gap:1px}
+  .side .stack{min-width:0;display:flex;flex-direction:column;gap:1px;align-items:flex-start}
+  .side.away .stack{align-items:flex-end}
   .draw{
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     border:1.5px solid var(--line);background:#fff;border-radius:8px;
@@ -295,7 +297,7 @@
   .ko__slot--tbd{opacity:.35}
   .ko__slot--tbd .cd{font-style:italic;font-weight:600}
   .ko__slot--home{border-left:3px solid var(--gc,var(--line))}
-  .ko__slot--away{border-right:3px solid var(--gc,var(--line))}
+  .ko__slot--away{border-right:3px solid var(--gc,var(--line));justify-content:flex-end;text-align:right}
   .ko__date-h{
     display:flex;align-items:center;gap:8px;margin:10px 2px 5px;
     font:800 11px/1 ui-monospace,monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--pitch-dk)
@@ -975,10 +977,10 @@ function renderFixtures(){
           const hCls = hWin?'lk-win':isDraw?'lk-draw':'dim';
           const aCls = aWin?'lk-win':isDraw?'lk-draw':'dim';
           const lkSide = (code,score,cls,pts,isAway)=>isAway
-            ? `<button class="side ${cls}" data-pick="">
+            ? `<button class="side away ${cls}" data-pick="">
               <span class="lk-score">${score}</span>
-              ${flag(code)}
               <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n} (${pts})</span></span>
+              ${flag(code)}
             </button>`
             : `<button class="side ${cls}" data-pick="">
               ${flag(code)}
@@ -1020,10 +1022,11 @@ function renderFixtures(){
 }
 
 /* ---- Bracket rendering ---- */
-function koSlot(code, groupLetter, label){
+function koSlot(code, groupLetter, label, isAway){
   if(!code) return `<span class="ko__slot ko__slot--tbd"><span class="cd">${label||"TBD"}</span></span>`;
   const gc = groupLetter ? GC[groupLetter] : "var(--line)";
   const grpTag = groupLetter ? `<span class="ko__grp" style="color:${gc}">${groupLetter}</span>` : "";
+  if(isAway) return `<span class="ko__slot ko__slot--away" style="--gc:${gc}"><span class="nm">${TEAMS[code].n}</span> <span class="cd">${code}</span> ${flag(code)}${grpTag}</span>`;
   return `<span class="ko__slot ko__slot--home" style="--gc:${gc}">${grpTag}${flag(code)} <span class="cd">${code}</span> <span class="nm">${TEAMS[code].n}</span></span>`;
 }
 
@@ -1099,7 +1102,7 @@ function renderBracket(){
       <div class="ko__row">${mnTime(match.m)}
       ${koSlot(r.home, hg, sl.home)}
       <span class="ko__vs">vs</span>
-      ${koSlot(r.away, ag, sl.away)}</div>
+      ${koSlot(r.away, ag, sl.away, true)}</div>
     </div>`;
   });
 
