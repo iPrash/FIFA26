@@ -4,6 +4,21 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-25 · 1:00 PM — Bug Fix & Mirror Layout
+
+### Bug Fix
+- Fixed R32 third-place team mapping (`THIRD_HOST_TO_MATCH` was scrambled), which caused illegal same-group pairings (e.g. GER vs ECU rematch).
+
+### UI
+- Team cards now mirror-image: home = flag left / left-aligned text, away = right-aligned text / flag right. Applied to both group stage and bracket.
+- Tightened date line spacing (smaller gap, letter-spacing) and added `white-space:nowrap` to prevent wrapping.
+- Bracket team flags (22×16px) and fonts (13px code, 10px name) bumped up to match group stage.
+
+### Data
+- Scores updated through Jun 25 (Group A MD3, Group B MD3, Group C MD3, Group E MD3).
+
+---
+
 ## 2026-06-25 · 11:00 AM — Venues & Polish
 
 ### Stadium Venues
