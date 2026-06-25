@@ -4,6 +4,26 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-24 · 4:30 PM — Live Scores & Bracket
+
+### Live Score Integration
+- Scores now loaded from `scores.json` on page load — update match results by editing the JSON file on GitHub, no code changes needed.
+- Confirmed matches render as compact locked cards: scores inline on team buttons, winner highlighted in green, "Final" badge.
+- Locked matches are read-only — no accidental overwriting of real results.
+- Clinched teams (🔒) always appear in the knockout bracket, even with no picks set.
+
+### Knockout Bracket
+- Full R32 → R16 → QF → SF → Final bracket, swipeable on mobile (tap "Bracket" tab).
+- Bracket updates live as you change picks. All 16 R32 pairings follow official FIFA Annex C mapping.
+- Third-place allocation resolves automatically when all 12 groups are complete.
+- Matches grouped by date with kick-off times.
+
+### Fixes
+- Clear Picks now preserves confirmed match results.
+- Fixed double-counting bug where locked scores were applied twice to standings.
+
+---
+
 ## 2026-06-24 · 1:30 PM — What's New Popup
 
 - On first visit (per version), a small overlay highlights recent features: group standings, score steppers, kick-off times.

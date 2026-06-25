@@ -29,7 +29,7 @@
   body{
     background:var(--paper);color:var(--ink);
     font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    padding-bottom:48px;
+    overflow-x:hidden;
   }
   .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
 
@@ -145,8 +145,44 @@
   }
   .toast.show{opacity:1}
 
+  /* ---------- panel container (swipeable on mobile, side-by-side on desktop) ---------- */
+  .panels{
+    display:flex;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scroll-behavior:smooth;
+  }
+  .panel{
+    flex:0 0 100%;
+    min-width:0;
+    scroll-snap-align:start;
+  }
+  .panel--fixtures{padding-bottom:48px}
+  .panel--bracket{padding-bottom:48px}
+
+  /* tab bar (mobile only) */
+  .tabs{
+    display:flex;gap:0;border-bottom:1px solid var(--line);
+    background:var(--paper);max-width:560px;margin:0 auto;padding:0 10px;
+  }
+  .tab{
+    flex:1;padding:8px 0 6px;text-align:center;
+    font:700 11px/1 ui-monospace,monospace;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;
+    background:none;border-top:none;border-left:none;border-right:none;
+    transition:color .2s,border-color .2s
+  }
+  .tab.active{color:var(--pitch-dk);border-bottom-color:var(--pitch)}
+
+  @media(min-width:768px){
+    .panels{overflow:visible;scroll-snap-type:none}
+    .panel{flex:0 0 50%}
+    .tabs{display:none}
+  }
+
   /* ---------- fixtures ---------- */
-  main{max-width:560px;margin:0 auto;padding:4px 10px}
+  .fix-inner{max-width:560px;margin:0 auto;padding:4px 10px}
   .day{margin-top:14px}
   .day__h{
     display:flex;align-items:center;gap:8px;margin:0 2px 7px;
@@ -207,7 +243,60 @@
   .score-row .sval{width:18px;text-align:center}
   .score-row .sdash{color:var(--muted);margin:0 2px}
 
-  /* ----- group popup ----- */
+  /* locked (confirmed) match */
+  .match--locked{opacity:1;border-color:var(--pitch);background:rgba(31,157,87,.06)}
+  .match--locked .pick{pointer-events:none}
+  .match--locked .side{cursor:default;border-color:var(--line)}
+  .match--locked .side.lk-win{background:rgba(31,157,87,.18);border-color:var(--pitch)}
+  .match--locked .side.lk-draw{background:rgba(31,157,87,.08)}
+  .match--locked .lk-score{font:800 15px/1 ui-monospace,monospace;color:var(--pitch-dk)}
+  .match--locked .side:first-child .lk-score{margin-left:auto;padding-right:2px}
+  .match--locked .side:last-child .lk-score{margin-right:auto;padding-left:2px}
+  .match--locked .lk-sep{display:flex;align-items:center;justify-content:center;padding:0 4px}
+  .match--locked .lk-sep hr{width:16px;border:none;border-top:2px solid var(--line);margin:0}
+  .locked-badge{font:700 8px/1 ui-monospace,monospace;color:var(--pitch);text-transform:uppercase;letter-spacing:.04em;position:absolute;top:2px;right:6px}
+
+  /* ---------- knockout bracket ---------- */
+  .ko-inner{max-width:560px;margin:0 auto;padding:4px 10px}
+  .ko-note{
+    text-align:center;padding:20px 10px;color:var(--muted);
+    font:600 12px/1.5 system-ui,sans-serif
+  }
+  .ko__round{margin-bottom:12px}
+  .ko__round-h{
+    display:flex;align-items:center;gap:8px;margin:0 2px 7px;
+    font:800 12px/1 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--pitch-dk)
+  }
+  .ko__round-h::after{content:"";flex:1;height:1px;background:var(--line)}
+  .ko__grid{display:grid;grid-template-columns:1fr;gap:5px}
+  .ko__match{
+    display:flex;align-items:center;
+    background:#fff;border:1px solid var(--line);border-radius:8px;
+    padding:5px 7px;font:600 11px/1.2 ui-monospace,monospace;
+    gap:0
+  }
+  .ko__mn{color:var(--muted);font-size:9px;flex:none;width:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px}
+  .ko__time{font:600 7px/1 ui-monospace,monospace;color:var(--pitch-dk);white-space:nowrap}
+  .ko__slot{
+    display:flex;align-items:center;gap:4px;flex:1;min-width:0;
+    padding:2px 4px;border-radius:4px
+  }
+  .ko__slot .flag{width:18px;height:13px;flex:none}
+  .ko__slot .cd{font:700 11px/1 ui-monospace,monospace;white-space:nowrap}
+  .ko__slot .nm{font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ko__grp{font:800 8px/1 ui-monospace,monospace;flex:none;opacity:.8}
+  .ko__vs{color:var(--muted);font-size:9px;flex:none;margin:0 3px}
+  .ko__slot--tbd{opacity:.35}
+  .ko__slot--tbd .cd{font-style:italic;font-weight:600}
+  .ko__slot--home{border-left:3px solid var(--gc,var(--line))}
+  .ko__slot--away{border-right:3px solid var(--gc,var(--line))}
+  .ko__date-h{
+    display:flex;align-items:center;gap:8px;margin:10px 2px 5px;
+    font:800 11px/1 ui-monospace,monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--pitch-dk)
+  }
+  .ko__date-h::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  /* ----- popups ----- */
   .wnew-overlay{
     position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;
     display:flex;align-items:center;justify-content:center;
@@ -299,13 +388,26 @@
   <div class="gpop" id="gpop"></div>
 </div>
 
-<main id="fixtures"></main>
+<!-- Tab bar for mobile -->
+<div class="tabs" id="tabs">
+  <button class="tab active" data-panel="0">Group Matches</button>
+  <button class="tab" data-panel="1">Knockout Bracket</button>
+</div>
 
-<footer>
-  <p class="asof">Standings as of end of Matchday 2 (Jun 23, 2026), both rounds complete. The 24 Matchday-3 games remain.</p>
-  <p><b>How it works:</b> win = 3, draw = 1, loss = 0. Pick a winner then adjust the scoreline with the steppers — goal difference updates live. Tied teams are ordered by points → GD → goals scored. The 8 best third-placed teams take the final 8 R32 slots. A <b>🔒</b> means a team is mathematically through regardless of remaining results.</p>
-  <p>Each group is colour-coded A–L; that colour follows a team into the third-place row so you can see where it came from. Edit the <code>TEAMS</code> / <code>PLAYED</code> / <code>FIXTURES</code> blocks in the source to correct any result.</p>
-</footer>
+<!-- Two-panel container -->
+<div class="panels" id="panels">
+  <div class="panel panel--fixtures">
+    <div class="fix-inner" id="fixtures"></div>
+    <footer>
+      <p class="asof">Standings as of end of Matchday 2 (Jun 23, 2026), both rounds complete. The 24 Matchday-3 games remain.</p>
+      <p><b>How it works:</b> win = 3, draw = 1, loss = 0. Pick a winner then adjust the scoreline with the steppers — goal difference updates live. Tied teams are ordered by points → GD → goals scored. The 8 best third-placed teams take the final 8 R32 slots. A <b>🔒</b> means a team is mathematically through regardless of remaining results.</p>
+      <p>Each group is colour-coded A–L; that colour follows a team into the third-place row so you can see where it came from. Edit the <code>TEAMS</code> / <code>PLAYED</code> / <code>FIXTURES</code> blocks in the source to correct any result.</p>
+    </footer>
+  </div>
+  <div class="panel panel--bracket">
+    <div class="ko-inner" id="bracket"></div>
+  </div>
+</div>
 
 <script>
 /* =================== DATA =================== */
@@ -393,6 +495,13 @@ const allFix = FIXTURES.flatMap(d=>d.ms);          // [id,g,h,a]
 const fixById = Object.fromEntries(allFix.map(m=>[m[0],m]));
 const fixByGroup = Object.fromEntries(GROUPS.map(g=>[g,allFix.filter(m=>m[1]===g)]));
 
+/* locked = fixture IDs with confirmed real scores from scores.json */
+const locked = {};  // id -> {s1, s2}
+
+/* reverse lookup: "SUI|CAN" -> fixture id, so we can match scores.json to fixtures */
+const fixByTeams = {};
+allFix.forEach(([id,g,h,a])=>{ fixByTeams[h+"|"+a]=id; });
+
 // seed order = current standing within group, used as the final tiebreaker
 const seedIndex = {};
 
@@ -406,14 +515,17 @@ function baseStats(){
   for(const c in s) s[c].gd=s[c].gf-s[c].ga;
   return s;
 }
-const BASE = baseStats();
+let BASE = baseStats();
 
 // establish seed order from base standings
-GROUPS.forEach(g=>{
-  const teams=Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
-  teams.sort((x,y)=>cmpRaw(BASE[x],BASE[y],x,y,0));
-  teams.forEach((c,i)=>seedIndex[c]=i);
-});
+function buildSeedIndex(){
+  GROUPS.forEach(g=>{
+    const teams=Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
+    teams.sort((x,y)=>cmpRaw(BASE[x],BASE[y],x,y,0));
+    teams.forEach((c,i)=>seedIndex[c]=i);
+  });
+}
+buildSeedIndex();
 
 function cmpRaw(A,B,ca,cb,extra){
   return (B.pts-A.pts) || (B.gd-A.gd) || (B.gf-A.gf) || ((seedIndex[ca]??0)-(seedIndex[cb]??0));
@@ -424,6 +536,7 @@ function statsWith(picks){
   const s={}; for(const c in BASE) s[c]={...BASE[c]};
   for(const id in picks){
     const p=picks[id]; if(!p) continue;
+    if(locked[id]) continue; // already counted in BASE via PLAYED
     const [,, h,a]=fixById[id];
     const r = typeof p==="object" ? p.r : p;
     const hs = typeof p==="object" ? p.hs : (r==="H"?1:r==="D"?0:0);
@@ -487,7 +600,161 @@ function clinchedTop2(){
   });
   return locked;
 }
-const LOCKED = clinchedTop2();
+let LOCKED = clinchedTop2();
+
+/* =================== KNOCKOUT BRACKET DATA =================== */
+/* Inlined from r32-bracket.js — FIFA Annex C */
+const R32_MATCHES = [
+  {m:73, home:"2A", away:"2B"},
+  {m:74, home:"1E", away:{third:["A","B","C","D","F"]}},
+  {m:75, home:"1F", away:"2C"},
+  {m:76, home:"1C", away:"2F"},
+  {m:77, home:"1I", away:{third:["C","D","F","G","H"]}},
+  {m:78, home:"2E", away:"2I"},
+  {m:79, home:"1A", away:{third:["C","E","F","H","I"]}},
+  {m:80, home:"1L", away:{third:["E","H","I","J","K"]}},
+  {m:81, home:"1D", away:{third:["B","E","F","I","J"]}},
+  {m:82, home:"1G", away:{third:["A","E","H","I","J"]}},
+  {m:83, home:"2K", away:"2L"},
+  {m:84, home:"1H", away:"2J"},
+  {m:85, home:"1B", away:{third:["E","F","G","I","J"]}},
+  {m:86, home:"1J", away:"2H"},
+  {m:87, home:"1K", away:{third:["D","E","I","J","L"]}},
+  {m:88, home:"2D", away:"2G"}
+];
+const THIRD_COLS = ["A","B","D","E","G","I","K","L"];
+const THIRD_MAP = {"EFGHIJKL":"EJIFHGLK","DFGHIJKL":"HGIDJFLK","DEGHIJKL":"EJIDHGLK","DEFHIJKL":"EJIDHFLK","DEFGIJKL":"EGIDJFLK","DEFGHJKL":"EGJDHFLK","DEFGHIKL":"EGIDHFLK","DEFGHIJL":"EGJDHFLI","DEFGHIJK":"EGJDHFIK","CFGHIJKL":"HGICJFLK","CEGHIJKL":"EJICHGLK","CEFHIJKL":"EJICHFLK","CEFGIJKL":"EGICJFLK","CEFGHJKL":"EGJCHFLK","CEFGHIKL":"EGICHFLK","CEFGHIJL":"EGJCHFLI","CEFGHIJK":"EGJCHFIK","CDGHIJKL":"HGICJDLK","CDFHIJKL":"CJIDHFLK","CDFGIJKL":"CGIDJFLK","CDFGHJKL":"CGJDHFLK","CDFGHIKL":"CGIDHFLK","CDFGHIJL":"CGJDHFLI","CDFGHIJK":"CGJDHFIK","CDEHIJKL":"EJICHDLK","CDEGIJKL":"EGICJDLK","CDEGHJKL":"EGJCHDLK","CDEGHIKL":"EGICHDLK","CDEGHIJL":"EGJCHDLI","CDEGHIJK":"EGJCHDIK","CDEFIJKL":"CJEDIFLK","CDEFHJKL":"CJEDHFLK","CDEFHIKL":"CEIDHFLK","CDEFHIJL":"CJEDHFLI","CDEFHIJK":"CJEDHFIK","CDEFGJKL":"CGEDJFLK","CDEFGIKL":"CGEDIFLK","CDEFGIJL":"CGEDJFLI","CDEFGIJK":"CGEDJFIK","CDEFGHKL":"CGEDHFLK","CDEFGHJL":"CGJDHFLE","CDEFGHJK":"CGJDHFEK","CDEFGHIL":"CGEDHFLI","CDEFGHIK":"CGEDHFIK","CDEFGHIJ":"CGJDHFEI","BFGHIJKL":"HJBFIGLK","BEGHIJKL":"EJIBHGLK","BEFHIJKL":"EJBFIHLK","BEFGIJKL":"EJBFIGLK","BEFGHJKL":"EJBFHGLK","BEFGHIKL":"EGBFIHLK","BEFGHIJL":"EJBFHGLI","BEFGHIJK":"EJBFHGIK","BDGHIJKL":"HJBDIGLK","BDFHIJKL":"HJBDIFLK","BDFGIJKL":"IGBDJFLK","BDFGHJKL":"HGBDJFLK","BDFGHIKL":"HGBDIFLK","BDFGHIJL":"HGBDJFLI","BDFGHIJK":"HGBDJFIK","BDEHIJKL":"EJBDIHLK","BDEGIJKL":"EJBDIGLK","BDEGHJKL":"EJBDHGLK","BDEGHIKL":"EGBDIHLK","BDEGHIJL":"EJBDHGLI","BDEGHIJK":"EJBDHGIK","BDEFIJKL":"EJBDIFLK","BDEFHJKL":"EJBDHFLK","BDEFHIKL":"EIBDHFLK","BDEFHIJL":"EJBDHFLI","BDEFHIJK":"EJBDHFIK","BDEFGJKL":"EGBDJFLK","BDEFGIKL":"EGBDIFLK","BDEFGIJL":"EGBDJFLI","BDEFGIJK":"EGBDJFIK","BDEFGHKL":"EGBDHFLK","BDEFGHJL":"HGBDJFLE","BDEFGHJK":"HGBDJFEK","BDEFGHIL":"EGBDHFLI","BDEFGHIK":"EGBDHFIK","BDEFGHIJ":"HGBDJFEI","BCGHIJKL":"HJBCIGLK","BCFHIJKL":"HJBCIFLK","BCFGIJKL":"IGBCJFLK","BCFGHJKL":"HGBCJFLK","BCFGHIKL":"HGBCIFLK","BCFGHIJL":"HGBCJFLI","BCFGHIJK":"HGBCJFIK","BCEHIJKL":"EJBCIHLK","BCEGIJKL":"EJBCIGLK","BCEGHJKL":"EJBCHGLK","BCEGHIKL":"EGBCIHLK","BCEGHIJL":"EJBCHGLI","BCEGHIJK":"EJBCHGIK","BCEFIJKL":"EJBCIFLK","BCEFHJKL":"EJBCHFLK","BCEFHIKL":"EIBCHFLK","BCEFHIJL":"EJBCHFLI","BCEFHIJK":"EJBCHFIK","BCEFGJKL":"EGBCJFLK","BCEFGIKL":"EGBCIFLK","BCEFGIJL":"EGBCJFLI","BCEFGIJK":"EGBCJFIK","BCEFGHKL":"EGBCHFLK","BCEFGHJL":"HGBCJFLE","BCEFGHJK":"HGBCJFEK","BCEFGHIL":"EGBCHFLI","BCEFGHIK":"EGBCHFIK","BCEFGHIJ":"HGBCJFEI","BCDHIJKL":"HJBCIDLK","BCDGIJKL":"IGBCJDLK","BCDGHJKL":"HGBCJDLK","BCDGHIKL":"HGBCIDLK","BCDGHIJL":"HGBCJDLI","BCDGHIJK":"HGBCJDIK","BCDFIJKL":"CJBDIFLK","BCDFHJKL":"CJBDHFLK","BCDFHIKL":"CIBDHFLK","BCDFHIJL":"CJBDHFLI","BCDFHIJK":"CJBDHFIK","BCDFGJKL":"CGBDJFLK","BCDFGIKL":"CGBDIFLK","BCDFGIJL":"CGBDJFLI","BCDFGIJK":"CGBDJFIK","BCDFGHKL":"CGBDHFLK","BCDFGHJL":"CGBDHFLJ","BCDFGHJK":"HGBCJFDK","BCDFGHIL":"CGBDHFLI","BCDFGHIK":"CGBDHFIK","BCDFGHIJ":"HGBCJFDI","BCDEIJKL":"EJBCIDLK","BCDEHJKL":"EJBCHDLK","BCDEHIKL":"EIBCHDLK","BCDEHIJL":"EJBCHDLI","BCDEHIJK":"EJBCHDIK","BCDEGJKL":"EGBCJDLK","BCDEGIKL":"EGBCIDLK","BCDEGIJL":"EGBCJDLI","BCDEGIJK":"EGBCJDIK","BCDEGHKL":"EGBCHDLK","BCDEGHJL":"HGBCJDLE","BCDEGHJK":"HGBCJDEK","BCDEGHIL":"EGBCHDLI","BCDEGHIK":"EGBCHDIK","BCDEGHIJ":"HGBCJDEI","BCDEFJKL":"CJBDEFLK","BCDEFIKL":"CEBDIFLK","BCDEFIJL":"CJBDEFLI","BCDEFIJK":"CJBDEFIK","BCDEFHKL":"CEBDHFLK","BCDEFHJL":"CJBDHFLE","BCDEFHJK":"CJBDHFEK","BCDEFHIL":"CEBDHFLI","BCDEFHIK":"CEBDHFIK","BCDEFHIJ":"CJBDHFEI","BCDEFGKL":"CGBDEFLK","BCDEFGJL":"CGBDJFLE","BCDEFGJK":"CGBDJFEK","BCDEFGIL":"CGBDEFLI","BCDEFGIK":"CGBDEFIK","BCDEFGIJ":"CGBDJFEI","BCDEFGHL":"CGBDHFLE","BCDEFGHK":"CGBDHFEK","BCDEFGHJ":"HGBCJFDE","BCDEFGHI":"CGBDHFEI","AFGHIJKL":"HJIFAGLK","AEGHIJKL":"EJIAHGLK","AEFHIJKL":"EJIFAHLK","AEFGIJKL":"EJIFAGLK","AEFGHJKL":"EGJFAHLK","AEFGHIKL":"EGIFAHLK","AEFGHIJL":"EGJFAHLI","AEFGHIJK":"EGJFAHIK","ADGHIJKL":"HJIDAGLK","ADFHIJKL":"HJIDAFLK","ADFGIJKL":"IGJDAFLK","ADFGHJKL":"HGJDAFLK","ADFGHIKL":"HGIDAFLK","ADFGHIJL":"HGJDAFLI","ADFGHIJK":"HGJDAFIK","ADEHIJKL":"EJIDAHLK","ADEGIJKL":"EJIDAGLK","ADEGHJKL":"EGJDAHLK","ADEGHIKL":"EGIDAHLK","ADEGHIJL":"EGJDAHLI","ADEGHIJK":"EGJDAHIK","ADEFIJKL":"EJIDAFLK","ADEFHJKL":"HJEDAFLK","ADEFHIKL":"HEIDAFLK","ADEFHIJL":"HJEDAFLI","ADEFHIJK":"HJEDAFIK","ADEFGJKL":"EGJDAFLK","ADEFGIKL":"EGIDAFLK","ADEFGIJL":"EGJDAFLI","ADEFGIJK":"EGJDAFIK","ADEFGHKL":"HGEDAFLK","ADEFGHJL":"HGJDAFLE","ADEFGHJK":"HGJDAFEK","ADEFGHIL":"HGEDAFLI","ADEFGHIK":"HGEDAFIK","ADEFGHIJ":"HGJDAFEI","ACGHIJKL":"HJICAGLK","ACFHIJKL":"HJICAFLK","ACFGIJKL":"IGJCAFLK","ACFGHJKL":"HGJCAFLK","ACFGHIKL":"HGICAFLK","ACFGHIJL":"HGJCAFLI","ACFGHIJK":"HGJCAFIK","ACEHIJKL":"EJICAHLK","ACEGIJKL":"EJICAGLK","ACEGHJKL":"EGJCAHLK","ACEGHIKL":"EGICAHLK","ACEGHIJL":"EGJCAHLI","ACEGHIJK":"EGJCAHIK","ACEFIJKL":"EJICAFLK","ACEFHJKL":"HJECAFLK","ACEFHIKL":"HEICAFLK","ACEFHIJL":"HJECAFLI","ACEFHIJK":"HJECAFIK","ACEFGJKL":"EGJCAFLK","ACEFGIKL":"EGICAFLK","ACEFGIJL":"EGJCAFLI","ACEFGIJK":"EGJCAFIK","ACEFGHKL":"HGECAFLK","ACEFGHJL":"HGJCAFLE","ACEFGHJK":"HGJCAFEK","ACEFGHIL":"HGECAFLI","ACEFGHIK":"HGECAFIK","ACEFGHIJ":"HGJCAFEI","ACDHIJKL":"HJICADLK","ACDGIJKL":"IGJCADLK","ACDGHJKL":"HGJCADLK","ACDGHIKL":"HGICADLK","ACDGHIJL":"HGJCADLI","ACDGHIJK":"HGJCADIK","ACDFIJKL":"CJIDAFLK","ACDFHJKL":"HJFCADLK","ACDFHIKL":"HFICADLK","ACDFHIJL":"HJFCADLI","ACDFHIJK":"HJFCADIK","ACDFGJKL":"CGJDAFLK","ACDFGIKL":"CGIDAFLK","ACDFGIJL":"CGJDAFLI","ACDFGIJK":"CGJDAFIK","ACDFGHKL":"HGFCADLK","ACDFGHJL":"CGJDAFLH","ACDFGHJK":"HGJCAFDK","ACDFGHIL":"HGFCADLI","ACDFGHIK":"HGFCADIK","ACDFGHIJ":"HGJCAFDI","ACDEIJKL":"EJICADLK","ACDEHJKL":"HJECADLK","ACDEHIKL":"HEICADLK","ACDEHIJL":"HJECADLI","ACDEHIJK":"HJECADIK","ACDEGJKL":"EGJCADLK","ACDEGIKL":"EGICADLK","ACDEGIJL":"EGJCADLI","ACDEGIJK":"EGJCADIK","ACDEGHKL":"HGECADLK","ACDEGHJL":"HGJCADLE","ACDEGHJK":"HGJCADEK","ACDEGHIL":"HGECADLI","ACDEGHIK":"HGECADIK","ACDEGHIJ":"HGJCADEI","ACDEFJKL":"CJEDAFLK","ACDEFIKL":"CEIDAFLK","ACDEFIJL":"CJEDAFLI","ACDEFIJK":"CJEDAFIK","ACDEFHKL":"HEFCADLK","ACDEFHJL":"HJFCADLE","ACDEFHJK":"HJECAFDK","ACDEFHIL":"HEFCADLI","ACDEFHIK":"HEFCADIK","ACDEFHIJ":"HJECAFDI","ACDEFGKL":"CGEDAFLK","ACDEFGJL":"CGJDAFLE","ACDEFGJK":"CGJDAFEK","ACDEFGIL":"CGEDAFLI","ACDEFGIK":"CGEDAFIK","ACDEFGIJ":"CGJDAFEI","ACDEFGHL":"HGFCADLE","ACDEFGHK":"HGECAFDK","ACDEFGHJ":"HGJCAFDE","ACDEFGHI":"HGECAFDI","ABGHIJKL":"HJBAIGLK","ABFHIJKL":"HJBAIFLK","ABFGIJKL":"IJBFAGLK","ABFGHJKL":"HJBFAGLK","ABFGHIKL":"HGBAIFLK","ABFGHIJL":"HJBFAGLI","ABFGHIJK":"HJBFAGIK","ABEHIJKL":"EJBAIHLK","ABEGIJKL":"EJBAIGLK","ABEGHJKL":"EJBAHGLK","ABEGHIKL":"EGBAIHLK","ABEGHIJL":"EJBAHGLI","ABEGHIJK":"EJBAHGIK","ABEFIJKL":"EJBAIFLK","ABEFHJKL":"EJBFAHLK","ABEFHIKL":"EIBFAHLK","ABEFHIJL":"EJBFAHLI","ABEFHIJK":"EJBFAHIK","ABEFGJKL":"EJBFAGLK","ABEFGIKL":"EGBAIFLK","ABEFGIJL":"EJBFAGLI","ABEFGIJK":"EJBFAGIK","ABEFGHKL":"EGBFAHLK","ABEFGHJL":"HJBFAGLE","ABEFGHJK":"HJBFAGEK","ABEFGHIL":"EGBFAHLI","ABEFGHIK":"EGBFAHIK","ABEFGHIJ":"HJBFAGEI","ABDHIJKL":"IJBDAHLK","ABDGIJKL":"IJBDAGLK","ABDGHJKL":"HJBDAGLK","ABDGHIKL":"IGBDAHLK","ABDGHIJL":"HJBDAGLI","ABDGHIJK":"HJBDAGIK","ABDFIJKL":"IJBDAFLK","ABDFHJKL":"HJBDAFLK","ABDFHIKL":"HIBDAFLK","ABDFHIJL":"HJBDAFLI","ABDFHIJK":"HJBDAFIK","ABDFGJKL":"FJBDAGLK","ABDFGIKL":"IGBDAFLK","ABDFGIJL":"FJBDAGLI","ABDFGIJK":"FJBDAGIK","ABDFGHKL":"HGBDAFLK","ABDFGHJL":"HGBDAFLJ","ABDFGHJK":"HGBDAFJK","ABDFGHIL":"HGBDAFLI","ABDFGHIK":"HGBDAFIK","ABDFGHIJ":"HGBDAFIJ","ABDEIJKL":"EJBAIDLK","ABDEHJKL":"EJBDAHLK","ABDEHIKL":"EIBDAHLK","ABDEHIJL":"EJBDAHLI","ABDEHIJK":"EJBDAHIK","ABDEGJKL":"EJBDAGLK","ABDEGIKL":"EGBAIDLK","ABDEGIJL":"EJBDAGLI","ABDEGIJK":"EJBDAGIK","ABDEGHKL":"EGBDAHLK","ABDEGHJL":"HJBDAGLE","ABDEGHJK":"HJBDAGEK","ABDEGHIL":"EGBDAHLI","ABDEGHIK":"EGBDAHIK","ABDEGHIJ":"HJBDAGEI","ABDEFJKL":"EJBDAFLK","ABDEFIKL":"EIBDAFLK","ABDEFIJL":"EJBDAFLI","ABDEFIJK":"EJBDAFIK","ABDEFHKL":"HEBDAFLK","ABDEFHJL":"HJBDAFLE","ABDEFHJK":"HJBDAFEK","ABDEFHIL":"HEBDAFLI","ABDEFHIK":"HEBDAFIK","ABDEFHIJ":"HJBDAFEI","ABDEFGKL":"EGBDAFLK","ABDEFGJL":"EGBDAFLJ","ABDEFGJK":"EGBDAFJK","ABDEFGIL":"EGBDAFLI","ABDEFGIK":"EGBDAFIK","ABDEFGIJ":"EGBDAFIJ","ABDEFGHL":"HGBDAFLE","ABDEFGHK":"HGBDAFEK","ABDEFGHJ":"HGBDAFEJ","ABDEFGHI":"HGBDAFEI","ABCHIJKL":"IJBCAHLK","ABCGIJKL":"IJBCAGLK","ABCGHJKL":"HJBCAGLK","ABCGHIKL":"IGBCAHLK","ABCGHIJL":"HJBCAGLI","ABCGHIJK":"HJBCAGIK","ABCFIJKL":"IJBCAFLK","ABCFHJKL":"HJBCAFLK","ABCFHIKL":"HIBCAFLK","ABCFHIJL":"HJBCAFLI","ABCFHIJK":"HJBCAFIK","ABCFGJKL":"CJBFAGLK","ABCFGIKL":"IGBCAFLK","ABCFGIJL":"CJBFAGLI","ABCFGIJK":"CJBFAGIK","ABCFGHKL":"HGBCAFLK","ABCFGHJL":"HGBCAFLJ","ABCFGHJK":"HGBCAFJK","ABCFGHIL":"HGBCAFLI","ABCFGHIK":"HGBCAFIK","ABCFGHIJ":"HGBCAFIJ","ABCEIJKL":"EJBAICLK","ABCEHJKL":"EJBCAHLK","ABCEHIKL":"EIBCAHLK","ABCEHIJL":"EJBCAHLI","ABCEHIJK":"EJBCAHIK","ABCEGJKL":"EJBCAGLK","ABCEGIKL":"EGBAICLK","ABCEGIJL":"EJBCAGLI","ABCEGIJK":"EJBCAGIK","ABCEGHKL":"EGBCAHLK","ABCEGHJL":"HJBCAGLE","ABCEGHJK":"HJBCAGEK","ABCEGHIL":"EGBCAHLI","ABCEGHIK":"EGBCAHIK","ABCEGHIJ":"HJBCAGEI","ABCEFJKL":"EJBCAFLK","ABCEFIKL":"EIBCAFLK","ABCEFIJL":"EJBCAFLI","ABCEFIJK":"EJBCAFIK","ABCEFHKL":"HEBCAFLK","ABCEFHJL":"HJBCAFLE","ABCEFHJK":"HJBCAFEK","ABCEFHIL":"HEBCAFLI","ABCEFHIK":"HEBCAFIK","ABCEFHIJ":"HJBCAFEI","ABCEFGKL":"EGBCAFLK","ABCEFGJL":"EGBCAFLJ","ABCEFGJK":"EGBCAFJK","ABCEFGIL":"EGBCAFLI","ABCEFGIK":"EGBCAFIK","ABCEFGIJ":"EGBCAFIJ","ABCEFGHL":"HGBCAFLE","ABCEFGHK":"HGBCAFEK","ABCEFGHJ":"HGBCAFEJ","ABCEFGHI":"HGBCAFEI","ABCDIJKL":"IJBCADLK","ABCDHJKL":"HJBCADLK","ABCDHIKL":"HIBCADLK","ABCDHIJL":"HJBCADLI","ABCDHIJK":"HJBCADIK","ABCDGJKL":"CJBDAGLK","ABCDGIKL":"IGBCADLK","ABCDGIJL":"CJBDAGLI","ABCDGIJK":"CJBDAGIK","ABCDGHKL":"HGBCADLK","ABCDGHJL":"HGBCADLJ","ABCDGHJK":"HGBCADJK","ABCDGHIL":"HGBCADLI","ABCDGHIK":"HGBCADIK","ABCDGHIJ":"HGBCADIJ","ABCDFJKL":"CJBDAFLK","ABCDFIKL":"CIBDAFLK","ABCDFIJL":"CJBDAFLI","ABCDFIJK":"CJBDAFIK","ABCDFHKL":"HFBCADLK","ABCDFHJL":"CJBDAFLH","ABCDFHJK":"HJBCAFDK","ABCDFHIL":"HFBCADLI","ABCDFHIK":"HFBCADIK","ABCDFHIJ":"HJBCAFDI","ABCDFGKL":"CGBDAFLK","ABCDFGJL":"CGBDAFLJ","ABCDFGJK":"CGBDAFJK","ABCDFGIL":"CGBDAFLI","ABCDFGIK":"CGBDAFIK","ABCDFGIJ":"CGBDAFIJ","ABCDFGHL":"CGBDAFLH","ABCDFGHK":"HGBCAFDK","ABCDFGHJ":"HGBCAFDJ","ABCDFGHI":"HGBCAFDI","ABCDEJKL":"EJBCADLK","ABCDEIKL":"EIBCADLK","ABCDEIJL":"EJBCADLI","ABCDEIJK":"EJBCADIK","ABCDEHKL":"HEBCADLK","ABCDEHJL":"HJBCADLE","ABCDEHJK":"HJBCADEK","ABCDEHIL":"HEBCADLI","ABCDEHIK":"HEBCADIK","ABCDEHIJ":"HJBCADEI","ABCDEGKL":"EGBCADLK","ABCDEGJL":"EGBCADLJ","ABCDEGJK":"EGBCADJK","ABCDEGIL":"EGBCADLI","ABCDEGIK":"EGBCADIK","ABCDEGIJ":"EGBCADIJ","ABCDEGHL":"HGBCADLE","ABCDEGHK":"HGBCADEK","ABCDEGHJ":"HGBCADEJ","ABCDEGHI":"HGBCADEI","ABCDEFKL":"CEBDAFLK","ABCDEFJL":"CJBDAFLE","ABCDEFJK":"CJBDAFEK","ABCDEFIL":"CEBDAFLI","ABCDEFIK":"CEBDAFIK","ABCDEFIJ":"CJBDAFEI","ABCDEFHL":"HFBCADLE","ABCDEFHK":"HEBCAFDK","ABCDEFHJ":"HJBCAFDE","ABCDEFHI":"HEBCAFDI","ABCDEFGL":"CGBDAFLE","ABCDEFGK":"CGBDAFEK","ABCDEFGJ":"CGBDAFEJ","ABCDEFGI":"CGBDAFEI","ABCDEFGH":"HGBCAFDE"};
+
+function assignThirds(qualifyingGroups){
+  const key=[...qualifyingGroups].sort().join('');
+  const v=THIRD_MAP[key];
+  if(!v) return null;
+  const out={};
+  THIRD_COLS.forEach((host,i)=> out[host]=v[i]);
+  return out;
+}
+
+/* Map THIRD_COLS host positions to R32 match numbers */
+const THIRD_HOST_TO_MATCH = {A:74, B:77, D:79, E:80, G:81, I:82, K:85, L:87};
+
+/* Later knockout rounds */
+const R16_MATCHES = [
+  {m:89, home:"W74", away:"W77"},
+  {m:90, home:"W73", away:"W75"},
+  {m:91, home:"W76", away:"W78"},
+  {m:92, home:"W79", away:"W80"},
+  {m:93, home:"W83", away:"W84"},
+  {m:94, home:"W81", away:"W82"},
+  {m:95, home:"W86", away:"W88"},
+  {m:96, home:"W85", away:"W87"}
+];
+const QF_MATCHES = [
+  {m:97, home:"W89", away:"W90"},
+  {m:98, home:"W93", away:"W94"},
+  {m:99, home:"W91", away:"W92"},
+  {m:100, home:"W95", away:"W96"}
+];
+const SF_MATCHES = [
+  {m:101, home:"W97", away:"W98"},
+  {m:102, home:"W99", away:"W100"}
+];
+const FINAL_MATCH = {m:104, home:"W101", away:"W102"};
+const THIRD_PLACE = {m:103, home:"L101", away:"L102"};
+
+/* Knockout match dates + ET kick-off times */
+const KO_DATES = {
+  73:"Jun 28 · 3 PM",   74:"Jun 29 · 4:30 PM", 75:"Jun 29 · 9 PM",   76:"Jun 29 · 1 PM",
+  77:"Jun 30 · 5 PM",   78:"Jun 30 · 1 PM",    79:"Jun 30 · 9 PM",   80:"Jul 1 · 12 PM",
+  81:"Jul 1 · 8 PM",    82:"Jul 1 · 4 PM",     83:"Jul 2 · 7 PM",    84:"Jul 2 · 3 PM",
+  85:"Jul 2 · 11 PM",   86:"Jul 3 · 6 PM",     87:"Jul 3 · 9:30 PM", 88:"Jul 3 · 2 PM",
+  89:"Jul 4 · 5 PM",    90:"Jul 4 · 1 PM",     91:"Jul 5 · 4 PM",    92:"Jul 5 · 8 PM",
+  93:"Jul 6 · 3 PM",    94:"Jul 6 · 8 PM",     95:"Jul 7 · 12 PM",   96:"Jul 7 · 4 PM",
+  97:"Jul 9 · 4 PM",    98:"Jul 10 · 3 PM",    99:"Jul 11 · 5 PM",   100:"Jul 11 · 9 PM",
+  101:"Jul 14 · 3 PM",  102:"Jul 15 · 3 PM",
+  103:"Jul 18 · 5 PM",  104:"Jul 19 · 3 PM"
+};
+
+/* ---- Knockout resolution engine ---- */
+function resolveKnockout(){
+  const {tables, thirds, s} = standings(picks);
+  const nPicked = Object.values(picks).filter(v=>v&&pickResult(v)).length;
+
+  // Which groups are fully determined? (all fixtures in that group have picks)
+  const groupDone = {};
+  GROUPS.forEach(g=>{
+    groupDone[g] = fixByGroup[g].every(([id])=> picks[id] && pickResult(picks[id]));
+  });
+  const allDone = GROUPS.every(g=>groupDone[g]);
+
+  // Build qualifiers map
+  // Fully-picked groups: use final standings
+  // Incomplete groups: still show clinched (LOCKED) teams in their current position
+  const qualifiers = {};
+  GROUPS.forEach(g=>{
+    if(groupDone[g]){
+      qualifiers["1"+g] = tables[g][0];
+      qualifiers["2"+g] = tables[g][1];
+    } else {
+      const t = tables[g];
+      if(LOCKED.has(t[0])) qualifiers["1"+g] = t[0];
+      if(LOCKED.has(t[1])) qualifiers["2"+g] = t[1];
+    }
+  });
+
+  // Third-place resolution only works when ALL groups are decided
+  let thirdTeams = {}; // matchNum -> team code
+  if(allDone){
+    const bestThirds = thirds.slice(0, 8);
+    const qualGroups = bestThirds.map(c => TEAMS[c].g);
+    const thirdAssignment = assignThirds(qualGroups);
+    if(thirdAssignment){
+      THIRD_COLS.forEach(host=>{
+        const originGroup = thirdAssignment[host];
+        const matchNum = THIRD_HOST_TO_MATCH[host];
+        thirdTeams[matchNum] = tables[originGroup][2];
+      });
+    }
+  }
+
+  // Resolve R32
+  const resolved = {}; // matchNum -> {home: code|null, away: code|null}
+  R32_MATCHES.forEach(match=>{
+    const home = typeof match.home === "string" ? (qualifiers[match.home]||null) : null;
+    let away;
+    if(typeof match.away === "string"){
+      away = qualifiers[match.away]||null;
+    } else {
+      away = thirdTeams[match.m]||null;
+    }
+    resolved[match.m] = {home, away};
+  });
+
+  // Slot labels for R32 matches (for display when team unknown)
+  const slotLabels = {};
+  R32_MATCHES.forEach(match=>{
+    slotLabels[match.m] = {
+      home: typeof match.home === "string" ? match.home : "1"+match.home,
+      away: typeof match.away === "string" ? match.away : "3rd"
+    };
+  });
+
+  // R16 onward: show the teams from resolved R32 matches
+  R16_MATCHES.forEach(match=>{
+    const hm = parseInt(match.home.slice(1));
+    const am = parseInt(match.away.slice(1));
+    resolved[match.m] = {home:null, away:null, homeFrom:match.home, awayFrom:match.away};
+  });
+  QF_MATCHES.forEach(match=>{
+    resolved[match.m] = {home:null, away:null, homeFrom:match.home, awayFrom:match.away};
+  });
+  SF_MATCHES.forEach(match=>{
+    resolved[match.m] = {home:null, away:null, homeFrom:match.home, awayFrom:match.away};
+  });
+  resolved[FINAL_MATCH.m] = {home:null, away:null, homeFrom:FINAL_MATCH.home, awayFrom:FINAL_MATCH.away};
+  resolved[THIRD_PLACE.m] = {home:null, away:null, homeFrom:THIRD_PLACE.home, awayFrom:THIRD_PLACE.away};
+
+  return {resolved, nPicked, slotLabels, allDone};
+}
 
 /* =================== PERSISTENCE =================== */
 const FIX_IDS = allFix.map(m=>m[0]);  // ordered fixture IDs for encoding
@@ -583,6 +850,7 @@ let viewMode="winners";  // "winners" or "full"
 const groupsEl=document.getElementById("groups");
 const thirdsEl=document.getElementById("thirds");
 const fixturesEl=document.getElementById("fixtures");
+const bracketEl=document.getElementById("bracket");
 
 document.getElementById("viewToggle").addEventListener("click",()=>{
   viewMode=viewMode==="winners"?"full":"winners";
@@ -652,9 +920,37 @@ function renderFixtures(){
     <section class="day">
       <h2 class="day__h">${day.date}<span class="tag">${day.note.replace(/Group ([A-L])/,'<span class="grp-link" data-grp="$1">Group $1</span>')}</span></h2>
       ${day.ms.map(([id,g,h,a])=>{
+        const lk=locked[id];
         const p=picks[id];
         const r=pickResult(p);
         const sc=pickScores(p);
+        if(lk){
+          // confirmed result — compact read-only display
+          const isDraw = lk.s1===lk.s2;
+          const hWin = lk.s1>lk.s2, aWin = lk.s1<lk.s2;
+          const hCls = hWin?'lk-win':isDraw?'lk-draw':'dim';
+          const aCls = aWin?'lk-win':isDraw?'lk-draw':'dim';
+          const lkSide = (code,score,cls,pts,isAway)=>isAway
+            ? `<button class="side ${cls}" data-pick="">
+              <span class="lk-score">${score}</span>
+              ${flag(code)}
+              <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n} (${pts})</span></span>
+            </button>`
+            : `<button class="side ${cls}" data-pick="">
+              ${flag(code)}
+              <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n} (${pts})</span></span>
+              <span class="lk-score">${score}</span>
+            </button>`;
+          return `<div class="match match--locked" data-id="${id}" style="position:relative">
+            <div class="match__grp">${g}</div>
+            <div class="pick">
+              ${lkSide(h,lk.s1,hCls,s[h].pts,false)}
+              <div class="lk-sep"><hr></div>
+              ${lkSide(a,lk.s2,aCls,s[a].pts,true)}
+            </div>
+            <span class="locked-badge">Final</span>
+          </div>`;
+        }
         return `<div class="match" data-id="${id}">
           <div class="match__grp">${g}</div>
           <div class="pick">
@@ -678,8 +974,148 @@ function renderFixtures(){
     </section>`).join("");
 }
 
+/* ---- Bracket rendering ---- */
+function koSlot(code, groupLetter, label){
+  if(!code) return `<span class="ko__slot ko__slot--tbd"><span class="cd">${label||"TBD"}</span></span>`;
+  const gc = groupLetter ? GC[groupLetter] : "var(--line)";
+  const grpTag = groupLetter ? `<span class="ko__grp" style="color:${gc}">${groupLetter}</span>` : "";
+  return `<span class="ko__slot ko__slot--home" style="--gc:${gc}">${grpTag}${flag(code)} <span class="cd">${code}</span> <span class="nm">${TEAMS[code].n}</span></span>`;
+}
+
+/* Parse "Jun 29 · 4:30 PM" into {date:"Jun 29", time:"4:30 PM", sortKey:1630} */
+function parseKoDate(m){
+  const s = KO_DATES[m] || "";
+  const parts = s.split(" · ");
+  const date = parts[0] || s;
+  const time = parts[1] || "";
+  // sortKey: convert time to minutes for ordering
+  let mins = 0;
+  if(time){
+    const tm = time.match(/(\d+)(?::(\d+))?\s*(AM|PM)/i);
+    if(tm){
+      let h = parseInt(tm[1]); const mm = parseInt(tm[2]||"0");
+      if(tm[3].toUpperCase()==="PM" && h!==12) h+=12;
+      if(tm[3].toUpperCase()==="AM" && h===12) h=0;
+      mins = h*60+mm;
+    }
+  }
+  return {date, time, sortKey:mins};
+}
+
+/* Group an array of match objects by date, sorted by time within each date */
+function koRoundHtml(roundName, matches, buildMatch){
+  // Sort matches by date order (preserve original order for date grouping) then by time
+  const enriched = matches.map(m=>({match:m, ...parseKoDate(m.m)}));
+  // Group by date, preserving date order from KO_DATES
+  const groups = [];
+  let lastDate = "";
+  enriched.forEach(e=>{
+    if(e.date !== lastDate){ groups.push({date:e.date, items:[]}); lastDate=e.date; }
+    groups[groups.length-1].items.push(e);
+  });
+  // Sort items within each date group by time
+  groups.forEach(g=>g.items.sort((a,b)=>a.sortKey-b.sortKey));
+
+  let html = `<div class="ko__round"><h2 class="ko__round-h">${roundName}</h2>`;
+  groups.forEach(g=>{
+    html += `<div class="ko__date-h">${g.date}</div><div class="ko__grid ko__grid--wide">`;
+    g.items.forEach(e=>{
+      html += buildMatch(e.match, e.time);
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+function renderBracket(){
+  const {resolved, nPicked, slotLabels, allDone} = resolveKnockout();
+
+  let html = "";
+
+  // helper: match number + time label
+  function mnTime(m, time){
+    return `<span class="ko__mn">${m}${time?`<span class="ko__time">${time}</span>`:""}</span>`;
+  }
+
+  // R32
+  html += koRoundHtml("Round of 32", R32_MATCHES, (match,time)=>{
+    const r = resolved[match.m];
+    const sl = slotLabels[match.m];
+    const hg = r.home ? TEAMS[r.home].g : null;
+    const ag = r.away ? TEAMS[r.away].g : null;
+    return `<div class="ko__match">
+      ${mnTime(match.m,time)}
+      ${koSlot(r.home, hg, sl.home)}
+      <span class="ko__vs">vs</span>
+      ${koSlot(r.away, ag, sl.away)}
+    </div>`;
+  });
+
+  // R16
+  html += koRoundHtml("Round of 16", R16_MATCHES, (match,time)=>{
+    const hm = parseInt(match.home.slice(1));
+    const am = parseInt(match.away.slice(1));
+    const hr = resolved[hm], ar = resolved[am];
+    const homeLabel = hr.home && hr.away ? `${hr.home}/${hr.away}` : match.home;
+    const awayLabel = ar.home && ar.away ? `${ar.home}/${ar.away}` : match.away;
+    return `<div class="ko__match">
+      ${mnTime(match.m,time)}
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${homeLabel}</span></span>
+      <span class="ko__vs">vs</span>
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${awayLabel}</span></span>
+    </div>`;
+  });
+
+  // QF
+  html += koRoundHtml("Quarter-Finals", QF_MATCHES, (match,time)=>{
+    return `<div class="ko__match">
+      ${mnTime(match.m,time)}
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
+      <span class="ko__vs">vs</span>
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span>
+    </div>`;
+  });
+
+  // SF
+  html += koRoundHtml("Semi-Finals", SF_MATCHES, (match,time)=>{
+    return `<div class="ko__match">
+      ${mnTime(match.m,time)}
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
+      <span class="ko__vs">vs</span>
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span>
+    </div>`;
+  });
+
+  // Final
+  html += koRoundHtml("Final", [FINAL_MATCH], (match,time)=>{
+    return `<div class="ko__match">
+      ${mnTime(match.m,time)}
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
+      <span class="ko__vs">vs</span>
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span>
+    </div>`;
+  });
+
+  // Third Place
+  html += koRoundHtml("Third Place", [THIRD_PLACE], (match,time)=>{
+    return `<div class="ko__match">
+      ${mnTime(match.m,time)}
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
+      <span class="ko__vs">vs</span>
+      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span>
+    </div>`;
+  });
+
+  bracketEl.innerHTML = html;
+}
+
 /* one delegated listener handles every pick */
 fixturesEl.addEventListener("click",e=>{
+  // ignore clicks on locked (confirmed) matches
+  const matchEl=e.target.closest(".match");
+  if(matchEl && locked[matchEl.dataset.id]) return;
+
   // score stepper buttons
   const sc=e.target.closest("[data-sc]");
   if(sc){
@@ -698,7 +1134,7 @@ fixturesEl.addEventListener("click",e=>{
     if(r==="A"&&as<=hs) as=hs+1;
     if(r==="D") as=hs;
     picks[id]={r,hs,as};
-    savePicks(picks); renderFixtures(); renderBoard();
+    savePicks(picks); renderFixtures(); renderBoard(); renderBracket();
     return;
   }
   // result pick buttons
@@ -707,18 +1143,21 @@ fixturesEl.addEventListener("click",e=>{
   const want=btn.dataset.pick;
   const cur=pickResult(picks[id]);
   picks[id] = (cur===want) ? null : defaultPick(want);
-  savePicks(picks); renderFixtures(); renderBoard();
+  savePicks(picks); renderFixtures(); renderBoard(); renderBracket();
+  // #3: nudge toward bracket on first pick
+  if(!pickPeekDone){ pickPeekDone=true; setTimeout(peekBracket, 400); }
 });
 
 document.getElementById("probable").addEventListener("click",()=>{
   for(const id in PROBABLE) picks[id]=defaultPick(PROBABLE[id]);
-  savePicks(picks); renderFixtures(); renderBoard();
+  savePicks(picks); renderFixtures(); renderBoard(); renderBracket();
 });
 
 document.getElementById("reset").addEventListener("click",()=>{
   if(!Object.values(picks).some(v=>v&&pickResult(v))) return;
   if(!confirm("Clear all picks?")) return;
-  picks={}; savePicks(picks); renderFixtures(); renderBoard();
+  const kept={}; for(const id in locked){ if(picks[id]) kept[id]=picks[id]; }
+  picks=kept; savePicks(picks); renderFixtures(); renderBoard(); renderBracket();
 });
 
 document.getElementById("share").addEventListener("click",()=>{
@@ -782,20 +1221,92 @@ document.addEventListener("click",e=>{
   if(grpLink){ showGroupPopup(grpLink.dataset.grp); return; }
 });
 
+/* ---- Panel tabs (mobile swipe + tab clicks) ---- */
+const panelsEl = document.getElementById("panels");
+const tabBtns = document.querySelectorAll(".tab");
+
+tabBtns.forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const idx = parseInt(btn.dataset.panel);
+    const panel = panelsEl.children[idx];
+    panel.scrollIntoView({behavior:"smooth",block:"nearest",inline:"start"});
+  });
+});
+
+// Update active tab on scroll
+panelsEl.addEventListener("scroll",()=>{
+  const scrollLeft = panelsEl.scrollLeft;
+  const panelWidth = panelsEl.offsetWidth;
+  const activeIdx = Math.round(scrollLeft / panelWidth);
+  tabBtns.forEach((btn,i)=>{
+    btn.classList.toggle("active", i===activeIdx);
+  });
+});
+
 renderFixtures();
 renderBoard();
+renderBracket();
+
+/* ── Bracket peek hint (mobile only) ── */
+let peekDone = false, pickPeekDone = false;
+function peekBracket(){
+  if(window.innerWidth >= 900) return; // desktop shows both panels
+  const pw = panelsEl.offsetWidth;
+  panelsEl.scrollTo({left:60, behavior:"smooth"});
+  setTimeout(()=> panelsEl.scrollTo({left:0, behavior:"smooth"}), 500);
+}
+// #1: peek on first load
+setTimeout(peekBracket, 800);
+
+/* ── Fetch live scores from scores.json ── */
+async function fetchScores(){
+  try{
+    const base = window.location.hostname ? "" : "";
+    const url = window.location.href.replace(/\/[^\/]*$/,"/scores.json");
+    const resp = await fetch(url, {cache:"no-store"});
+    if(!resp.ok) return;
+    const data = await resp.json();
+    let changed = false;
+    for(const m of data.matches){
+      if(m.s1===null || m.s2===null) continue;
+      // find the fixture id by team pairing
+      const id = fixByTeams[m.t1+"|"+m.t2];
+      if(!id) continue; // not a Matchday 3 match (already in PLAYED)
+      if(locked[id]) continue; // already locked
+      // lock this match with confirmed score
+      locked[id] = {s1:m.s1, s2:m.s2};
+      // add to PLAYED so baseStats picks it up
+      PLAYED.push([m.g, m.t1, m.s1, m.s2, m.t2]);
+      // override user's pick with the real result
+      const r = m.s1>m.s2 ? "H" : m.s1<m.s2 ? "A" : "D";
+      picks[id] = {r, hs:m.s1, as:m.s2};
+      changed = true;
+    }
+    if(changed){
+      // recompute engine from updated PLAYED
+      BASE = baseStats();
+      buildSeedIndex();
+      LOCKED = clinchedTop2();
+      savePicks(picks);
+      renderFixtures();
+      renderBoard();
+      renderBracket();
+    }
+  }catch(e){/* file:// or network error — silent fallback */}
+}
+fetchScores();
 
 /* ── What's New popup (shows once per version) ── */
-const WNEW_VER="v3";
+const WNEW_VER="v5";
 try{
   if(localStorage.getItem("fifa26_seen")!==WNEW_VER){
     const wo=document.getElementById("wnewOverlay");
     document.getElementById("wnew").innerHTML=`
       <h3>What's New</h3>
       <ul>
-        <li><b>Group standings:</b> tap any group card or group link to see full table</li>
-        <li><b>Score steppers:</b> adjust predicted scores — goal difference now counts</li>
-        <li><b>Kick-off times</b> shown for every fixture slot</li>
+        <li><b>Live scores:</b> confirmed results now lock automatically</li>
+        <li><b>Knockout bracket:</b> swipe left to see the full R32→Final draw update live as you pick</li>
+        <li><b>Clinched teams</b> (🔒) always show in the bracket, even with no picks</li>
       </ul>
       <button id="wnewOk">Got it</button>`;
     wo.classList.add("open");
