@@ -4,6 +4,12 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-25 · 10:00 AM — Help Button
+
+- Added `?` help button in the board header — opens a brief overlay explaining all major features (Probable Picks, picking, score steppers, completed matches, knockout bracket, group standings, sharing).
+
+---
+
 ## 2026-06-24 · 4:30 PM — Live Scores & Bracket
 
 ### Live Score Integration
@@ -18,9 +24,14 @@ All notable changes to this project, in reverse chronological order.
 - Third-place allocation resolves automatically when all 12 groups are complete.
 - Matches grouped by date with kick-off times.
 
+### Mobile UX
+- Bracket discovery: subtle peek animation on load and on first pick nudges you to swipe right.
+- Tab switching (Group / Bracket) no longer causes vertical scroll.
+
 ### Fixes
 - Clear Picks now preserves confirmed match results.
 - Fixed double-counting bug where locked scores were applied twice to standings.
+- Fixed clinched detection for completed groups with tied teams (e.g. SUI and CAN in Group B now correctly show 🔒).
 
 ---
 

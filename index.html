@@ -342,6 +342,14 @@
   .gpop .tm .flag{width:20px;height:15px}
   .gpop .pts-col{color:var(--gold);font-weight:800}
 
+  /* help button */
+  .help-btn{
+    width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(255,255,255,.25);
+    background:rgba(255,255,255,.08);color:var(--chalk);font:700 12px/20px ui-monospace,monospace;
+    cursor:pointer;padding:0;flex-shrink:0;margin-left:4px
+  }
+  .help-btn:hover{background:rgba(255,255,255,.18)}
+
   footer{max-width:560px;margin:20px auto 0;padding:0 14px;color:var(--muted);font-size:11px;line-height:1.55}
   footer code{background:#ececdf;padding:1px 4px;border-radius:4px}
   .asof{color:var(--pitch-dk);font-weight:600}
@@ -351,7 +359,7 @@
 
 <header class="board" id="board">
   <div class="board__head">
-    <div class="board__title">FIFA<b>26</b></div>
+    <div class="board__title">FIFA<b>26</b> <button class="help-btn" id="helpBtn" aria-label="Help">?</button></div>
     <div class="toggle" id="viewToggle">
       <span class="toggle__lbl active" id="tLblW">Winners</span>
       <div class="toggle__track" id="tTrack"><div class="toggle__knob"></div></div>
@@ -383,6 +391,9 @@
 <div class="toast" id="toast"></div>
 <div class="wnew-overlay" id="wnewOverlay">
   <div class="wnew" id="wnew"></div>
+</div>
+<div class="wnew-overlay" id="helpOverlay">
+  <div class="wnew" id="helpPopup"></div>
 </div>
 <div class="gpop-overlay" id="gpopOverlay">
   <div class="gpop" id="gpop"></div>
@@ -1327,6 +1338,28 @@ try{
     });
   }
 }catch(e){}
+
+/* ── Help overlay ── */
+(function(){
+  const ho=document.getElementById("helpOverlay");
+  const hp=document.getElementById("helpPopup");
+  hp.innerHTML=`
+    <h3>How to Use</h3>
+    <ul>
+      <li><b>Probable Picks:</b> Auto-fills all matches with likely outcomes — tweak any you disagree with.</li>
+      <li><b>Pick Results:</b> Use "Probable Picks" or just choose your own team as winner (or tap Draw). The board up top updates instantly!</li>
+      <li><b>Score Steppers:</b> After picking, use +/− to set exact scorelines (used for tiebreakers).</li>
+      <li><b>Completed Matches:</b> Real results load automatically — these can't be changed.</li>
+      <li><b>Knockout Bracket:</b> Swipe left or tap the "Knockout Bracket" tab to see the full R32 → Final draw. It updates live as you pick.</li>
+      <li><b>Group Standings:</b> Tap any Group Card on the board up top for a full W/D/L/GD table.</li>
+      <li><b>Share:</b> Copies a link with your picks so friends can see your predictions.</li>
+    </ul>
+    <button id="helpOk">Got it</button>`;
+  function closeHelp(){ho.classList.remove("open");}
+  document.getElementById("helpBtn").addEventListener("click",()=>ho.classList.add("open"));
+  document.getElementById("helpOk").addEventListener("click",closeHelp);
+  ho.addEventListener("click",e=>{if(e.target===ho)closeHelp();});
+})();
 </script>
 </body>
 </html>
