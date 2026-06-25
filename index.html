@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#1f9d57">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -311,6 +314,16 @@
     opacity:0;pointer-events:none;transition:opacity .2s
   }
   .wnew-overlay.open{opacity:1;pointer-events:auto}
+  .install-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .2s
+  }
+  .install-overlay.open{opacity:1;pointer-events:auto}
+  .install-overlay .wnew{max-width:min(90vw,360px)}
+  .install-overlay h4{margin:12px 0 6px;font:700 12px/1.2 ui-monospace,monospace;color:var(--pitch)}
+  .install-overlay ol{margin:0 0 10px;padding-left:20px;font:12px/1.7 system-ui,sans-serif;color:#cde0d3}
+  .install-overlay .install-note{font:11px/1.4 system-ui,sans-serif;color:#8fa;margin:0 0 14px;opacity:.7}
   .wnew{
     background:var(--board);color:var(--chalk);border-radius:12px;
     padding:16px 18px;max-width:min(88vw,340px);
@@ -402,6 +415,9 @@
 </div>
 <div class="wnew-overlay" id="helpOverlay">
   <div class="wnew" id="helpPopup"></div>
+</div>
+<div class="install-overlay" id="installOverlay">
+  <div class="wnew" id="installPopup"></div>
 </div>
 <div class="gpop-overlay" id="gpopOverlay">
   <div class="gpop" id="gpop"></div>
@@ -1395,13 +1411,62 @@ try{
       <li><b>Knockout Bracket:</b> Swipe left or tap the "Knockout Bracket" tab to see the full R32 → Final draw. It updates live as you pick.</li>
       <li><b>Group Standings:</b> Tap any Group Card on the board up top for a full W/D/L/GD table.</li>
       <li><b>Share:</b> Copies a link with your picks so friends can see your predictions.</li>
+      <li><b><a href="#" id="installLink" style="color:var(--pitch);text-decoration:underline">Install App:</a></b> Add MyFIFA26 to your home screen for an app-like experience!</li>
     </ul>
     <button id="helpOk">Got it</button>`;
   function closeHelp(){ho.classList.remove("open");}
   document.getElementById("helpBtn").addEventListener("click",()=>ho.classList.add("open"));
   document.getElementById("helpOk").addEventListener("click",closeHelp);
   ho.addEventListener("click",e=>{if(e.target===ho)closeHelp();});
+
+  // Install overlay (super-overlay on top of help)
+  const io=document.getElementById("installOverlay");
+  const ip=document.getElementById("installPopup");
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isAndroid=/Android/.test(navigator.userAgent);
+  let deferredPrompt=null;
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;});
+
+  ip.innerHTML=`
+    <h3>Install MyFIFA26</h3>
+    <p style="font:12px/1.5 system-ui,sans-serif;color:#cde0d3;margin:0 0 10px">Get the full app experience — launches from your home screen, no browser bar!</p>
+    ${isIOS ? `
+    <h4>iPhone / iPad (Safari)</h4>
+    <ol>
+      <li>Tap the <b>Share</b> button <span style="font-size:16px">⎙</span> at the bottom of Safari</li>
+      <li>Scroll down and tap <b>"Add to Home Screen"</b></li>
+      <li>Tap <b>"Add"</b> in the top-right corner</li>
+    </ol>
+    <p class="install-note">Must use Safari — Chrome/Firefox on iOS don't support this.</p>
+    ` : isAndroid ? `
+    <h4>Android (Chrome)</h4>
+    <ol>
+      <li>Tap the <b>⋮ menu</b> (three dots) in the top-right of Chrome</li>
+      <li>Tap <b>"Add to Home screen"</b> or <b>"Install app"</b></li>
+      <li>Tap <b>"Install"</b> to confirm</li>
+    </ol>
+    <p class="install-note">Works in Chrome, Edge, and Samsung Internet.</p>
+    ` : `
+    <h4>On Your Phone</h4>
+    <p style="font:12px/1.5 system-ui,sans-serif;color:#cde0d3;margin:0 0 6px"><b>iPhone (Safari):</b> Tap Share → "Add to Home Screen" → Add</p>
+    <p style="font:12px/1.5 system-ui,sans-serif;color:#cde0d3;margin:0 0 10px"><b>Android (Chrome):</b> Tap ⋮ menu → "Install app" or "Add to Home screen"</p>
+    <h4>Desktop (Chrome / Edge)</h4>
+    <ol>
+      <li>Look for the <b>install icon</b> in the address bar (⊕ or ↓)</li>
+      <li>Click <b>"Install"</b></li>
+    </ol>
+    `}
+    <button id="installOk">Got it</button>`;
+
+  document.getElementById("installLink").addEventListener("click",e=>{
+    e.preventDefault();
+    if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;return;}
+    io.classList.add("open");
+  });
+  document.getElementById("installOk").addEventListener("click",()=>io.classList.remove("open"));
+  io.addEventListener("click",e=>{if(e.target===io)io.classList.remove("open");});
 })();
 </script>
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
 </body>
 </html>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#163d2a"/>
+  <text x="256" y="200" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="120" fill="#f6f5ef" letter-spacing="-2">MY</text>
+  <text x="256" y="310" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="120" fill="#f6f5ef" letter-spacing="-2">FIFA</text>
+  <text x="256" y="420" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="900" font-size="140" fill="#1f9d57" letter-spacing="-2">26</text>
+  <!-- Soccer ball top-right -->
+  <g transform="translate(430,75)">
+    <circle r="38" fill="#f6f5ef" opacity=".9"/>
+    <path d="M0-18L10-6 6,10-6,10-10-6Z" fill="#163d2a" opacity=".7"/>
+    <path d="M0-38L7-17 18-12" fill="none" stroke="#163d2a" stroke-width="2" opacity=".4"/>
+    <path d="M0-38L-7-17-18-12" fill="none" stroke="#163d2a" stroke-width="2" opacity=".4"/>
+    <path d="M36-12L18-12 10-6" fill="none" stroke="#163d2a" stroke-width="2" opacity=".4"/>
+    <path d="M-36-12L-18-12-10-6" fill="none" stroke="#163d2a" stroke-width="2" opacity=".4"/>
+    <path d="M22,31L6,10 10-6" fill="none" stroke="#163d2a" stroke-width="2" opacity=".4"/>
+    <path d="M-22,31L-6,10-10-6" fill="none" stroke="#163d2a" stroke-width="2" opacity=".4"/>
+  </g>
+</svg>

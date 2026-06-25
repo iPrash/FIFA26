@@ -4,6 +4,15 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-25 · 3:00 PM — Progressive Web App
+
+- MyFIFA26 is now installable as an app on iOS, Android, and desktop via "Add to Home Screen".
+- Added `manifest.json`, service worker (`sw.js`), and app icons (192px, 512px, SVG).
+- Service worker caches flag images (cache-first) and app files (network-first) for offline support.
+- "Install App" link added to Help overlay — opens a super-overlay with platform-specific install instructions (iOS Safari, Android Chrome, Desktop).
+
+---
+
 ## 2026-06-25 · 1:00 PM — Bug Fix & Mirror Layout
 
 ### Bug Fix
