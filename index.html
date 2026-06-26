@@ -9,7 +9,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>FIFA26 · World Cup 2026 What-If</title>
+<title>MyFIFA26 · World Cup 2026 What-If</title>
 <style>
   :root{
     --ink:#0d1b14;          /* near-black green ink */
@@ -381,7 +381,7 @@
 
 <header class="board" id="board">
   <div class="board__head">
-    <div class="board__title">FIFA<b>26</b> <button class="help-btn" id="helpBtn" aria-label="Help">?</button></div>
+    <div class="board__title">My<b>FIFA26</b> <button class="help-btn" id="refreshBtn" aria-label="Refresh" title="Refresh">&#x21bb;</button><button class="help-btn" id="helpBtn" aria-label="Help" title="Help">?</button></div>
     <div class="toggle" id="viewToggle">
       <span class="toggle__lbl active" id="tLblW">Winners</span>
       <div class="toggle__track" id="tTrack"><div class="toggle__knob"></div></div>
@@ -1434,6 +1434,16 @@ try{
     });
   }
 }catch(e){}
+
+/* ── Refresh button ── */
+document.getElementById("refreshBtn").addEventListener("click",()=>{
+  if('serviceWorker' in navigator && navigator.serviceWorker.controller){
+    navigator.serviceWorker.getRegistration().then(reg=>{
+      if(reg) reg.update().then(()=>location.reload());
+      else location.reload();
+    });
+  } else { location.reload(); }
+});
 
 /* ── Help overlay ── */
 (function(){
