@@ -1392,10 +1392,23 @@ document.getElementById("share").addEventListener("click",()=>{
   const n=Object.values(picks).filter(v=>v&&pickResult(v)).length;
   if(!n){ toast("Make some picks first!"); return; }
   const url=window.location.origin+window.location.pathname+"?p="+encodePicks(picks);
-  navigator.clipboard.writeText(url).then(
-    ()=>toast("Link copied! "+n+"/24 picks"),
-    ()=>{ prompt("Copy this link:",url); }
-  );
+
+  // Try native Web Share API first (phones)
+  if(navigator.share){
+    navigator.share({
+      title:"My FIFA26 Picks",
+      text:"Check out my World Cup group stage predictions ("+n+"/24 picks)",
+      url:url
+    }).catch(err => {
+      if(err.name !== "AbortError") console.error("Share failed:", err);
+    });
+  } else {
+    // Fallback: copy to clipboard (desktop)
+    navigator.clipboard.writeText(url).then(
+      ()=>toast("Link copied! "+n+"/24 picks"),
+      ()=>{ prompt("Copy this link:",url); }
+    );
+  }
 });
 
 /* group popup */
