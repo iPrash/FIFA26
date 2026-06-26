@@ -802,7 +802,7 @@ function resolveKnockout(){
     }
   });
 
-  // Third-place resolution only works when ALL groups are decided
+  // Third-place resolution: full when all groups decided, partial when some slots are invariant
   let thirdTeams = {}; // matchNum -> team code
   if(allDone){
     const bestThirds = thirds.slice(0, 8);
@@ -814,6 +814,97 @@ function resolveKnockout(){
         const matchNum = THIRD_HOST_TO_MATCH[host];
         thirdTeams[matchNum] = tables[originGroup][2];
       });
+    }
+  } else {
+    // Partial third-place resolution via full brute-force.
+    // Done groups (all fixtures locked): 3rd-place team + stats are fixed.
+    // Open groups: enumerate every W/D/L outcome of remaining matches,
+    // compute each group's 3rd-place team + stats for every outcome.
+    // Then combine across groups, rank all 12 thirds, pick top 8,
+    // run assignThirds, and check which R32 slots are invariant.
+    const doneGroups = GROUPS.filter(g => fixByGroup[g].every(([id])=>locked[id]));
+    const openGroups = GROUPS.filter(g => !doneGroups.includes(g));
+
+    // For done groups: fixed 3rd-place outcome
+    const doneThirds = {}; // group -> {team, pts, gd, gf}
+    doneGroups.forEach(g => {
+      const team = tables[g][2];
+      doneThirds[g] = {team, pts:s[team].pts, gd:s[team].gd, gf:s[team].gf};
+    });
+
+    // For each open group: enumerate all possible W/D/L outcomes and collect
+    // the set of distinct 3rd-place results (team, pts, gd, gf).
+    // Pts are exact (depend only on W/D/L). GD uses 1-0 scores as proxy.
+    const openOutcomes = {}; // group -> [{team, pts, gd, gf}, ...]
+    openGroups.forEach(g => {
+      const rem = fixByGroup[g].filter(([id])=>!locked[id]);
+      const teams = Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
+      const N = Math.pow(3, rem.length);
+      const seen = new Set();
+      const outcomes = [];
+      for(let mask=0; mask<N; mask++){
+        const p = {};
+        teams.forEach(t => { p[t] = {pts:BASE[t].pts, gd:BASE[t].gd, gf:BASE[t].gf, ga:BASE[t].ga}; });
+        let m = mask;
+        for(const [,, h, a] of rem){
+          const o = m%3; m = (m-o)/3;
+          if(o===0){ p[h].pts+=3; p[h].gf++; p[a].ga++; p[h].gd++; p[a].gd--; }
+          else if(o===1){ p[a].pts+=3; p[a].gf++; p[h].ga++; p[a].gd++; p[h].gd--; }
+          else { p[h].pts++; p[a].pts++; }
+        }
+        const sorted = teams.slice().sort((x,y)=>
+          (p[y].pts-p[x].pts)||(p[y].gd-p[x].gd)||(p[y].gf-p[x].gf)||((seedIndex[x]??0)-(seedIndex[y]??0))
+        );
+        const third = sorted[2];
+        const key = third+"|"+p[third].pts+"|"+p[third].gd+"|"+p[third].gf;
+        if(!seen.has(key)){
+          seen.add(key);
+          outcomes.push({team:third, pts:p[third].pts, gd:p[third].gd, gf:p[third].gf});
+        }
+      }
+      openOutcomes[g] = outcomes;
+    });
+
+    // Cross-product of all open group outcomes, combined with fixed done-group thirds.
+    // For each combination: rank all 12 thirds, pick top 8, run assignThirds.
+    const slotResults = {}; // matchNum -> Set of team codes
+    THIRD_COLS.forEach(host => { slotResults[THIRD_HOST_TO_MATCH[host]] = new Set(); });
+
+    // Build array of open group outcome arrays for iteration
+    const openKeys = openGroups.slice();
+    const openArrs = openKeys.map(g => openOutcomes[g]);
+    const lengths = openArrs.map(a => a.length);
+    const totalCombos = lengths.reduce((a,b)=>a*b, 1);
+
+    if(totalCombos > 100000) {/* too many open groups — skip brute-force */}
+    else for(let combo=0; combo<totalCombos; combo++){
+      const allThirds = [];
+      let c = combo;
+      for(let i=0; i<openKeys.length; i++){
+        const idx = c % lengths[i]; c = (c - idx) / lengths[i];
+        allThirds.push({g:openKeys[i], ...openArrs[i][idx]});
+      }
+      doneGroups.forEach(g => allThirds.push({g, ...doneThirds[g]}));
+
+      // Rank all 12 thirds by pts > gd > gf
+      allThirds.sort((a,b)=>(b.pts-a.pts)||(b.gd-a.gd)||(b.gf-a.gf));
+      const top8 = allThirds.slice(0,8).map(t=>t.g);
+
+      const assignment = assignThirds(top8);
+      if(!assignment) continue;
+      THIRD_COLS.forEach(host => {
+        const originGroup = assignment[host];
+        const matchNum = THIRD_HOST_TO_MATCH[host];
+        const entry = allThirds.find(t=>t.g===originGroup);
+        slotResults[matchNum].add(entry.team);
+      });
+    }
+
+    // Slots where only ONE team appeared across ALL scenarios are locked
+    for(const matchNum in slotResults){
+      if(slotResults[matchNum].size === 1){
+        thirdTeams[matchNum] = [...slotResults[matchNum]][0];
+      }
     }
   }
 

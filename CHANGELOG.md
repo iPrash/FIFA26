@@ -4,6 +4,21 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-26 · Morning — Partial Third-Place Resolution
+
+### Bracket Logic
+- R32 third-place slots now resolve as soon as they're mathematically locked, without waiting for all 12 groups to finish.
+- Full brute-force: enumerates every W/D/L outcome for open groups, cross-products all combinations, ranks 12 thirds, runs Annex C assignment, and locks any slot that gets the same team in every scenario.
+- Result: USA vs BIH (Match 81) now shows immediately with 6 groups complete — matches all major sports outlets.
+
+### Bug Fix
+- Fixed double-counting of user picks in the brute-force: open-group stats now start from confirmed results only (BASE), not from picks-inflated stats.
+
+### Performance
+- Added safeguard: brute-force skips if cross-product exceeds 100k combinations (prevents browser freeze with many open groups).
+
+---
+
 ## 2026-06-25 · 9:00 PM — PWA Stability & Board Cleanup
 
 - Fixed blank page caused by stale localStorage picks after fixture ID migration.
