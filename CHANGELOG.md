@@ -4,6 +4,15 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-25 · 5:00 PM — Smarter Bracket Slots
+
+### Bracket Logic
+- When two locked teams still play each other (e.g. FRA vs NOR), bracket shows both as "FRA/NOR" with dual flags instead of guessing who's 1st vs 2nd.
+- When a single locked team has remaining matches that could change their position (e.g. COL vs POR), bracket no longer prematurely assigns them to a slot — waits for the result.
+- Dual slots render in mirror-image style consistent with other bracket cards: home = `flag CODE / flag CODE`, away = `CODE flag / CODE flag`.
+
+---
+
 ## 2026-06-25 · 3:00 PM — Progressive Web App
 
 - MyFIFA26 is now installable as an app on iOS, Android, and desktop via "Add to Home Screen".

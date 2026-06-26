@@ -297,6 +297,7 @@
   .ko__slot .nm{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ko__grp{font:800 8px/1 ui-monospace,monospace;flex:none;opacity:.8}
   .ko__vs{color:var(--muted);font-size:9px;flex:none;margin:0 3px}
+  .ko__slot--dual{opacity:.7}
   .ko__slot--tbd{opacity:.35}
   .ko__slot--tbd .cd{font-style:italic;font-weight:600}
   .ko__slot--home{border-left:3px solid var(--gc,var(--line))}
@@ -749,7 +750,8 @@ function resolveKnockout(){
 
   // Build qualifiers map
   // Fully-picked groups: use final standings
-  // Incomplete groups: still show clinched (LOCKED) teams in their current position
+  // Incomplete groups: show clinched teams, but if both top-2 are locked
+  // and remaining matches could swap their order, show as dual (either/or)
   const qualifiers = {};
   GROUPS.forEach(g=>{
     if(groupDone[g]){
@@ -757,8 +759,31 @@ function resolveKnockout(){
       qualifiers["2"+g] = tables[g][1];
     } else {
       const t = tables[g];
-      if(LOCKED.has(t[0])) qualifiers["1"+g] = t[0];
-      if(LOCKED.has(t[1])) qualifiers["2"+g] = t[1];
+      const t0Locked = LOCKED.has(t[0]), t1Locked = LOCKED.has(t[1]);
+      const rem = fixByGroup[g].filter(([id])=> !locked[id] && !(picks[id] && pickResult(picks[id])));
+
+      if(t0Locked && t1Locked){
+        // Both locked: check if remaining matches could swap their order
+        const canSwap = rem.some(([,, h, a])=> (h===t[0]&&a===t[1]) || (h===t[1]&&a===t[0]));
+        if(canSwap){
+          const dual = {dual:[t[0],t[1]]};
+          qualifiers["1"+g] = dual;
+          qualifiers["2"+g] = dual;
+        } else {
+          qualifiers["1"+g] = t[0];
+          qualifiers["2"+g] = t[1];
+        }
+      } else if(t0Locked && !t1Locked){
+        // Only 1st is locked: check if any remaining match could let someone overtake them
+        const couldDrop = rem.some(([,, h, a])=> h===t[0] || a===t[0]);
+        if(couldDrop){
+          // Don't assign position — result could change 1st vs 2nd
+        } else {
+          qualifiers["1"+g] = t[0];
+        }
+      } else if(t1Locked){
+        qualifiers["2"+g] = t[1];
+      }
     }
   });
 
@@ -778,16 +803,23 @@ function resolveKnockout(){
   }
 
   // Resolve R32
-  const resolved = {}; // matchNum -> {home: code|null, away: code|null}
+  const resolved = {}; // matchNum -> {home: code|null, away: code|null, homeDual: [a,b]|null, awayDual: [a,b]|null}
   R32_MATCHES.forEach(match=>{
-    const home = typeof match.home === "string" ? (qualifiers[match.home]||null) : null;
-    let away;
+    let home = null, homeDual = null;
+    if(typeof match.home === "string"){
+      const q = qualifiers[match.home];
+      if(q && q.dual) homeDual = q.dual;
+      else home = q || null;
+    }
+    let away = null, awayDual = null;
     if(typeof match.away === "string"){
-      away = qualifiers[match.away]||null;
+      const q = qualifiers[match.away];
+      if(q && q.dual) awayDual = q.dual;
+      else away = q || null;
     } else {
       away = thirdTeams[match.m]||null;
     }
-    resolved[match.m] = {home, away};
+    resolved[match.m] = {home, away, homeDual, awayDual};
   });
 
   // Slot labels for R32 matches (for display when team unknown)
@@ -1038,7 +1070,13 @@ function renderFixtures(){
 }
 
 /* ---- Bracket rendering ---- */
-function koSlot(code, groupLetter, label, isAway){
+function koSlot(code, groupLetter, label, isAway, dual){
+  if(dual){
+    const [a,b] = dual;
+    const gc = TEAMS[a].g ? GC[TEAMS[a].g] : "var(--line)";
+    if(isAway) return `<span class="ko__slot ko__slot--away ko__slot--dual" style="--gc:${gc}"><span class="cd">${b}</span> ${flag(b)} / ${flag(a)} <span class="cd">${a}</span></span>`;
+    return `<span class="ko__slot ko__slot--home ko__slot--dual" style="--gc:${gc}">${flag(a)} <span class="cd">${a}</span> / ${flag(b)} <span class="cd">${b}</span></span>`;
+  }
   if(!code) return `<span class="ko__slot ko__slot--tbd"><span class="cd">${label||"TBD"}</span></span>`;
   const gc = groupLetter ? GC[groupLetter] : "var(--line)";
   const grpTag = groupLetter ? `<span class="ko__grp" style="color:${gc}">${groupLetter}</span>` : "";
@@ -1116,9 +1154,9 @@ function renderBracket(){
     return `<div class="ko__match">
       ${koVenue(match.m,time)}
       <div class="ko__row">${mnTime(match.m)}
-      ${koSlot(r.home, hg, sl.home)}
+      ${koSlot(r.home, hg, sl.home, false, r.homeDual)}
       <span class="ko__vs">vs</span>
-      ${koSlot(r.away, ag, sl.away, true)}</div>
+      ${koSlot(r.away, ag, sl.away, true, r.awayDual)}</div>
     </div>`;
   });
 
