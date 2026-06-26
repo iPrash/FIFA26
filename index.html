@@ -237,7 +237,7 @@
     font:700 10px/1.1 ui-monospace,monospace
   }
   .draw small{font-size:8px;font-weight:600;opacity:.8}
-  .side.sel{border-color:var(--pick);background:rgba(31,157,87,.10)}
+  .side.sel{border-color:var(--gold);background:rgba(218,165,32,.10)}
   .side.sel .cd{color:var(--pitch-dk)}
   .draw.sel{border-color:var(--pickdraw);background:rgba(91,110,126,.12);color:#3c4a55}
   .side.dim,.draw.dim{opacity:.5}
@@ -263,7 +263,8 @@
   .match--locked{opacity:1;border-color:var(--pitch);background:rgba(31,157,87,.06)}
   .match--locked .pick{pointer-events:none}
   .match--locked .side{cursor:default;border-color:var(--line)}
-  .match--locked .side.lk-win{background:rgba(31,157,87,.18);border-color:var(--pitch)}
+  .match--locked .side.lk-win{background:rgba(218,165,32,.10);border-color:var(--gold);font-weight:800}
+  .match--locked .side.lk-win .cd{font-weight:800}
   .match--locked .side.lk-draw{background:rgba(31,157,87,.08)}
   .match--locked .lk-score{font:800 15px/1 ui-monospace,monospace;color:var(--pitch-dk)}
   .match--locked .side:first-child .lk-score{margin-left:auto;padding-right:2px}
@@ -436,9 +437,11 @@
     justify-content:center;
   }
   .bkt-mn{
-    font:600 7px/1 ui-monospace,monospace;color:var(--muted);text-align:center;
-    padding:0 0 1px;
+    font:600 7px/1 ui-monospace,monospace;color:rgba(255,255,255,.85);text-align:center;
+    padding:0 0 1px;white-space:nowrap;
   }
+  .bkt-dt{font-weight:400;color:rgba(255,255,255,.7)}
+  .bkt-dt-line{font:400 7px/1 ui-monospace,monospace;color:rgba(255,255,255,.7);text-align:center;padding:0 0 2px}
   .bkt-team{
     display:flex;align-items:center;gap:3px;
     background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
@@ -497,12 +500,12 @@
   /* knockout pickable/picked states */
   .ko__slot--pickable{cursor:pointer;transition:background .15s,border-color .15s}
   .ko__slot--pickable:hover{background:rgba(31,157,87,.08)}
-  .ko__slot--picked{background:rgba(31,157,87,.15)!important;border-color:var(--pitch)!important}
+  .ko__slot--picked{background:rgba(218,165,32,.12)!important;border:2px solid var(--gold)!important}
   .ko__slot--picked .cd{color:var(--pitch-dk)}
   .bkt-team--pickable{cursor:pointer;transition:background .15s}
   .bkt-team--pickable:hover{background:rgba(255,255,255,.12)}
-  .bkt-team--picked{background:rgba(31,157,87,.25)!important;border-color:var(--pitch)!important}
-  .bkt-team--picked .cd{color:var(--pitch)}
+  .bkt-team--picked{background:rgba(218,165,32,.15)!important;border:2px solid var(--gold)!important}
+  .bkt-team--picked .cd{color:var(--chalk)}
 </style>
 </head>
 <body>
@@ -1287,6 +1290,41 @@ const PROBABLE = {
   67:"A", 68:"H"    // PAN vs ENG → ENG; CRO vs GHA → CRO
 };
 
+/* Strength ranking for probable KO picks (Polymarket odds, Jun 26 2026) */
+const PROBABLE_STRENGTH = [
+  "FRA","ARG","ESP","ENG","POR","NED","BRA","GER",
+  "NOR","USA","MAR","COL","JPN","MEX","BEL","SUI",
+  "ECU","CRO","AUT","CIV","EGY","CAN","SEN","SWE",
+  "BIH","URU","PAR","GHA","AUS","COD","KOR","CPV",
+  "RSA","KSA","SCO","IRN","ALG","NZL","UZB","IRQ",
+  "HAI","JOR","TUR","CUW","QAT","TUN","PAN","CZE"
+];
+
+function computeProbableKoPicks(){
+  const {resolved} = resolveKnockout(picks);
+  const kp = {};
+  KO_ORDER.forEach(m => {
+    const r = resolved[m];
+    if(!r || !r.home || !r.away) return;
+    const hi = PROBABLE_STRENGTH.indexOf(r.home);
+    const ai = PROBABLE_STRENGTH.indexOf(r.away);
+    if(hi < 0 && ai < 0) return;
+    const winner = (hi >= 0 && (ai < 0 || hi < ai)) ? r.home : r.away;
+    kp[m] = winner;
+    const feeds = KO_FEEDS_INTO[m];
+    if(!feeds) return;
+    feeds.forEach(({target, slot, type}) => {
+      if(!resolved[target]) resolved[target] = {home:null, away:null};
+      if(type === "W") resolved[target][slot] = winner;
+      else if(type === "L"){
+        const loser = (r.home === winner) ? r.away : r.home;
+        if(loser) resolved[target][slot] = loser;
+      }
+    });
+  });
+  return kp;
+}
+
 /* =================== STATE + RENDER =================== */
 let picks=initPicks();
 let koPicks = _sharedKoPicks || loadKoPicks();
@@ -1295,6 +1333,8 @@ if(_sharedKoPicks){ saveKoPicks(koPicks); _sharedKoPicks=null; }
 if(!Object.values(picks).some(Boolean)){
   for(const id in PROBABLE) picks[id]=defaultPick(PROBABLE[id]);
   savePicks(picks);
+  koPicks = computeProbableKoPicks();
+  saveKoPicks(koPicks);
 }
 
 /* 12 distinct hues, one per group (bright enough for the dark board) */
@@ -1375,11 +1415,9 @@ function gteam(rk,code,s,full){
 function side(code,r,which,pts){
   const sel=r===which;
   const dim=r && !sel;
-  const badge = sel ? '<span class="win-badge">✓</span>' : '';
   return `<button class="side ${which==='A'?'away':''} ${sel?'sel':''} ${dim?'dim':''}" data-pick="${which}">
       ${flag(code)}
       <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n} (${pts})</span></span>
-      ${badge}
     </button>`;
 }
 
@@ -1608,7 +1646,7 @@ function bktMatchCell(m, col, row, span, res, labels){
   }
   const bothKnown = hCode && aCode;
   return `<div class="bkt-match" style="grid-column:${col};grid-row:${row}/span ${span}">
-    <div class="bkt-mn">${m}</div>
+    <div class="bkt-mn">${m} <span class="bkt-dt">${(KO_DATES[m]||"").replace(/^\w+ · /,"")}</span></div>
     ${bktTeamHtml(hCode, hGrp, hLbl, bothKnown ? m : null)}
     ${bktTeamHtml(aCode, aGrp, aLbl, bothKnown ? m : null)}
   </div>`;
@@ -1689,13 +1727,14 @@ function renderBracketOverlay(){
       let hC=null,aC=null,hG=null,aG=null,hL=sl?sl.home:"TBD",aL=sl?sl.away:"TBD";
       if(r2){hC=r2.home;aC=r2.away;if(hC)hG=TEAMS[hC].g;if(aC)aG=TEAMS[aC].g;}
       const bk=hC&&aC?104:null;
-      return `<div class="bkt-mn">104</div>${bktTeamHtml(hC,hG,hL,bk)}${bktTeamHtml(aC,aG,aL,bk)}`;
+      return `<div class="bkt-mn">104</div><div class="bkt-dt-line">${(KO_DATES[104]||"").replace(/^\w+ · /,"")}</div>${bktTeamHtml(hC,hG,hL,bk)}${bktTeamHtml(aC,aG,aL,bk)}`;
     })()}
   </div>`;
 
   // 3rd place (col 9, below final)
   h += `<div class="bkt-match" style="grid-column:9;grid-row:24/span 4">
     <div class="bkt-mn" style="color:var(--bronze)">3rd · 103</div>
+    <div class="bkt-dt-line">${(KO_DATES[103]||"").replace(/^\w+ · /,"")}</div>
     ${(()=>{const r2=res[103],sl=labels[103];
       let hC=null,aC=null,hG=null,aG=null,hL=sl?sl.home:"TBD",aL=sl?sl.away:"TBD";
       if(r2){hC=r2.home;aC=r2.away;if(hC)hG=TEAMS[hC].g;if(aC)aG=TEAMS[aC].g;}
@@ -1763,9 +1802,10 @@ fixturesEl.addEventListener("click",e=>{
 
 document.getElementById("probable").addEventListener("click",()=>{
   for(const id in PROBABLE) picks[id]=defaultPick(PROBABLE[id]);
-  koPicks={};
-  savePicks(picks); saveKoPicks(koPicks); renderFixtures(); renderBoard(); renderBracket();
-  toast("Loaded probable picks");
+  savePicks(picks);
+  koPicks = computeProbableKoPicks();
+  saveKoPicks(koPicks); renderFixtures(); renderBoard(); renderBracket();
+  toast("Loaded probable picks (groups + bracket)");
 });
 
 document.getElementById("myPicks").addEventListener("click",()=>{

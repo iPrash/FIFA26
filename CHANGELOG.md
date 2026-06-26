@@ -4,6 +4,25 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-26 · Late Night — Probable KO Picks & Golden Winners
+
+### Probable Picks → Full Bracket
+- Probable Picks now fills the entire knockout bracket (R32 through Final), not just group matches.
+- Uses Polymarket strength ranking (France → Argentina → Spain → ...) to pick the favored team in each matchup.
+- First-visit auto-load also fills bracket picks.
+
+### Golden Winner Borders
+- Picked winners across all views (Groups tab, Bracket tab, Overlay) now highlighted with a golden border.
+- Completed (locked) match winners also use golden border styling.
+- Removed redundant ✓ tick marks from group match picks.
+
+### Overlay Enhancements
+- Date and time shown next to match number on all bracket overlay matches.
+- Final and 3rd Place show date/time on a separate line below the match number.
+- Brighter match number and date text for readability.
+
+---
+
 ## 2026-06-26 · Night — Bracket Picks, My Picks & UI Polish
 
 ### Bracket Picks
