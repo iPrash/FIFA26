@@ -388,7 +388,7 @@
       <div class="toggle__track" id="tTrack"><div class="toggle__knob"></div></div>
       <span class="toggle__lbl" id="tLblF">Full Group</span>
     </div>
-    <div class="board__count"><strong id="lockN">0</strong> qualified · <span id="fillN">0</span>/<span id="totN">24</span> picks</div>
+    <div class="board__count">🔒 Qualified: <strong id="lockN">0</strong>/32</div>
   </div>
   <div class="boardbody">
     <div class="groups" id="groups"></div>
@@ -996,7 +996,6 @@ function renderBoard(){
   }).join("");
 
   document.getElementById("lockN").textContent=LOCKED.size;
-  document.getElementById("fillN").textContent=Object.values(picks).filter(v=>v&&pickResult(v)).length;
 }
 
 function gteam(rk,code,s,full){
