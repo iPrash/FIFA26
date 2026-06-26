@@ -376,6 +376,109 @@
   footer{max-width:560px;margin:20px auto 0;padding:0 14px;color:var(--muted);font-size:11px;line-height:1.55}
   footer code{background:#ececdf;padding:1px 4px;border-radius:4px}
   .asof{color:var(--pitch-dk);font-weight:600}
+
+  /* ---------- bracket tree overlay ---------- */
+  .bkt-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .2s
+  }
+  .bkt-overlay.open{opacity:1;pointer-events:auto}
+  .bkt-popup{
+    background:var(--board);color:var(--chalk);border-radius:14px;
+    box-shadow:0 12px 50px rgba(0,0,0,.6);border-top:3px solid var(--pitch);
+    width:min(96vw,1200px);height:min(90vh,700px);
+    display:flex;flex-direction:column;overflow:hidden;
+  }
+  .bkt-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0
+  }
+  .bkt-header h3{margin:0;font:800 14px/1.2 ui-monospace,monospace;color:var(--pitch)}
+  .bkt-close{
+    background:none;border:none;color:#9fb3a7;font-size:22px;cursor:pointer;padding:0 4px;line-height:1
+  }
+  .bkt-close:hover{color:#fff}
+  .bkt-scroll{
+    flex:1;overflow:auto;-webkit-overflow-scrolling:touch;
+    padding:10px;
+  }
+  /* --- grid-based bracket tree --- */
+  .bkt-tree{
+    display:grid;
+    /* 17 cols: R32L cL1 R16L cL2 QFL cL3 SFL cL4 FINAL cR4 SFR cR3 QFR cR2 R16R cR1 R32R */
+    grid-template-columns:
+      minmax(70px,1fr) 10px minmax(70px,1fr) 10px minmax(70px,1fr) 10px
+      minmax(70px,1fr) 10px minmax(80px,1fr) 10px minmax(70px,1fr) 10px
+      minmax(70px,1fr) 10px minmax(70px,1fr) 10px minmax(70px,1fr);
+    grid-template-rows:repeat(32,19px);
+    gap:0;
+    min-width:1000px;
+    padding:8px 4px;
+    align-items:stretch;
+  }
+  .bkt-match{
+    display:flex;flex-direction:column;gap:0;padding:0 2px;
+    justify-content:center;
+  }
+  .bkt-mn{
+    font:600 7px/1 ui-monospace,monospace;color:var(--muted);text-align:center;
+    padding:0 0 1px;
+  }
+  .bkt-team{
+    display:flex;align-items:center;gap:3px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+    padding:2px 4px;min-width:0;
+    font:600 10px/1.2 ui-monospace,monospace;
+  }
+  .bkt-team:first-of-type{border-radius:4px 4px 0 0;border-bottom:none}
+  .bkt-team:last-of-type{border-radius:0 0 4px 4px}
+  .bkt-team--has{border-left:3px solid var(--gc,rgba(255,255,255,.15))}
+  .bkt-team--tbd{opacity:.35}
+  .bkt-team .flag{width:18px;height:13px;flex:none}
+  .bkt-team .cd{white-space:nowrap}
+  /* connector lines */
+  .bkt-conn{position:relative}
+  .bkt-conn::after{content:"";position:absolute;background:rgba(255,255,255,.2)}
+  /* horizontal right half-line */
+  .bkt-hr::after{top:50%;right:0;width:50%;height:2px;transform:translateY(-1px)}
+  /* horizontal left half-line */
+  .bkt-hl::after{top:50%;left:0;width:50%;height:2px;transform:translateY(-1px)}
+  /* horizontal full line */
+  .bkt-hf::after{top:50%;left:0;width:100%;height:2px;transform:translateY(-1px)}
+  /* vertical full */
+  .bkt-vf::after{left:50%;top:0;width:2px;height:100%;transform:translateX(-1px)}
+  /* vertical bottom half (top-right corner) */
+  .bkt-vb::after{left:50%;top:50%;width:2px;height:50%;transform:translateX(-1px)}
+  .bkt-vb::before{content:"";position:absolute;top:50%;right:0;width:50%;height:2px;background:rgba(255,255,255,.2);transform:translateY(-1px)}
+  /* vertical top half (bottom-right corner) */
+  .bkt-vt::after{left:50%;top:0;width:2px;height:50%;transform:translateX(-1px)}
+  .bkt-vt::before{content:"";position:absolute;top:50%;right:0;width:50%;height:2px;background:rgba(255,255,255,.2);transform:translateY(-1px)}
+  /* mirrored: vertical bottom + left line */
+  .bkt-vb-l::after{right:50%;top:50%;width:2px;height:50%;transform:translateX(1px)}
+  .bkt-vb-l::before{content:"";position:absolute;top:50%;left:0;width:50%;height:2px;background:rgba(255,255,255,.2);transform:translateY(-1px)}
+  /* mirrored: vertical top + left line */
+  .bkt-vt-l::after{right:50%;top:0;width:2px;height:50%;transform:translateX(1px)}
+  .bkt-vt-l::before{content:"";position:absolute;top:50%;left:0;width:50%;height:2px;background:rgba(255,255,255,.2);transform:translateY(-1px)}
+  /* mirrored vertical full (right-aligned) */
+  .bkt-vf-l::after{right:50%;top:0;width:2px;height:100%;transform:translateX(1px)}
+  /* round labels */
+  .bkt-rlbl{
+    font:800 9px/1 ui-monospace,monospace;color:var(--pitch);
+    text-transform:uppercase;letter-spacing:.06em;text-align:center;
+    display:flex;align-items:end;justify-content:center;padding-bottom:2px;
+  }
+  /* final cell */
+  .bkt-final{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;
+  }
+  .bkt-final-label{
+    font:800 11px/1 ui-monospace,monospace;color:var(--gold);
+    text-align:center;letter-spacing:.08em;text-transform:uppercase;
+  }
+  .bkt-trophy{font-size:22px;line-height:1}
+  .btn--bracket{border-color:var(--gold);color:#8a6d1b;font:600 9px/1.15 system-ui}
 </style>
 </head>
 <body>
@@ -404,6 +507,7 @@
     <div class="bar">
       <p id="hint">Probable winners shown.<br>Tap to change. Board updates live.</p>
       <div class="bar__btns">
+        <button class="btn btn--bracket" id="bracketTreeBtn">🏆<br>Bracket</button>
         <button class="btn btn--pitch" id="probable">Probable<br>Picks</button>
         <button class="btn btn--share" id="share">Share<br>My Picks</button>
         <button class="btn btn--danger" id="reset">Clear<br>Picks</button>
@@ -423,6 +527,17 @@
 </div>
 <div class="gpop-overlay" id="gpopOverlay">
   <div class="gpop" id="gpop"></div>
+</div>
+<div class="bkt-overlay" id="bktOverlay">
+  <div class="bkt-popup">
+    <div class="bkt-header">
+      <h3>🏆 Knockout Bracket</h3>
+      <button class="bkt-close" id="bktClose">&times;</button>
+    </div>
+    <div class="bkt-scroll">
+      <div class="bkt-tree" id="bktTree"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Tab bar for mobile -->
@@ -1338,6 +1453,140 @@ function renderBracket(){
   bracketEl.innerHTML = html;
 }
 
+/* ========== BRACKET TREE OVERLAY ========== */
+function bktTeamHtml(code, groupLetter, label){
+  if(!code){
+    return `<div class="bkt-team bkt-team--tbd"><span class="cd">${label||"TBD"}</span></div>`;
+  }
+  const gc = groupLetter ? GC[groupLetter] : "rgba(255,255,255,.15)";
+  return `<div class="bkt-team bkt-team--has" style="--gc:${gc}">${flag(code)} <span class="cd">${code}</span></div>`;
+}
+
+function bktMatchCell(m, col, row, span, res, labels){
+  const r = res[m];
+  const sl = labels[m];
+  let hCode=null, aCode=null, hGrp=null, aGrp=null;
+  let hLbl = sl ? sl.home : "TBD";
+  let aLbl = sl ? sl.away : "TBD";
+  if(r){
+    hCode = r.home; aCode = r.away;
+    if(r.homeDual) hLbl = r.homeDual.join("/");
+    if(r.awayDual) aLbl = r.awayDual.join("/");
+    if(hCode) hGrp = TEAMS[hCode].g;
+    if(aCode) aGrp = TEAMS[aCode].g;
+  }
+  return `<div class="bkt-match" style="grid-column:${col};grid-row:${row}/span ${span}">
+    <div class="bkt-mn">${m}</div>
+    ${bktTeamHtml(hCode, hGrp, hLbl)}
+    ${bktTeamHtml(aCode, aGrp, aLbl)}
+  </div>`;
+}
+
+function bktConn(col, row, span, cls){
+  return `<div class="bkt-conn ${cls}" style="grid-column:${col};grid-row:${row}/span ${span}"></div>`;
+}
+
+function renderBracketOverlay(){
+  const {resolved, slotLabels} = resolveKnockout();
+  const res = Object.assign({}, resolved);
+  const labels = Object.assign({}, slotLabels);
+  [...R16_MATCHES,...QF_MATCHES,...SF_MATCHES,FINAL_MATCH,THIRD_PLACE].forEach(m=>{
+    if(!labels[m.m]) labels[m.m] = {home:m.home, away:m.away};
+    if(!res[m.m]) res[m.m] = {home:null, away:null};
+  });
+
+  /*
+   * Grid: 17 columns × 32 rows
+   * Cols: 1=R32L 2=cL1 3=R16L 4=cL2 5=QFL 6=cL3 7=SFL 8=cL4 9=FINAL
+   *       10=cR4 11=SFR 12=cR3 13=QFR 14=cR2 15=R16R 16=cR1 17=R32R
+   * Each R32 match = 2 rows, stride of 4 → 8 matches in 32 rows
+   */
+  const r32rows = [1,5,9,13,17,21,25,29];
+  const r16rows = [2,10,18,26];
+  const qfRows  = [4,20];
+
+  const leftR32=[74,77,73,75,83,84,81,82], leftR16=[89,90,93,94], leftQF=[97,98], leftSF=101;
+  const rightR32=[76,78,79,80,86,88,85,87], rightR16=[91,92,95,96], rightQF=[99,100], rightSF=102;
+
+  let h='';
+
+  // helper: add left-side connectors (bracket ] shape — arm goes right toward next round)
+  function addConnsL(col, pairs, matchRows, span){
+    for(let p=0;p<pairs;p++){
+      const midTop = matchRows[p*2] + Math.floor(span/2);
+      const midBot = matchRows[p*2+1] + Math.floor(span/2) - (span>2?1:0);
+      h += bktConn(col, midTop, 1, 'bkt-vb-l');
+      if(midBot-midTop-1>0) h += bktConn(col, midTop+1, midBot-midTop-1, 'bkt-vf-l');
+      h += bktConn(col, midBot, 1, 'bkt-vt-l');
+    }
+  }
+  // helper: add right-side connectors (bracket [ shape — arm goes left toward next round)
+  function addConnsR(col, pairs, matchRows, span){
+    for(let p=0;p<pairs;p++){
+      const midTop = matchRows[p*2] + Math.floor(span/2);
+      const midBot = matchRows[p*2+1] + Math.floor(span/2) - (span>2?1:0);
+      h += bktConn(col, midTop, 1, 'bkt-vb');
+      if(midBot-midTop-1>0) h += bktConn(col, midTop+1, midBot-midTop-1, 'bkt-vf');
+      h += bktConn(col, midBot, 1, 'bkt-vt');
+    }
+  }
+
+  // Left R32 (col 1) + connectors (col 2)
+  leftR32.forEach((m,i)=> h += bktMatchCell(m, 1, r32rows[i], 2, res, labels));
+  addConnsL(2, 4, r32rows, 2);
+
+  // Left R16 (col 3) + connectors (col 4)
+  leftR16.forEach((m,i)=> h += bktMatchCell(m, 3, r16rows[i], 4, res, labels));
+  addConnsL(4, 2, r16rows, 4);
+
+  // Left QF (col 5) + connectors (col 6)
+  leftQF.forEach((m,i)=> h += bktMatchCell(m, 5, qfRows[i], 8, res, labels));
+  addConnsL(6, 1, qfRows, 8);
+
+  // Left SF (col 7) + connector (col 8)
+  h += bktMatchCell(leftSF, 7, 8, 16, res, labels);
+  h += bktConn(8, 16, 1, 'bkt-hf');
+
+  // FINAL (col 9)
+  h += `<div class="bkt-final" style="grid-column:9;grid-row:12/span 8">
+    <div class="bkt-trophy">🏆</div>
+    <div class="bkt-final-label">FINAL</div>
+    ${(()=>{const r2=res[104],sl=labels[104];
+      let hC=null,aC=null,hG=null,aG=null,hL=sl?sl.home:"TBD",aL=sl?sl.away:"TBD";
+      if(r2){hC=r2.home;aC=r2.away;if(hC)hG=TEAMS[hC].g;if(aC)aG=TEAMS[aC].g;}
+      return `<div class="bkt-mn">104</div>${bktTeamHtml(hC,hG,hL)}${bktTeamHtml(aC,aG,aL)}`;
+    })()}
+  </div>`;
+
+  // 3rd place (col 9, below final)
+  h += `<div class="bkt-match" style="grid-column:9;grid-row:24/span 4">
+    <div class="bkt-mn" style="color:var(--bronze)">3rd · 103</div>
+    ${(()=>{const r2=res[103],sl=labels[103];
+      let hC=null,aC=null,hG=null,aG=null,hL=sl?sl.home:"TBD",aL=sl?sl.away:"TBD";
+      if(r2){hC=r2.home;aC=r2.away;if(hC)hG=TEAMS[hC].g;if(aC)aG=TEAMS[aC].g;}
+      return `${bktTeamHtml(hC,hG,hL)}${bktTeamHtml(aC,aG,aL)}`;
+    })()}
+  </div>`;
+
+  // Right SF (col 11) + connector (col 10)
+  h += bktMatchCell(rightSF, 11, 8, 16, res, labels);
+  h += bktConn(10, 16, 1, 'bkt-hf');
+
+  // Right QF (col 13) + connectors (col 12)
+  rightQF.forEach((m,i)=> h += bktMatchCell(m, 13, qfRows[i], 8, res, labels));
+  addConnsR(12, 1, qfRows, 8);
+
+  // Right R16 (col 15) + connectors (col 14)
+  rightR16.forEach((m,i)=> h += bktMatchCell(m, 15, r16rows[i], 4, res, labels));
+  addConnsR(14, 2, r16rows, 4);
+
+  // Right R32 (col 17) + connectors (col 16)
+  rightR32.forEach((m,i)=> h += bktMatchCell(m, 17, r32rows[i], 2, res, labels));
+  addConnsR(16, 4, r32rows, 2);
+
+  document.getElementById("bktTree").innerHTML = h;
+}
+
 /* one delegated listener handles every pick */
 fixturesEl.addEventListener("click",e=>{
   // ignore clicks on locked (confirmed) matches
@@ -1682,6 +1931,17 @@ document.getElementById("refreshBtn").addEventListener("click",()=>{
   });
   document.getElementById("installOk").addEventListener("click",()=>io.classList.remove("open"));
   io.addEventListener("click",e=>{if(e.target===io)io.classList.remove("open");});
+})();
+
+/* ── Bracket tree overlay ── */
+(function(){
+  const overlay = document.getElementById("bktOverlay");
+  document.getElementById("bracketTreeBtn").addEventListener("click",()=>{
+    renderBracketOverlay();
+    overlay.classList.add("open");
+  });
+  document.getElementById("bktClose").addEventListener("click",()=>overlay.classList.remove("open"));
+  overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.remove("open");});
 })();
 </script>
 <script>

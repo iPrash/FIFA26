@@ -4,6 +4,18 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-26 · Evening — Bracket Tree Overlay
+
+- New "🏆 Bracket" button in the board header opens a full tournament bracket popup.
+- CSS Grid–based bracket tree with symmetric left/right halves: R32 → R16 → QF → SF → Final.
+- Connector lines link each pair of matches to their next-round target.
+- Shows confirmed teams with flags and group colours; unresolved slots display labels (W73, 3rd, etc.).
+- 3rd-place match displayed below the Final.
+- Horizontally scrollable on mobile for full bracket visibility.
+- Click outside or × to dismiss.
+
+---
+
 ## 2026-06-26 · Afternoon — Auto-Scroll & Footer Update
 
 - App smoothly scrolls to today's first fixture on load, accounting for the sticky board height so the date header is visible.
