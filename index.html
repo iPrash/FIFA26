@@ -878,6 +878,9 @@ function loadPicks(){
     const p=JSON.parse(v);
     // migrate old string picks to object format
     for(const id in p){ if(typeof p[id]==="string") p[id]=defaultPick(p[id]); }
+    // discard picks with IDs that don't match any current fixture
+    const validIds = new Set(FIX_IDS.map(String));
+    for(const id in p){ if(!validIds.has(String(id))) delete p[id]; }
     return p;
   }catch(e){ return {}; }
 }

@@ -1,4 +1,4 @@
-const CACHE = 'myfifa26-v2';
+const CACHE = 'myfifa26-v3';
 
 const PRECACHE = [
   './index.html',
