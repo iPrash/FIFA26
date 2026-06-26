@@ -1475,6 +1475,7 @@ tabBtns.forEach(btn=>{
 });
 
 // Update active tab on scroll
+let lastActiveIdx = 0;
 panelsEl.addEventListener("scroll",()=>{
   const scrollLeft = panelsEl.scrollLeft;
   const panelWidth = panelsEl.offsetWidth;
@@ -1482,6 +1483,18 @@ panelsEl.addEventListener("scroll",()=>{
   tabBtns.forEach((btn,i)=>{
     btn.classList.toggle("active", i===activeIdx);
   });
+  // On mobile, scroll to appropriate position when switching tabs
+  if(window.innerWidth < 900 && activeIdx !== lastActiveIdx){
+    if(activeIdx === 1){
+      // Switched TO bracket tab: scroll to top
+      const bracketPanel = document.querySelector(".panel--bracket");
+      if(bracketPanel) bracketPanel.scrollTop = 0;
+    } else if(activeIdx === 0){
+      // Switched TO groups tab: scroll back to today
+      setTimeout(scrollToToday, 50);
+    }
+    lastActiveIdx = activeIdx;
+  }
 });
 
 renderFixtures();
