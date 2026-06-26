@@ -1,4 +1,4 @@
-const CACHE = 'myfifa26-v3';
+const CACHE = 'myfifa26-v4';
 
 const PRECACHE = [
   './index.html',
@@ -19,6 +19,9 @@ self.addEventListener('activate', e => {
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
+     .then(() => self.clients.matchAll().then(clients =>
+       clients.forEach(c => c.postMessage({type:'SW_UPDATED'}))
+     ))
   );
 });
 

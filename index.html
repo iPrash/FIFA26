@@ -1539,6 +1539,13 @@ document.getElementById("refreshBtn").addEventListener("click",()=>{
   io.addEventListener("click",e=>{if(e.target===io)io.classList.remove("open");});
 })();
 </script>
-<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.addEventListener('message',e=>{
+    if(e.data&&e.data.type==='SW_UPDATED') location.reload();
+  });
+}
+</script>
 </body>
 </html>
