@@ -137,9 +137,14 @@
   }
   .btn:active{transform:translateY(1px)}
   .btn--danger{border-color:#c0392b;color:#c0392b}
-  .btn--pitch{border-color:var(--pitch);color:var(--pitch-dk)}
+  .btn--pitch{border-color:#48a6f5;color:#2a6fad}
   .btn--share{border-color:var(--silver);color:#3c5a70}
   .bar__btns{display:flex;gap:4px;flex-shrink:0}
+  .btn-duo{display:flex}
+  .btn-duo .btn:first-child{border-radius:6px 0 0 6px;border-right:none}
+  .btn-duo .btn:last-child{border-radius:0 6px 6px 0;padding:5px 6px}
+  .btn--my{border-color:var(--pitch)!important;color:var(--pitch-dk)!important}
+  .btn--my-share{font-size:13px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(31,157,87,.3)!important}
   .toast{
     position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
     background:var(--ink);color:#fff;padding:8px 16px;border-radius:8px;
@@ -395,6 +400,15 @@
     padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0
   }
   .bkt-header h3{margin:0;font:800 14px/1.2 ui-monospace,monospace;color:var(--pitch)}
+  .bkt-actions{display:flex;gap:4px;align-items:center;justify-content:flex-start;padding:6px 16px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0}
+  .btn--ov{font:600 10px/1.2 system-ui;padding:4px 8px;border-radius:6px;background:transparent;cursor:pointer;white-space:nowrap}
+  .btn--ov-pitch{border:1px solid #48a6f5;color:#6dbcff}
+  .btn--ov-my{border:1px solid var(--pitch)!important;color:#5ee09a!important}
+  .btn--ov-danger{border:1px solid #c0392b;color:#e86054}
+  .btn-duo--ov{display:flex}
+  .btn-duo--ov .btn:first-child{border-radius:6px 0 0 6px;border-right:none}
+  .btn-duo--ov .btn:last-child{border-radius:0 6px 6px 0;padding:4px 6px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(94,224,154,.3)!important}
+  .btn--ov-my-share svg{display:block}
   .bkt-close{
     background:none;border:none;color:#9fb3a7;font-size:22px;cursor:pointer;padding:0 4px;line-height:1
   }
@@ -479,6 +493,16 @@
   }
   .bkt-trophy{font-size:22px;line-height:1}
   .btn--bracket{border-color:var(--gold);color:#8a6d1b;font:600 9px/1.15 system-ui}
+
+  /* knockout pickable/picked states */
+  .ko__slot--pickable{cursor:pointer;transition:background .15s,border-color .15s}
+  .ko__slot--pickable:hover{background:rgba(31,157,87,.08)}
+  .ko__slot--picked{background:rgba(31,157,87,.15)!important;border-color:var(--pitch)!important}
+  .ko__slot--picked .cd{color:var(--pitch-dk)}
+  .bkt-team--pickable{cursor:pointer;transition:background .15s}
+  .bkt-team--pickable:hover{background:rgba(255,255,255,.12)}
+  .bkt-team--picked{background:rgba(31,157,87,.25)!important;border-color:var(--pitch)!important}
+  .bkt-team--picked .cd{color:var(--pitch)}
 </style>
 </head>
 <body>
@@ -505,12 +529,12 @@
   </div>
   <div class="bar-wrap">
     <div class="bar">
-      <p id="hint">Probable winners shown.<br>Tap to change. Board updates live.</p>
+      <p id="hint">Tap a Team to Choose.<br>Board Updates Live.</p>
+      <button class="btn btn--bracket" id="bracketTreeBtn" title="View full tournament bracket">🏆<br>Bracket</button>
       <div class="bar__btns">
-        <button class="btn btn--bracket" id="bracketTreeBtn">🏆<br>Bracket</button>
-        <button class="btn btn--pitch" id="probable">Probable<br>Picks</button>
-        <button class="btn btn--share" id="share">Share<br>My Picks</button>
-        <button class="btn btn--danger" id="reset">Clear<br>Picks</button>
+        <button class="btn btn--pitch" id="probable" title="Auto-fill with most likely outcomes">Probable<br>Picks</button>
+        <div class="btn-duo"><button class="btn btn--my" id="myPicks" title="Restore your saved picks">My<br>Picks</button><button class="btn btn--my btn--my-share" id="share" title="Share your picks via link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
+        <button class="btn btn--danger" id="reset" title="Clear all picks (My Picks are preserved)">Clear<br>Picks</button>
       </div>
     </div>
   </div>
@@ -533,6 +557,11 @@
     <div class="bkt-header">
       <h3>🏆 Knockout Bracket</h3>
       <button class="bkt-close" id="bktClose">&times;</button>
+    </div>
+    <div class="bkt-actions">
+      <button class="btn btn--ov btn--ov-pitch" id="ovProbable" title="Auto-fill with most likely outcomes">Probable Picks</button>
+      <div class="btn-duo btn-duo--ov"><button class="btn btn--ov btn--ov-my" id="ovMyPicks" title="Restore your saved picks">My Picks</button><button class="btn btn--ov btn--ov-my btn--ov-my-share" id="ovShare" title="Share your picks via link"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
+      <button class="btn btn--ov btn--ov-danger" id="ovReset" title="Clear all picks (My Picks are preserved)">Clear Picks</button>
     </div>
     <div class="bkt-scroll">
       <div class="bkt-tree" id="bktTree"></div>
@@ -819,6 +848,27 @@ const SF_MATCHES = [
 const FINAL_MATCH = {m:104, home:"W101", away:"W102"};
 const THIRD_PLACE = {m:103, home:"L101", away:"L102"};
 
+/* KO_FEEDS_INTO: maps match number → [{target, slot, type}]
+   e.g. KO_FEEDS_INTO[81] = [{target:94, slot:"home", type:"W"}]
+   meaning: winner of M81 fills M94's home slot */
+const KO_FEEDS_INTO = {};
+[...R16_MATCHES,...QF_MATCHES,...SF_MATCHES,FINAL_MATCH,THIRD_PLACE].forEach(match=>{
+  ["home","away"].forEach(slot=>{
+    const ref = match[slot];
+    const wm = ref.match(/^([WL])(\d+)$/);
+    if(wm){
+      const type = wm[1], src = parseInt(wm[2]);
+      if(!KO_FEEDS_INTO[src]) KO_FEEDS_INTO[src] = [];
+      KO_FEEDS_INTO[src].push({target:match.m, slot, type});
+    }
+  });
+});
+/* All KO match numbers in bracket order */
+const KO_ORDER = R32_MATCHES.map(m=>m.m).concat(
+  R16_MATCHES.map(m=>m.m), QF_MATCHES.map(m=>m.m),
+  SF_MATCHES.map(m=>m.m), [FINAL_MATCH.m, THIRD_PLACE.m]
+);
+
 /* Knockout match venues */
 const KO_VENUES = {
   73:"SoFi Stadium, Los Angeles",       74:"Gillette Stadium, Boston",
@@ -1096,6 +1146,19 @@ function encodePicks(p){
   const scores=FIX_IDS.map(id=>{const v=p[id]; if(!v) return ""; const sc=pickScores(v); return sc.hs+","+sc.as;}).join(";");
   return results+"."+scores;
 }
+function encodeKoPicks(kp){
+  // format: "81:USA,94:GER,104:ESP"
+  return Object.entries(kp).map(([m,t])=>m+":"+t).join(",");
+}
+function decodeKoPicks(str){
+  const kp={};
+  if(!str) return kp;
+  str.split(",").forEach(s=>{
+    const [m,t]=s.split(":");
+    if(m&&t) kp[parseInt(m)]=t;
+  });
+  return kp;
+}
 function decodePicks(str){
   const p={};
   // support old format (24 chars, no dot) and new format (results.scores)
@@ -1121,12 +1184,85 @@ function toast(msg){
   setTimeout(()=>el.classList.remove("show"),2200);
 }
 
+/* ---- Knockout picks persistence ---- */
+function saveKoPicks(kp){ try{localStorage.setItem("fifa26_ko_picks",JSON.stringify(kp));}catch(e){} }
+function loadKoPicks(){ try{const v=localStorage.getItem("fifa26_ko_picks"); return v?JSON.parse(v):{};}catch(e){return {};} }
+
+/* ---- "My Picks" snapshot (saved when user manually edits, restored via My Picks button) ---- */
+function saveMyPicks(p, kp){
+  try{
+    localStorage.setItem("fifa26_my_picks",JSON.stringify(p));
+    localStorage.setItem("fifa26_my_ko_picks",JSON.stringify(kp));
+  }catch(e){}
+}
+function loadMyPicks(){
+  try{
+    const p=localStorage.getItem("fifa26_my_picks");
+    const kp=localStorage.getItem("fifa26_my_ko_picks");
+    return {picks: p?JSON.parse(p):{}, koPicks: kp?JSON.parse(kp):{}};
+  }catch(e){ return {picks:{}, koPicks:{}}; }
+}
+function hasMyPicks(){
+  try{ return !!localStorage.getItem("fifa26_my_picks"); }catch(e){ return false; }
+}
+function clearMyPicks(){
+  try{ localStorage.removeItem("fifa26_my_picks"); localStorage.removeItem("fifa26_my_ko_picks"); }catch(e){}
+}
+
+/* Cascade bracket picks: fill downstream slots from koPicks */
+function resolveKoWithPicks(resolved, koPicks){
+  KO_ORDER.forEach(m=>{
+    const pick = koPicks[m];
+    if(!pick) return;
+    const r = resolved[m];
+    if(!r) return;
+    const feeds = KO_FEEDS_INTO[m];
+    if(!feeds) return;
+    feeds.forEach(({target, slot, type})=>{
+      if(!resolved[target]) resolved[target] = {home:null, away:null};
+      if(type === "W") resolved[target][slot] = pick;
+      else if(type === "L"){
+        // loser = the other team in the match
+        const loser = (r.home === pick) ? r.away : r.home;
+        if(loser) resolved[target][slot] = loser;
+      }
+    });
+  });
+}
+
+/* Invalidate bracket picks if upstream teams changed.
+   Re-resolves after each deletion to cascade invalidation properly. */
+function invalidateKoPicks(resolved, koPicks){
+  let changed = false, pass = true;
+  while(pass){
+    pass = false;
+    // Re-resolve from scratch each pass
+    const fresh = Object.assign({}, resolved);
+    resolveKoWithPicks(fresh, koPicks);
+    for(const m of KO_ORDER){
+      if(!koPicks[m]) continue;
+      const r = fresh[m];
+      if(!r || (koPicks[m] !== r.home && koPicks[m] !== r.away)){
+        delete koPicks[m];
+        changed = true;
+        pass = true; // need another pass — downstream may now be invalid
+        break;
+      }
+    }
+  }
+  return changed;
+}
+
 // load from URL params first (shared link), else localStorage
+let _sharedKoPicks = null; // temp holder for URL ko picks
 function initPicks(){
   const params=new URLSearchParams(window.location.search);
   const pp=params.get("p");
   if(pp && pp.length>=FIX_IDS.length){
     const p=decodePicks(pp);
+    // Also load bracket picks from URL if present
+    const kk=params.get("ko");
+    if(kk){ _sharedKoPicks = decodeKoPicks(kk); }
     // clean URL without reload
     window.history.replaceState({},"",window.location.pathname);
     toast("Loaded shared picks!");
@@ -1153,6 +1289,8 @@ const PROBABLE = {
 
 /* =================== STATE + RENDER =================== */
 let picks=initPicks();
+let koPicks = _sharedKoPicks || loadKoPicks();
+if(_sharedKoPicks){ saveKoPicks(koPicks); _sharedKoPicks=null; }
 // first visit: start with probable picks so the board is populated
 if(!Object.values(picks).some(Boolean)){
   for(const id in PROBABLE) picks[id]=defaultPick(PROBABLE[id]);
@@ -1170,6 +1308,19 @@ const groupsEl=document.getElementById("groups");
 const thirdsEl=document.getElementById("thirds");
 const fixturesEl=document.getElementById("fixtures");
 const bracketEl=document.getElementById("bracket");
+
+/* ── Bracket pick click handler ── */
+bracketEl.addEventListener("click",e=>{
+  const slot = e.target.closest("[data-ko-team]");
+  if(!slot) return;
+  const matchNum = parseInt(slot.dataset.koMatch);
+  const team = slot.dataset.koTeam;
+  if(koPicks[matchNum] === team) delete koPicks[matchNum];
+  else koPicks[matchNum] = team;
+  saveKoPicks(koPicks); saveMyPicks(picks, koPicks);
+  renderBracket();
+  if(document.getElementById("bktOverlay").classList.contains("open")) renderBracketOverlay();
+});
 
 document.getElementById("viewToggle").addEventListener("click",()=>{
   viewMode=viewMode==="winners"?"full":"winners";
@@ -1363,103 +1514,83 @@ function koRoundHtml(roundName, matches, buildMatch){
 function renderBracket(){
   const {resolved, nPicked, slotLabels, allDone} = resolveKnockout();
 
+  // Invalidate stale bracket picks against base resolution, then cascade
+  if(invalidateKoPicks(resolved, koPicks)) saveKoPicks(koPicks);
+  // Cascade bracket picks into resolved
+  resolveKoWithPicks(resolved, koPicks);
+
   let html = "";
 
-  // helper: match number + time label
-  function mnTime(m){
-    return `<span class="ko__mn">${m}</span>`;
-  }
+  function mnTime(m){ return `<span class="ko__mn">${m}</span>`; }
   function koVenue(m, time){
     const v = KO_VENUES[m];
     const t = time ? `${time} · ` : "";
     return v ? `<div class="ko__venue">${t}${v}</div>` : (time ? `<div class="ko__venue">${time}</div>` : "");
   }
 
+  // Render a pickable KO slot — if both teams known, slot is tappable
+  function koPickSlot(code, groupLetter, label, isAway, matchNum, dual, partial){
+    if(dual || partial) return koSlot(code, groupLetter, label, isAway, dual, partial);
+    if(!code) return koSlot(null, null, label, isAway);
+    const picked = koPicks[matchNum] === code;
+    const gc = groupLetter ? GC[groupLetter] : "var(--line)";
+    const cls = `ko__slot ${isAway?"ko__slot--away":"ko__slot--home"} ko__slot--pickable${picked?" ko__slot--picked":""}`;
+    const grpTag = groupLetter ? `<span class="ko__grp" style="color:${gc}">${groupLetter}</span>` : "";
+    if(isAway) return `<span class="${cls}" style="--gc:${gc}" data-ko-match="${matchNum}" data-ko-team="${code}"><span class="nm">${TEAMS[code].n}</span> <span class="cd">${code}</span> ${flag(code)}${grpTag}</span>`;
+    return `<span class="${cls}" style="--gc:${gc}" data-ko-match="${matchNum}" data-ko-team="${code}">${grpTag}${flag(code)} <span class="cd">${code}</span> <span class="nm">${TEAMS[code].n}</span></span>`;
+  }
+
+  // Generic KO match renderer — works for all rounds
+  function koMatchHtml(match, time, r, sl){
+    const hg = r && r.home ? TEAMS[r.home].g : null;
+    const ag = r && r.away ? TEAMS[r.away].g : null;
+    const hLabel = sl ? sl.home : (match.home||"TBD");
+    const aLabel = sl ? sl.away : (match.away||"TBD");
+    const bothKnown = r && r.home && r.away && !r.homeDual && !r.awayDual;
+    return `<div class="ko__match" data-ko-m="${match.m}">
+      ${koVenue(match.m,time)}
+      <div class="ko__row">${mnTime(match.m)}
+      ${bothKnown ? koPickSlot(r.home, hg, hLabel, false, match.m) : koSlot(r?r.home:null, hg, hLabel, false, r?r.homeDual:null, r?r.homePartial:null)}
+      <span class="ko__vs">vs</span>
+      ${bothKnown ? koPickSlot(r.away, ag, aLabel, true, match.m) : koSlot(r?r.away:null, ag, aLabel, true, r?r.awayDual:null, r?r.awayPartial:null)}</div>
+    </div>`;
+  }
+
   // R32
   html += koRoundHtml("Round of 32", R32_MATCHES, (match,time)=>{
-    const r = resolved[match.m];
-    const sl = slotLabels[match.m];
-    const hg = r.home ? TEAMS[r.home].g : null;
-    const ag = r.away ? TEAMS[r.away].g : null;
-    return `<div class="ko__match">
-      ${koVenue(match.m,time)}
-      <div class="ko__row">${mnTime(match.m)}
-      ${koSlot(r.home, hg, sl.home, false, r.homeDual, r.homePartial)}
-      <span class="ko__vs">vs</span>
-      ${koSlot(r.away, ag, sl.away, true, r.awayDual, r.awayPartial)}</div>
-    </div>`;
+    return koMatchHtml(match, time, resolved[match.m], slotLabels[match.m]);
   });
 
-  // R16
-  html += koRoundHtml("Round of 16", R16_MATCHES, (match,time)=>{
-    const hm = parseInt(match.home.slice(1));
-    const am = parseInt(match.away.slice(1));
-    const hr = resolved[hm], ar = resolved[am];
-    const homeLabel = hr.home && hr.away ? `${hr.home}/${hr.away}` : match.home;
-    const awayLabel = ar.home && ar.away ? `${ar.home}/${ar.away}` : match.away;
-    return `<div class="ko__match">
-      ${koVenue(match.m,time)}
-      <div class="ko__row">${mnTime(match.m)}
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${homeLabel}</span></span>
-      <span class="ko__vs">vs</span>
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${awayLabel}</span></span></div>
-    </div>`;
-  });
-
-  // QF
-  html += koRoundHtml("Quarter-Finals", QF_MATCHES, (match,time)=>{
-    return `<div class="ko__match">
-      ${koVenue(match.m,time)}
-      <div class="ko__row">${mnTime(match.m)}
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
-      <span class="ko__vs">vs</span>
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span></div>
-    </div>`;
-  });
-
-  // SF
-  html += koRoundHtml("Semi-Finals", SF_MATCHES, (match,time)=>{
-    return `<div class="ko__match">
-      ${koVenue(match.m,time)}
-      <div class="ko__row">${mnTime(match.m)}
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
-      <span class="ko__vs">vs</span>
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span></div>
-    </div>`;
-  });
-
-  // Final
-  html += koRoundHtml("Final", [FINAL_MATCH], (match,time)=>{
-    return `<div class="ko__match">
-      ${koVenue(match.m,time)}
-      <div class="ko__row">${mnTime(match.m)}
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
-      <span class="ko__vs">vs</span>
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span></div>
-    </div>`;
-  });
-
-  // Third Place
-  html += koRoundHtml("Third Place", [THIRD_PLACE], (match,time)=>{
-    return `<div class="ko__match">
-      ${koVenue(match.m,time)}
-      <div class="ko__row">${mnTime(match.m)}
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.home}</span></span>
-      <span class="ko__vs">vs</span>
-      <span class="ko__slot ko__slot--tbd"><span class="cd">${match.away}</span></span></div>
-    </div>`;
+  // R16+: build labels for display
+  const laterRounds = [
+    ["Round of 16", R16_MATCHES],
+    ["Quarter-Finals", QF_MATCHES],
+    ["Semi-Finals", SF_MATCHES],
+    ["Final", [FINAL_MATCH]],
+    ["Third Place", [THIRD_PLACE]]
+  ];
+  laterRounds.forEach(([name, matches])=>{
+    html += koRoundHtml(name, matches, (match,time)=>{
+      const r = resolved[match.m];
+      const sl = {home: match.home, away: match.away};
+      return koMatchHtml(match, time, r, sl);
+    });
   });
 
   bracketEl.innerHTML = html;
 }
 
 /* ========== BRACKET TREE OVERLAY ========== */
-function bktTeamHtml(code, groupLetter, label){
+function bktTeamHtml(code, groupLetter, label, matchNum){
   if(!code){
     return `<div class="bkt-team bkt-team--tbd"><span class="cd">${label||"TBD"}</span></div>`;
   }
   const gc = groupLetter ? GC[groupLetter] : "rgba(255,255,255,.15)";
-  return `<div class="bkt-team bkt-team--has" style="--gc:${gc}">${flag(code)} <span class="cd">${code}</span></div>`;
+  const picked = matchNum && koPicks[matchNum] === code;
+  const pickable = matchNum ? " bkt-team--pickable" : "";
+  const pickedCls = picked ? " bkt-team--picked" : "";
+  const dataAttr = matchNum ? ` data-ko-match="${matchNum}" data-ko-team="${code}"` : "";
+  return `<div class="bkt-team bkt-team--has${pickable}${pickedCls}" style="--gc:${gc}"${dataAttr}>${flag(code)} <span class="cd">${code}</span></div>`;
 }
 
 function bktMatchCell(m, col, row, span, res, labels){
@@ -1475,10 +1606,11 @@ function bktMatchCell(m, col, row, span, res, labels){
     if(hCode) hGrp = TEAMS[hCode].g;
     if(aCode) aGrp = TEAMS[aCode].g;
   }
+  const bothKnown = hCode && aCode;
   return `<div class="bkt-match" style="grid-column:${col};grid-row:${row}/span ${span}">
     <div class="bkt-mn">${m}</div>
-    ${bktTeamHtml(hCode, hGrp, hLbl)}
-    ${bktTeamHtml(aCode, aGrp, aLbl)}
+    ${bktTeamHtml(hCode, hGrp, hLbl, bothKnown ? m : null)}
+    ${bktTeamHtml(aCode, aGrp, aLbl, bothKnown ? m : null)}
   </div>`;
 }
 
@@ -1494,6 +1626,8 @@ function renderBracketOverlay(){
     if(!labels[m.m]) labels[m.m] = {home:m.home, away:m.away};
     if(!res[m.m]) res[m.m] = {home:null, away:null};
   });
+  // Cascade bracket picks
+  resolveKoWithPicks(res, koPicks);
 
   /*
    * Grid: 17 columns × 32 rows
@@ -1554,7 +1688,8 @@ function renderBracketOverlay(){
     ${(()=>{const r2=res[104],sl=labels[104];
       let hC=null,aC=null,hG=null,aG=null,hL=sl?sl.home:"TBD",aL=sl?sl.away:"TBD";
       if(r2){hC=r2.home;aC=r2.away;if(hC)hG=TEAMS[hC].g;if(aC)aG=TEAMS[aC].g;}
-      return `<div class="bkt-mn">104</div>${bktTeamHtml(hC,hG,hL)}${bktTeamHtml(aC,aG,aL)}`;
+      const bk=hC&&aC?104:null;
+      return `<div class="bkt-mn">104</div>${bktTeamHtml(hC,hG,hL,bk)}${bktTeamHtml(aC,aG,aL,bk)}`;
     })()}
   </div>`;
 
@@ -1564,7 +1699,8 @@ function renderBracketOverlay(){
     ${(()=>{const r2=res[103],sl=labels[103];
       let hC=null,aC=null,hG=null,aG=null,hL=sl?sl.home:"TBD",aL=sl?sl.away:"TBD";
       if(r2){hC=r2.home;aC=r2.away;if(hC)hG=TEAMS[hC].g;if(aC)aG=TEAMS[aC].g;}
-      return `${bktTeamHtml(hC,hG,hL)}${bktTeamHtml(aC,aG,aL)}`;
+      const bk=hC&&aC?103:null;
+      return `${bktTeamHtml(hC,hG,hL,bk)}${bktTeamHtml(aC,aG,aL,bk)}`;
     })()}
   </div>`;
 
@@ -1611,7 +1747,7 @@ fixturesEl.addEventListener("click",e=>{
     if(r==="A"&&as<=hs) as=hs+1;
     if(r==="D") as=hs;
     picks[id]={r,hs,as};
-    savePicks(picks); renderFixtures(); renderBoard(); renderBracket();
+    savePicks(picks); saveMyPicks(picks, koPicks); renderFixtures(); renderBoard(); renderBracket();
     return;
   }
   // result pick buttons
@@ -1620,33 +1756,47 @@ fixturesEl.addEventListener("click",e=>{
   const want=btn.dataset.pick;
   const cur=pickResult(picks[id]);
   picks[id] = (cur===want) ? null : defaultPick(want);
-  savePicks(picks); renderFixtures(); renderBoard(); renderBracket();
+  savePicks(picks); saveMyPicks(picks, koPicks); renderFixtures(); renderBoard(); renderBracket();
   // #3: nudge toward bracket on first pick
   if(!pickPeekDone){ pickPeekDone=true; setTimeout(peekBracket, 400); }
 });
 
 document.getElementById("probable").addEventListener("click",()=>{
   for(const id in PROBABLE) picks[id]=defaultPick(PROBABLE[id]);
-  savePicks(picks); renderFixtures(); renderBoard(); renderBracket();
+  koPicks={};
+  savePicks(picks); saveKoPicks(koPicks); renderFixtures(); renderBoard(); renderBracket();
+  toast("Loaded probable picks");
+});
+
+document.getElementById("myPicks").addEventListener("click",()=>{
+  if(!hasMyPicks()){ toast("No saved picks yet — make some picks first!"); return; }
+  const my = loadMyPicks();
+  // Preserve locked match results
+  for(const id in locked){ if(picks[id]) my.picks[id]=picks[id]; }
+  picks = my.picks; koPicks = my.koPicks;
+  savePicks(picks); saveKoPicks(koPicks); renderFixtures(); renderBoard(); renderBracket();
+  toast("Restored your picks");
 });
 
 document.getElementById("reset").addEventListener("click",()=>{
-  if(!Object.values(picks).some(v=>v&&pickResult(v))) return;
-  if(!confirm("Clear all picks?")) return;
+  if(!Object.values(picks).some(v=>v&&pickResult(v)) && !Object.keys(koPicks).length) return;
   const kept={}; for(const id in locked){ if(picks[id]) kept[id]=picks[id]; }
-  picks=kept; savePicks(picks); renderFixtures(); renderBoard(); renderBracket();
+  picks=kept; koPicks={}; savePicks(picks); saveKoPicks(koPicks); renderFixtures(); renderBoard(); renderBracket();
 });
 
 document.getElementById("share").addEventListener("click",()=>{
   const n=Object.values(picks).filter(v=>v&&pickResult(v)).length;
-  if(!n){ toast("Make some picks first!"); return; }
-  const url=window.location.origin+window.location.pathname+"?p="+encodePicks(picks);
+  const nKo=Object.keys(koPicks).length;
+  if(!n && !nKo){ toast("Make some picks first!"); return; }
+  let url=window.location.origin+window.location.pathname+"?p="+encodePicks(picks);
+  if(nKo) url += "&ko="+encodeKoPicks(koPicks);
+  const desc = n+"/24 group" + (nKo ? " + "+nKo+" bracket" : "") + " picks";
 
   // Try native Web Share API first (phones)
   if(navigator.share){
     navigator.share({
       title:"My FIFA26 Picks",
-      text:"Check out my World Cup group stage predictions ("+n+"/24 picks)",
+      text:"Check out my World Cup predictions ("+desc+")",
       url:url
     }).catch(err => {
       if(err.name !== "AbortError") console.error("Share failed:", err);
@@ -1654,10 +1804,27 @@ document.getElementById("share").addEventListener("click",()=>{
   } else {
     // Fallback: copy to clipboard (desktop)
     navigator.clipboard.writeText(url).then(
-      ()=>toast("Link copied! "+n+"/24 picks"),
+      ()=>toast("Link copied! "+desc),
       ()=>{ prompt("Copy this link:",url); }
     );
   }
+});
+
+/* overlay action buttons — mirror main buttons + re-render overlay */
+document.getElementById("ovProbable").addEventListener("click",()=>{
+  document.getElementById("probable").click();
+  renderBracketOverlay();
+});
+document.getElementById("ovMyPicks").addEventListener("click",()=>{
+  document.getElementById("myPicks").click();
+  renderBracketOverlay();
+});
+document.getElementById("ovReset").addEventListener("click",()=>{
+  document.getElementById("reset").click();
+  renderBracketOverlay();
+});
+document.getElementById("ovShare").addEventListener("click",()=>{
+  document.getElementById("share").click();
 });
 
 /* group popup */
@@ -1936,12 +2103,25 @@ document.getElementById("refreshBtn").addEventListener("click",()=>{
 /* ── Bracket tree overlay ── */
 (function(){
   const overlay = document.getElementById("bktOverlay");
+  const bktTree = document.getElementById("bktTree");
   document.getElementById("bracketTreeBtn").addEventListener("click",()=>{
     renderBracketOverlay();
     overlay.classList.add("open");
   });
   document.getElementById("bktClose").addEventListener("click",()=>overlay.classList.remove("open"));
   overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.remove("open");});
+  // Bracket pick in overlay
+  bktTree.addEventListener("click",e=>{
+    const el = e.target.closest("[data-ko-team]");
+    if(!el) return;
+    const matchNum = parseInt(el.dataset.koMatch);
+    const team = el.dataset.koTeam;
+    if(koPicks[matchNum] === team) delete koPicks[matchNum];
+    else koPicks[matchNum] = team;
+    saveKoPicks(koPicks); saveMyPicks(picks, koPicks);
+    renderBracket();
+    renderBracketOverlay();
+  });
 })();
 </script>
 <script>

@@ -4,6 +4,38 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-26 · Night — Bracket Picks, My Picks & UI Polish
+
+### Bracket Picks
+- Tap any team in a knockout match (bracket tab or overlay) to pick a winner.
+- Picks cascade: winning team auto-fills the next round's slot through to the Final.
+- Upstream group-pick changes automatically invalidate affected bracket picks (multi-pass).
+- Bracket picks persist to localStorage and survive page reloads.
+
+### Share Includes Brackets
+- Share URL now encodes both group picks and bracket picks (`&ko=` param).
+- Share toast shows combined count (e.g. "18/24 group + 5 bracket picks").
+- Native Web Share API used on phones; clipboard fallback on desktop.
+
+### My Picks Snapshot
+- New "My Picks" button saves and restores your manual picks independently.
+- My Picks are never wiped by Clear or Probable — always restorable.
+- Combined My Picks + Share into a unified split button (green, with universal share SVG icon).
+
+### Bracket Overlay Buttons
+- Probable Picks, My Picks + Share, and Clear Picks buttons added to the bracket overlay header.
+- Buttons sit on their own row below the heading, always visible while scrolling the bracket.
+- Styled for the dark overlay theme (blue/green/red outlines).
+
+### UI Polish
+- Bracket button centered in the bar panel (between hint text and action buttons).
+- Hint text simplified: "Tap a Team to Choose. / Board Updates Live."
+- Probable Picks button styled blue; My Picks styled green.
+- Tooltips on all buttons.
+- Clear Picks no longer requires confirmation (easy to restore via My Picks or Probable).
+
+---
+
 ## 2026-06-26 · Evening — Bracket Tree Overlay
 
 - New "🏆 Bracket" button in the board header opens a full tournament bracket popup.
