@@ -1325,6 +1325,7 @@ function showGroupPopup(g){
   }
   for(const id in picks){
     const p=picks[id]; if(!p) continue;
+    if(locked[id]) continue; // already counted from PLAYED
     const [,fg,h,a]=fixById[id]; if(fg!==g) continue;
     const r=pickResult(p);
     wdl[h].mp++; wdl[a].mp++;
