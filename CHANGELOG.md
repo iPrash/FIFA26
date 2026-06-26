@@ -4,6 +4,15 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-25 · 9:00 PM — PWA Stability & Board Cleanup
+
+- Fixed blank page caused by stale localStorage picks after fixture ID migration.
+- Service worker now auto-reloads the page when a new version activates — no more stuck blank pages.
+- Board counter simplified to "🔒 Qualified: 13/32" (removed confusing picks counter).
+- Scores updated: Group F MD3 complete (JPN 1-1 SWE, TUN 1-3 NED).
+
+---
+
 ## 2026-06-25 · 7:00 PM — Match Numbers, Partial Slots, Refresh & Branding
 
 ### Match Numbers
