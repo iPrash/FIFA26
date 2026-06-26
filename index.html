@@ -1498,28 +1498,21 @@ function scrollToToday(){
   const dateNum = d.getDate();
   const todayStr = `${dayName} · ${monthName} ${dateNum}`;
 
-  // Find the last day section matching today's date
+  // Find the first day header matching today's date (query DOM fresh, after any re-renders)
   const dayHeaders = document.querySelectorAll(".day__h");
-  let lastTodaySection = null;
-  for(let h of dayHeaders){
-    // Extract just "Day · Month Date" part by taking first two segments
-    const fullText = h.textContent;
-    const parts = fullText.split(" · ");
+  for(const h of dayHeaders){
+    const parts = h.textContent.split(" · ");
     const dateText = parts.slice(0, 2).join(" · ");
     if(dateText === todayStr){
-      lastTodaySection = h.closest(".day");
-    } else if(lastTodaySection){
-      // We've passed today's matches, scroll to the last one
+      const board = document.getElementById("board");
+      const boardH = board ? board.offsetHeight : 0;
+      const rect = h.getBoundingClientRect();
+      const target = window.scrollY + rect.top - boardH - 10;
+      window.scrollTo({top: target, behavior:"smooth"});
       break;
     }
   }
-  if(lastTodaySection){
-    setTimeout(() => {
-      lastTodaySection.scrollIntoView({behavior:"smooth", block:"end"});
-    }, 1200);
-  }
 }
-setTimeout(scrollToToday, 500);
 
 /* ── Fetch live scores from scores.json ── */
 async function fetchScores(){
@@ -1557,7 +1550,7 @@ async function fetchScores(){
     }
   }catch(e){/* file:// or network error — silent fallback */}
 }
-fetchScores();
+fetchScores().then(() => setTimeout(scrollToToday, 300));
 
 /* ── What's New popup (shows once per version) ── */
 const WNEW_VER="v5";
