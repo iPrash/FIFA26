@@ -208,8 +208,9 @@
   .match__grp{
     font:800 11px/1 ui-monospace,monospace;color:#fff;background:var(--muted);
     border-radius:5px;text-align:center;padding:5px 0;align-self:stretch;
-    display:flex;align-items:center;justify-content:center
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px
   }
+  .match__grp .mn{font:600 8px/1 ui-monospace,monospace;opacity:.7}
   .pick{display:grid;grid-template-columns:1fr auto 1fr;gap:5px;align-items:stretch}
   .side{
     display:flex;align-items:center;gap:6px;border:1.5px solid var(--line);
@@ -488,40 +489,40 @@ const PLAYED = [
 /* remaining matches the user picks, grouped by date */
 const FIXTURES = [
   {date:"Wed · Jun 24 · 3:00 PM ET", note:"Group B · Matchday 3", ms:[
-    ["b1","B","SUI","CAN","BC Place, Vancouver"],["b2","B","BIH","QAT","Lumen Field, Seattle"]
+    [49,"B","SUI","CAN","BC Place, Vancouver"],[50,"B","BIH","QAT","Lumen Field, Seattle"]
   ]},
   {date:"Wed · Jun 24 · 6:00 PM ET", note:"Group C · Matchday 3", ms:[
-    ["c1","C","SCO","BRA","Hard Rock Stadium, Miami"],["c2","C","MAR","HAI","Mercedes-Benz Stadium, Atlanta"]
+    [51,"C","SCO","BRA","Hard Rock Stadium, Miami"],[52,"C","MAR","HAI","Mercedes-Benz Stadium, Atlanta"]
   ]},
   {date:"Wed · Jun 24 · 9:00 PM ET", note:"Group A · Matchday 3", ms:[
-    ["a1","A","CZE","MEX","Estadio Azteca, Mexico City"],["a2","A","RSA","KOR","Estadio BBVA, Monterrey"]
+    [53,"A","CZE","MEX","Estadio Azteca, Mexico City"],[54,"A","RSA","KOR","Estadio BBVA, Monterrey"]
   ]},
   {date:"Thu · Jun 25 · 4:00 PM ET", note:"Group E · Matchday 3", ms:[
-    ["e1","E","ECU","GER","MetLife Stadium, East Rutherford"],["e2","E","CUW","CIV","Lincoln Financial Field, Philadelphia"]
+    [55,"E","ECU","GER","MetLife Stadium, East Rutherford"],[56,"E","CUW","CIV","Lincoln Financial Field, Philadelphia"]
   ]},
   {date:"Thu · Jun 25 · 7:00 PM ET", note:"Group F · Matchday 3", ms:[
-    ["f1","F","JPN","SWE","AT&T Stadium, Arlington"],["f2","F","TUN","NED","Arrowhead Stadium, Kansas City"]
+    [57,"F","JPN","SWE","AT&T Stadium, Arlington"],[58,"F","TUN","NED","Arrowhead Stadium, Kansas City"]
   ]},
   {date:"Thu · Jun 25 · 10:00 PM ET", note:"Group D · Matchday 3", ms:[
-    ["d1","D","TUR","USA","SoFi Stadium, Los Angeles"],["d2","D","PAR","AUS","Levi's Stadium, Santa Clara"]
+    [59,"D","TUR","USA","SoFi Stadium, Los Angeles"],[60,"D","PAR","AUS","Levi's Stadium, Santa Clara"]
   ]},
   {date:"Fri · Jun 26 · 3:00 PM ET", note:"Group I · Matchday 3", ms:[
-    ["i1","I","NOR","FRA","Gillette Stadium, Foxborough"],["i2","I","SEN","IRQ","BMO Field, Toronto"]
+    [61,"I","NOR","FRA","Gillette Stadium, Foxborough"],[62,"I","SEN","IRQ","BMO Field, Toronto"]
   ]},
   {date:"Fri · Jun 26 · 8:00 PM ET", note:"Group H · Matchday 3", ms:[
-    ["h1","H","CPV","KSA","NRG Stadium, Houston"],["h2","H","URU","ESP","Estadio Akron, Guadalajara"]
+    [63,"H","CPV","KSA","NRG Stadium, Houston"],[64,"H","URU","ESP","Estadio Akron, Guadalajara"]
   ]},
   {date:"Fri · Jun 26 · 11:00 PM ET", note:"Group G · Matchday 3", ms:[
-    ["g1","G","EGY","IRN","Lumen Field, Seattle"],["g2","G","NZL","BEL","BC Place, Vancouver"]
+    [65,"G","EGY","IRN","Lumen Field, Seattle"],[66,"G","NZL","BEL","BC Place, Vancouver"]
   ]},
   {date:"Sat · Jun 27 · 5:00 PM ET", note:"Group L · Matchday 3", ms:[
-    ["l1","L","PAN","ENG","MetLife Stadium, East Rutherford"],["l2","L","CRO","GHA","Lincoln Financial Field, Philadelphia"]
+    [67,"L","PAN","ENG","MetLife Stadium, East Rutherford"],[68,"L","CRO","GHA","Lincoln Financial Field, Philadelphia"]
   ]},
   {date:"Sat · Jun 27 · 7:30 PM ET", note:"Group K · Matchday 3", ms:[
-    ["k2","K","COL","POR","Hard Rock Stadium, Miami"],["k3","K","COD","UZB","Mercedes-Benz Stadium, Atlanta"]
+    [69,"K","COL","POR","Hard Rock Stadium, Miami"],[70,"K","COD","UZB","Mercedes-Benz Stadium, Atlanta"]
   ]},
   {date:"Sat · Jun 27 · 10:00 PM ET", note:"Group J · Matchday 3", ms:[
-    ["j1","J","ALG","AUT","Arrowhead Stadium, Kansas City"],["j2","J","JOR","ARG","AT&T Stadium, Arlington"]
+    [71,"J","ALG","AUT","Arrowhead Stadium, Kansas City"],[72,"J","JOR","ARG","AT&T Stadium, Arlington"]
   ]}
 ];
 
@@ -774,10 +775,24 @@ function resolveKnockout(){
           qualifiers["2"+g] = t[1];
         }
       } else if(t0Locked && !t1Locked){
-        // Only 1st is locked: check if any remaining match could let someone overtake them
-        const couldDrop = rem.some(([,, h, a])=> h===t[0] || a===t[0]);
-        if(couldDrop){
-          // Don't assign position — result could change 1st vs 2nd
+        // Only 1st is locked: check if any remaining match could let t[1] overtake t[0]
+        // Brute-force remaining outcomes to see if t[0] can drop to 2nd
+        const teams = Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
+        let canDrop = false;
+        const N = Math.pow(3, rem.length);
+        for(let mask=0; mask<N; mask++){
+          const p = Object.fromEntries(teams.map(c=>[c, s[c].pts]));
+          let m = mask;
+          for(const [,, h, a] of rem){
+            const o = m%3; m = (m-o)/3;
+            if(o===0) p[h]+=3; else if(o===1) p[a]+=3; else {p[h]++; p[a]++;}
+          }
+          if(teams.some(u => u!==t[0] && p[u] > p[t[0]])) { canDrop = true; break; }
+        }
+        if(canDrop){
+          const partial = {partial: t[0]};
+          qualifiers["1"+g] = partial;
+          qualifiers["2"+g] = partial;
         } else {
           qualifiers["1"+g] = t[0];
         }
@@ -803,23 +818,25 @@ function resolveKnockout(){
   }
 
   // Resolve R32
-  const resolved = {}; // matchNum -> {home: code|null, away: code|null, homeDual: [a,b]|null, awayDual: [a,b]|null}
+  const resolved = {}; // matchNum -> {home, away, homeDual, awayDual, homePartial, awayPartial}
   R32_MATCHES.forEach(match=>{
-    let home = null, homeDual = null;
+    let home = null, homeDual = null, homePartial = null;
     if(typeof match.home === "string"){
       const q = qualifiers[match.home];
       if(q && q.dual) homeDual = q.dual;
+      else if(q && q.partial) homePartial = q.partial;
       else home = q || null;
     }
-    let away = null, awayDual = null;
+    let away = null, awayDual = null, awayPartial = null;
     if(typeof match.away === "string"){
       const q = qualifiers[match.away];
       if(q && q.dual) awayDual = q.dual;
+      else if(q && q.partial) awayPartial = q.partial;
       else away = q || null;
     } else {
       away = thirdTeams[match.m]||null;
     }
-    resolved[match.m] = {home, away, homeDual, awayDual};
+    resolved[match.m] = {home, away, homeDual, awayDual, homePartial, awayPartial};
   });
 
   // Slot labels for R32 matches (for display when team unknown)
@@ -911,18 +928,18 @@ function initPicks(){
 
 /* probable outcomes for Matchday 3 (source: The Athletic, Jun 2026 model) */
 const PROBABLE = {
-  a1:"A", a2:"A",   // CZE vs MEX → MEX; RSA vs KOR → KOR
-  b1:"A", b2:"H",   // SUI vs CAN → CAN; BIH vs QAT → BIH
-  c1:"A", c2:"H",   // SCO vs BRA → BRA; MAR vs HAI → MAR
-  d1:"A", d2:"A",   // TUR vs USA → USA; PAR vs AUS → AUS
-  e1:"A", e2:"A",   // ECU vs GER → GER; CUW vs CIV → CIV
-  f1:"H", f2:"A",   // JPN vs SWE → JPN; TUN vs NED → NED
-  g1:"H", g2:"A",   // EGY vs IRN → EGY; NZL vs BEL → BEL
-  h1:"H", h2:"A",   // CPV vs KSA → CPV; URU vs ESP → ESP
-  i1:"A", i2:"H",   // NOR vs FRA → FRA; SEN vs IRQ → SEN
-  j1:"A", j2:"A",   // ALG vs AUT → AUT; JOR vs ARG → ARG
-  k2:"A", k3:"H",   // COL vs POR → POR; COD vs UZB → COD
-  l1:"A", l2:"H"    // PAN vs ENG → ENG; CRO vs GHA → CRO
+  53:"A", 54:"A",   // CZE vs MEX → MEX; RSA vs KOR → KOR
+  49:"A", 50:"H",   // SUI vs CAN → CAN; BIH vs QAT → BIH
+  51:"A", 52:"H",   // SCO vs BRA → BRA; MAR vs HAI → MAR
+  59:"A", 60:"A",   // TUR vs USA → USA; PAR vs AUS → AUS
+  55:"A", 56:"A",   // ECU vs GER → GER; CUW vs CIV → CIV
+  57:"H", 58:"A",   // JPN vs SWE → JPN; TUN vs NED → NED
+  65:"H", 66:"A",   // EGY vs IRN → EGY; NZL vs BEL → BEL
+  63:"H", 64:"A",   // CPV vs KSA → CPV; URU vs ESP → ESP
+  61:"A", 62:"H",   // NOR vs FRA → FRA; SEN vs IRQ → SEN
+  71:"A", 72:"A",   // ALG vs AUT → AUT; JOR vs ARG → ARG
+  69:"A", 70:"H",   // COL vs POR → POR; COD vs UZB → COD
+  67:"A", 68:"H"    // PAN vs ENG → ENG; CRO vs GHA → CRO
 };
 
 /* =================== STATE + RENDER =================== */
@@ -1037,7 +1054,7 @@ function renderFixtures(){
             </button>`;
           return `<div class="match match--locked" data-id="${id}">
             ${venueHtml}
-            <div class="match__grp">${g}</div>
+            <div class="match__grp">${g}<span class="mn">${id}</span></div>
             <div class="pick">
               ${lkSide(h,lk.s1,hCls,s[h].pts,false)}
               <div class="lk-sep"><hr></div>
@@ -1047,7 +1064,7 @@ function renderFixtures(){
         }
         return `<div class="match" data-id="${id}">
           ${venueHtml}
-          <div class="match__grp">${g}</div>
+          <div class="match__grp">${g}<span class="mn">${id}</span></div>
           <div class="pick">
             ${side(h,r,"H",s[h].pts)}
             <button class="draw ${r==='D'?'sel':''} ${r&&r!=='D'?'dim':''}" data-pick="D">DRAW<small>tie</small></button>
@@ -1070,7 +1087,12 @@ function renderFixtures(){
 }
 
 /* ---- Bracket rendering ---- */
-function koSlot(code, groupLetter, label, isAway, dual){
+function koSlot(code, groupLetter, label, isAway, dual, partial){
+  if(partial){
+    const gc = TEAMS[partial].g ? GC[TEAMS[partial].g] : "var(--line)";
+    if(isAway) return `<span class="ko__slot ko__slot--away ko__slot--dual" style="--gc:${gc}"><span class="cd">TBD</span> / ${flag(partial)} <span class="cd">${partial}</span></span>`;
+    return `<span class="ko__slot ko__slot--home ko__slot--dual" style="--gc:${gc}">${flag(partial)} <span class="cd">${partial}</span> / <span class="cd">TBD</span></span>`;
+  }
   if(dual){
     const [a,b] = dual;
     const gc = TEAMS[a].g ? GC[TEAMS[a].g] : "var(--line)";
@@ -1154,9 +1176,9 @@ function renderBracket(){
     return `<div class="ko__match">
       ${koVenue(match.m,time)}
       <div class="ko__row">${mnTime(match.m)}
-      ${koSlot(r.home, hg, sl.home, false, r.homeDual)}
+      ${koSlot(r.home, hg, sl.home, false, r.homeDual, r.homePartial)}
       <span class="ko__vs">vs</span>
-      ${koSlot(r.away, ag, sl.away, true, r.awayDual)}</div>
+      ${koSlot(r.away, ag, sl.away, true, r.awayDual, r.awayPartial)}</div>
     </div>`;
   });
 

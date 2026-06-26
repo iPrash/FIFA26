@@ -4,6 +4,24 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-25 · 7:00 PM — Match Numbers, Partial Slots, Refresh & Branding
+
+### Match Numbers
+- Group stage fixtures now use official FIFA match numbers (49–72) instead of internal IDs.
+- Match number displayed below group letter badge on each match card.
+- scores.json updated with `m` field for each match.
+
+### Bracket Logic
+- Single locked team with undecided position (e.g. COL) now shows as "COL / TBD" in both possible bracket slots instead of disappearing.
+- Fixed bug where the `couldDrop` check was too broad, incorrectly hiding USA and ARG from the bracket.
+
+### UI
+- App renamed to MyFIFA26 (header + page title).
+- Added refresh button (↻) next to help button for PWA users.
+- Help tooltip added for consistency with refresh button.
+
+---
+
 ## 2026-06-25 · 5:00 PM — Smarter Bracket Slots
 
 ### Bracket Logic
