@@ -4,6 +4,13 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-26 · Afternoon — Auto-Scroll & Footer Update
+
+- App now smoothly scrolls to today's fixtures on load, pausing at the last match of the day so the date header stays visible.
+- Updated footer text to reflect Matchday 3 progress: "Matchday 3 underway: 6 groups complete."
+
+---
+
 ## 2026-06-26 · Morning — Partial Third-Place Resolution
 
 ### Bracket Logic

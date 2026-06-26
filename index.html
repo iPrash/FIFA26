@@ -436,7 +436,7 @@
   <div class="panel panel--fixtures">
     <div class="fix-inner" id="fixtures"></div>
     <footer>
-      <p class="asof">Standings as of end of Matchday 2 (Jun 23, 2026), both rounds complete. The 24 Matchday-3 games remain.</p>
+      <p class="asof">Matchday 3 underway: 6 groups complete. Pick the remaining 6 to see R32 matchups lock in live.</p>
       <p><b>How it works:</b> win = 3, draw = 1, loss = 0. Pick a winner then adjust the scoreline with the steppers — goal difference updates live. Tied teams are ordered by points → GD → goals scored. The 8 best third-placed teams take the final 8 R32 slots. A <b>🔒</b> means a team is mathematically through regardless of remaining results.</p>
       <p>Each group is colour-coded A–L; that colour follows a team into the third-place row so you can see where it came from. Edit the <code>TEAMS</code> / <code>PLAYED</code> / <code>FIXTURES</code> blocks in the source to correct any result.</p>
     </footer>
@@ -1485,6 +1485,41 @@ function peekBracket(){
 }
 // #1: peek on first load
 setTimeout(peekBracket, 800);
+
+/* ── Scroll to today's fixtures on load ── */
+function scrollToToday(){
+  // Extract today's date in ET timezone (day · mon date format)
+  const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const etDate = new Date().toLocaleString('en-US', {timeZone:'America/New_York'});
+  const d = new Date(etDate);
+  const dayName = days[d.getDay()];
+  const monthName = months[d.getMonth()];
+  const dateNum = d.getDate();
+  const todayStr = `${dayName} · ${monthName} ${dateNum}`;
+
+  // Find the last day section matching today's date
+  const dayHeaders = document.querySelectorAll(".day__h");
+  let lastTodaySection = null;
+  for(let h of dayHeaders){
+    // Extract just "Day · Month Date" part by taking first two segments
+    const fullText = h.textContent;
+    const parts = fullText.split(" · ");
+    const dateText = parts.slice(0, 2).join(" · ");
+    if(dateText === todayStr){
+      lastTodaySection = h.closest(".day");
+    } else if(lastTodaySection){
+      // We've passed today's matches, scroll to the last one
+      break;
+    }
+  }
+  if(lastTodaySection){
+    setTimeout(() => {
+      lastTodaySection.scrollIntoView({behavior:"smooth", block:"end"});
+    }, 1200);
+  }
+}
+setTimeout(scrollToToday, 500);
 
 /* ── Fetch live scores from scores.json ── */
 async function fetchScores(){
