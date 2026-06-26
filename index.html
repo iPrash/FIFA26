@@ -1487,8 +1487,7 @@ panelsEl.addEventListener("scroll",()=>{
   if(window.innerWidth < 900 && activeIdx !== lastActiveIdx){
     if(activeIdx === 1){
       // Switched TO bracket tab: scroll to top
-      const bracketPanel = document.querySelector(".panel--bracket");
-      if(bracketPanel) bracketPanel.scrollTop = 0;
+      window.scrollTo({top: 0, behavior:"smooth"});
     } else if(activeIdx === 0){
       // Switched TO groups tab: scroll back to today
       setTimeout(scrollToToday, 50);
