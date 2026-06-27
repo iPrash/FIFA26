@@ -426,7 +426,7 @@
       minmax(70px,1fr) 10px minmax(70px,1fr) 10px minmax(70px,1fr) 10px
       minmax(70px,1fr) 10px minmax(80px,1fr) 10px minmax(70px,1fr) 10px
       minmax(70px,1fr) 10px minmax(70px,1fr) 10px minmax(70px,1fr);
-    grid-template-rows:repeat(31,17px);
+    grid-template-rows:repeat(39,17px);
     gap:0;
     min-width:1000px;
     padding:8px 4px;
@@ -434,7 +434,7 @@
   }
   .bkt-match{
     display:flex;flex-direction:column;gap:0;padding:0 2px;
-    justify-content:center;
+    justify-content:center;overflow:visible;
   }
   .bkt-mn{
     font:600 7px/1 ui-monospace,monospace;color:rgba(255,255,255,.85);text-align:center;
@@ -442,6 +442,7 @@
   }
   .bkt-dt{font-weight:400;color:rgba(255,255,255,.7)}
   .bkt-dt-line{font:400 7px/1 ui-monospace,monospace;color:rgba(255,255,255,.7);text-align:center;padding:0 0 2px}
+  .bkt-venue{font:400 6px/1 ui-monospace,monospace;color:rgba(255,255,255,.5);text-align:center;padding:1px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .bkt-team{
     display:flex;align-items:center;gap:3px;
     background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
@@ -1645,10 +1646,12 @@ function bktMatchCell(m, col, row, span, res, labels){
     if(aCode) aGrp = TEAMS[aCode].g;
   }
   const bothKnown = hCode && aCode;
+  const venue = KO_VENUES[m] || "";
   return `<div class="bkt-match" style="grid-column:${col};grid-row:${row}/span ${span}">
     <div class="bkt-mn">${m} <span class="bkt-dt">${(KO_DATES[m]||"").replace(/^\w+ · /,"")}</span></div>
     ${bktTeamHtml(hCode, hGrp, hLbl, bothKnown ? m : null)}
     ${bktTeamHtml(aCode, aGrp, aLbl, bothKnown ? m : null)}
+    ${venue ? `<div class="bkt-venue">${venue}</div>` : ""}
   </div>`;
 }
 
@@ -1673,9 +1676,9 @@ function renderBracketOverlay(){
    *       10=cR4 11=SFR 12=cR3 13=QFR 14=cR2 15=R16R 16=cR1 17=R32R
    * Each R32 match = 2 rows, stride of 4 → 8 matches in 32 rows
    */
-  const r32rows = [1,5,9,13,17,21,25,29];
-  const r16rows = [2,10,18,26];
-  const qfRows  = [4,20];
+  const r32rows = [1,6,11,16,21,26,31,36];
+  const r16rows = [3,13,23,33];
+  const qfRows  = [5,25];
 
   const leftR32=[74,77,73,75,83,84,81,82], leftR16=[89,90,93,94], leftQF=[97,98], leftSF=101;
   const rightR32=[76,78,79,80,86,88,85,87], rightR16=[91,92,95,96], rightQF=[99,100], rightSF=102;
@@ -1704,60 +1707,60 @@ function renderBracketOverlay(){
   }
 
   // Left R32 (col 1) + connectors (col 2)
-  leftR32.forEach((m,i)=> h += bktMatchCell(m, 1, r32rows[i], 2, res, labels));
-  addConnsL(2, 4, r32rows, 2);
+  leftR32.forEach((m,i)=> h += bktMatchCell(m, 1, r32rows[i], 3, res, labels));
+  addConnsL(2, 4, r32rows, 3);
 
   // Left R16 (col 3) + connectors (col 4)
-  leftR16.forEach((m,i)=> h += bktMatchCell(m, 3, r16rows[i], 4, res, labels));
-  addConnsL(4, 2, r16rows, 4);
+  leftR16.forEach((m,i)=> h += bktMatchCell(m, 3, r16rows[i], 5, res, labels));
+  addConnsL(4, 2, r16rows, 5);
 
   // Left QF (col 5) + connectors (col 6)
-  leftQF.forEach((m,i)=> h += bktMatchCell(m, 5, qfRows[i], 8, res, labels));
-  addConnsL(6, 1, qfRows, 8);
+  leftQF.forEach((m,i)=> h += bktMatchCell(m, 5, qfRows[i], 10, res, labels));
+  addConnsL(6, 1, qfRows, 10);
 
   // Left SF (col 7) + connector (col 8)
-  h += bktMatchCell(leftSF, 7, 8, 16, res, labels);
-  h += bktConn(8, 16, 1, 'bkt-hf');
+  h += bktMatchCell(leftSF, 7, 10, 20, res, labels);
+  h += bktConn(8, 20, 1, 'bkt-hf');
 
   // FINAL (col 9)
-  h += `<div class="bkt-final" style="grid-column:9;grid-row:12/span 8">
+  h += `<div class="bkt-final" style="grid-column:9;grid-row:15/span 10">
     <div class="bkt-trophy">🏆</div>
     <div class="bkt-final-label">FINAL</div>
     ${(()=>{const r2=res[104],sl=labels[104];
       let hC=null,aC=null,hG=null,aG=null,hL=sl?sl.home:"TBD",aL=sl?sl.away:"TBD";
       if(r2){hC=r2.home;aC=r2.away;if(hC)hG=TEAMS[hC].g;if(aC)aG=TEAMS[aC].g;}
       const bk=hC&&aC?104:null;
-      return `<div class="bkt-mn">104</div><div class="bkt-dt-line">${(KO_DATES[104]||"").replace(/^\w+ · /,"")}</div>${bktTeamHtml(hC,hG,hL,bk)}${bktTeamHtml(aC,aG,aL,bk)}`;
+      return `<div class="bkt-mn">104</div><div class="bkt-dt-line">${(KO_DATES[104]||"").replace(/^\w+ · /,"")}</div>${bktTeamHtml(hC,hG,hL,bk)}${bktTeamHtml(aC,aG,aL,bk)}<div class="bkt-venue">${KO_VENUES[104]||""}</div>`;
     })()}
   </div>`;
 
   // 3rd place (col 9, below final)
-  h += `<div class="bkt-match" style="grid-column:9;grid-row:24/span 4">
+  h += `<div class="bkt-match" style="grid-column:9;grid-row:30/span 5">
     <div class="bkt-mn" style="color:var(--bronze)">3rd · 103</div>
     <div class="bkt-dt-line">${(KO_DATES[103]||"").replace(/^\w+ · /,"")}</div>
     ${(()=>{const r2=res[103],sl=labels[103];
       let hC=null,aC=null,hG=null,aG=null,hL=sl?sl.home:"TBD",aL=sl?sl.away:"TBD";
       if(r2){hC=r2.home;aC=r2.away;if(hC)hG=TEAMS[hC].g;if(aC)aG=TEAMS[aC].g;}
       const bk=hC&&aC?103:null;
-      return `${bktTeamHtml(hC,hG,hL,bk)}${bktTeamHtml(aC,aG,aL,bk)}`;
+      return `${bktTeamHtml(hC,hG,hL,bk)}${bktTeamHtml(aC,aG,aL,bk)}<div class="bkt-venue">${KO_VENUES[103]||""}</div>`;
     })()}
   </div>`;
 
   // Right SF (col 11) + connector (col 10)
-  h += bktMatchCell(rightSF, 11, 8, 16, res, labels);
-  h += bktConn(10, 16, 1, 'bkt-hf');
+  h += bktMatchCell(rightSF, 11, 10, 20, res, labels);
+  h += bktConn(10, 20, 1, 'bkt-hf');
 
   // Right QF (col 13) + connectors (col 12)
-  rightQF.forEach((m,i)=> h += bktMatchCell(m, 13, qfRows[i], 8, res, labels));
-  addConnsR(12, 1, qfRows, 8);
+  rightQF.forEach((m,i)=> h += bktMatchCell(m, 13, qfRows[i], 10, res, labels));
+  addConnsR(12, 1, qfRows, 10);
 
   // Right R16 (col 15) + connectors (col 14)
-  rightR16.forEach((m,i)=> h += bktMatchCell(m, 15, r16rows[i], 4, res, labels));
-  addConnsR(14, 2, r16rows, 4);
+  rightR16.forEach((m,i)=> h += bktMatchCell(m, 15, r16rows[i], 5, res, labels));
+  addConnsR(14, 2, r16rows, 5);
 
   // Right R32 (col 17) + connectors (col 16)
-  rightR32.forEach((m,i)=> h += bktMatchCell(m, 17, r32rows[i], 2, res, labels));
-  addConnsR(16, 4, r32rows, 2);
+  rightR32.forEach((m,i)=> h += bktMatchCell(m, 17, r32rows[i], 3, res, labels));
+  addConnsR(16, 4, r32rows, 3);
 
   document.getElementById("bktTree").innerHTML = h;
 }
