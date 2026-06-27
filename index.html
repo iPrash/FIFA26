@@ -278,6 +278,9 @@
   .match--live .pick{pointer-events:none}
   .match--live .side{cursor:default}
   .match--live .lk-score{font:800 15px/1 ui-monospace,monospace;color:#e74c3c}
+  .match--live .side:first-child .lk-score{margin-left:auto;padding-right:2px}
+  .match--live .side:last-child .lk-score{margin-right:auto;padding-left:2px}
+  .match--live .side.away{flex-direction:row}
 
   /* ---------- knockout bracket ---------- */
   .ko-inner{max-width:560px;margin:0 auto;padding:4px 10px}
@@ -2024,24 +2027,34 @@ setTimeout(peekBracket, 800);
 
 /* ── Scroll to today's fixtures on load ── */
 function scrollToToday(){
-  // Extract today's date in ET timezone (day · mon date format)
+  const board = document.getElementById("board");
+  const boardH = board ? board.offsetHeight : 0;
+
+  // Priority: scroll to first live match's date header if any are in progress
+  const liveMatch = document.querySelector(".match--live");
+  if(liveMatch){
+    // Walk up to find the .day__h header for this match's section
+    const section = liveMatch.closest(".day") || liveMatch.parentElement;
+    const header = section && section.querySelector(".day__h");
+    const scrollEl = header || liveMatch;
+    const rect = scrollEl.getBoundingClientRect();
+    const target = window.scrollY + rect.top - boardH - 10;
+    window.scrollTo({top: target, behavior:"smooth"});
+    return;
+  }
+
+  // Otherwise scroll to today's first fixture
   const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const etDate = new Date().toLocaleString('en-US', {timeZone:'America/New_York'});
   const d = new Date(etDate);
-  const dayName = days[d.getDay()];
-  const monthName = months[d.getMonth()];
-  const dateNum = d.getDate();
-  const todayStr = `${dayName} · ${monthName} ${dateNum}`;
+  const todayStr = `${days[d.getDay()]} · ${months[d.getMonth()]} ${d.getDate()}`;
 
-  // Find the first day header matching today's date (query DOM fresh, after any re-renders)
   const dayHeaders = document.querySelectorAll(".day__h");
   for(const h of dayHeaders){
     const parts = h.textContent.split(" · ");
     const dateText = parts.slice(0, 2).join(" · ");
     if(dateText === todayStr){
-      const board = document.getElementById("board");
-      const boardH = board ? board.offsetHeight : 0;
       const rect = h.getBoundingClientRect();
       const target = window.scrollY + rect.top - boardH - 10;
       window.scrollTo({top: target, behavior:"smooth"});
@@ -2088,41 +2101,53 @@ async function fetchScores(){
 }
 /* ── Fetch live scores from ESPN API ── */
 let liveInterval = null;
+function _processEspnEvents(events){
+  let changed = false, hasLive = false;
+  const seen = new Set();
+  for(const event of events){
+    if(seen.has(event.id)) continue; seen.add(event.id);
+    const comp = event.competitions[0];
+    const stState = comp.status.type.state;        // "pre","in","post"
+    const stDone  = comp.status.type.completed;      // true when FT
+    const home = comp.competitors.find(c=>c.homeAway==="home");
+    const away = comp.competitors.find(c=>c.homeAway==="away");
+    if(!home||!away) continue;
+    const hCode = ESPN_TEAMS[home.team.displayName];
+    const aCode = ESPN_TEAMS[away.team.displayName];
+    if(!hCode||!aCode) continue;
+    const s1 = parseInt(home.score), s2 = parseInt(away.score);
+    const id = fixByTeams[hCode+"|"+aCode];
+    if(!id) continue;
+    if(stState==="post" && stDone && !locked[id]){
+      locked[id]={s1,s2};
+      PLAYED.push([TEAMS[hCode].g, hCode, s1, s2, aCode]);
+      picks[id]={r:s1>s2?"H":s1<s2?"A":"D", hs:s1, as:s2};
+      delete liveScores[id];
+      changed=true;
+      try{
+        const cache=JSON.parse(localStorage.getItem("fifa26_live_scores")||"{}");
+        cache[id]={s1,s2,t1:hCode,t2:aCode,g:TEAMS[hCode].g};
+        localStorage.setItem("fifa26_live_scores",JSON.stringify(cache));
+      }catch(e){}
+    } else if(stState==="in"){
+      hasLive=true;
+      liveScores[id]={s1,s2,t1:hCode,t2:aCode};
+      changed=true;
+    }
+  }
+  return {changed, hasLive};
+}
 async function fetchLiveScores(){
   try{
-    const resp = await fetch("https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard");
-    if(!resp.ok) return;
-    const data = await resp.json();
-    let changed = false, hasLive = false;
-    for(const event of data.events){
-      const comp = event.competitions[0];
-      const status = comp.status.type.name;
-      const home = comp.competitors.find(c=>c.homeAway==="home");
-      const away = comp.competitors.find(c=>c.homeAway==="away");
-      if(!home||!away) continue;
-      const hCode = ESPN_TEAMS[home.team.displayName];
-      const aCode = ESPN_TEAMS[away.team.displayName];
-      if(!hCode||!aCode) continue;
-      const s1 = parseInt(home.score), s2 = parseInt(away.score);
-      const id = fixByTeams[hCode+"|"+aCode];
-      if(!id) continue;
-      if(status==="STATUS_FULL_TIME" && !locked[id]){
-        locked[id]={s1,s2};
-        PLAYED.push([TEAMS[hCode].g, hCode, s1, s2, aCode]);
-        picks[id]={r:s1>s2?"H":s1<s2?"A":"D", hs:s1, as:s2};
-        delete liveScores[id];
-        changed=true;
-        try{
-          const cache=JSON.parse(localStorage.getItem("fifa26_live_scores")||"{}");
-          cache[id]={s1,s2,t1:hCode,t2:aCode,g:TEAMS[hCode].g};
-          localStorage.setItem("fifa26_live_scores",JSON.stringify(cache));
-        }catch(e){}
-      } else if(status==="STATUS_IN_PROGRESS"){
-        hasLive=true;
-        liveScores[id]={s1,s2,t1:hCode,t2:aCode};
-        changed=true;
-      }
+    const base = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
+    const today = new Date().toISOString().slice(0,10).replace(/-/g,"");
+    const urls = [base, base+"?dates="+today];
+    const results = await Promise.allSettled(urls.map(u=>fetch(u).then(r=>r.ok?r.json():null)));
+    const allEvents = [];
+    for(const r of results){
+      if(r.status==="fulfilled" && r.value && r.value.events) allEvents.push(...r.value.events);
     }
+    const {changed, hasLive} = _processEspnEvents(allEvents);
     if(changed){
       BASE=baseStats(); buildSeedIndex(); LOCKED=clinchedTop2();
       savePicks(picks);
