@@ -123,7 +123,7 @@
   .bar-wrap{
     background:var(--paper);
     border-bottom:1px solid var(--line);
-    margin:0 -8px -6px;padding:0 8px 6px;
+    margin:0 -8px -6px;padding:0 8px 2px;
   }
   .bar{
     display:flex;gap:6px;align-items:center;justify-content:space-between;
@@ -386,22 +386,22 @@
   /* ---------- bracket tree overlay ---------- */
   .bkt-overlay{
     position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;
-    display:flex;align-items:center;justify-content:center;
+    display:flex;align-items:flex-start;justify-content:center;padding-top:12px;
     opacity:0;pointer-events:none;transition:opacity .2s
   }
   .bkt-overlay.open{opacity:1;pointer-events:auto}
   .bkt-popup{
     background:var(--board);color:var(--chalk);border-radius:14px;
     box-shadow:0 12px 50px rgba(0,0,0,.6);border-top:3px solid var(--pitch);
-    width:min(96vw,1200px);height:min(90vh,700px);
+    width:min(96vw,1200px);max-height:min(95vh,700px);
     display:flex;flex-direction:column;overflow:hidden;
   }
   .bkt-header{
     display:flex;align-items:center;justify-content:space-between;
-    padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0
+    padding:6px 12px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0
   }
   .bkt-header h3{margin:0;font:800 14px/1.2 ui-monospace,monospace;color:var(--pitch)}
-  .bkt-actions{display:flex;gap:4px;align-items:center;justify-content:flex-start;padding:6px 16px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0}
+  .bkt-actions{display:flex;gap:4px;align-items:center;justify-content:flex-start;padding:4px 12px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0}
   .btn--ov{font:600 10px/1.2 system-ui;padding:4px 8px;border-radius:6px;background:transparent;cursor:pointer;white-space:nowrap}
   .btn--ov-pitch{border:1px solid #48a6f5;color:#6dbcff}
   .btn--ov-my{border:1px solid var(--pitch)!important;color:#5ee09a!important}
@@ -416,7 +416,7 @@
   .bkt-close:hover{color:#fff}
   .bkt-scroll{
     flex:1;overflow:auto;-webkit-overflow-scrolling:touch;
-    padding:10px;
+    padding:10px 6px 2px;
   }
   /* --- grid-based bracket tree --- */
   .bkt-tree{
@@ -426,7 +426,7 @@
       minmax(70px,1fr) 10px minmax(70px,1fr) 10px minmax(70px,1fr) 10px
       minmax(70px,1fr) 10px minmax(80px,1fr) 10px minmax(70px,1fr) 10px
       minmax(70px,1fr) 10px minmax(70px,1fr) 10px minmax(70px,1fr);
-    grid-template-rows:repeat(32,19px);
+    grid-template-rows:repeat(30,17px);
     gap:0;
     min-width:1000px;
     padding:8px 4px;
@@ -495,7 +495,7 @@
     text-align:center;letter-spacing:.08em;text-transform:uppercase;
   }
   .bkt-trophy{font-size:22px;line-height:1}
-  .btn--bracket{border-color:var(--gold);color:#8a6d1b;font:600 9px/1.15 system-ui}
+  .btn--bracket{border:2px solid var(--gold);outline:2px solid #c8941e;outline-offset:-1px;background:linear-gradient(135deg,#fef9e7,#fdf0c8);color:#8a6d1b;font:600 10px/1.15 system-ui;padding:4px 10px}
 
   /* knockout pickable/picked states */
   .ko__slot--pickable{cursor:pointer;transition:background .15s,border-color .15s}
@@ -533,7 +533,7 @@
   <div class="bar-wrap">
     <div class="bar">
       <p id="hint">Tap a Team to Choose.<br>Board Updates Live.</p>
-      <button class="btn btn--bracket" id="bracketTreeBtn" title="View full tournament bracket">🏆<br>Bracket</button>
+      <button class="btn btn--bracket" id="bracketTreeBtn" title="View full tournament bracket"><span style="font-size:18px">🏆</span><br>Bracket</button>
       <div class="bar__btns">
         <button class="btn btn--pitch" id="probable" title="Auto-fill with most likely outcomes">Probable<br>Picks</button>
         <div class="btn-duo"><button class="btn btn--my" id="myPicks" title="Restore your saved picks">My<br>Picks</button><button class="btn btn--my btn--my-share" id="share" title="Share your picks via link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
