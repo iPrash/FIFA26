@@ -2034,16 +2034,18 @@ async function fetchScores(){
 fetchScores().then(() => setTimeout(scrollToToday, 300));
 
 /* ── What's New popup (shows once per version) ── */
-const WNEW_VER="v5";
+const WNEW_VER="v6";
 try{
   if(localStorage.getItem("fifa26_seen")!==WNEW_VER){
     const wo=document.getElementById("wnewOverlay");
     document.getElementById("wnew").innerHTML=`
       <h3>What's New</h3>
       <ul>
-        <li><b>Live scores:</b> confirmed results now lock automatically</li>
-        <li><b>Knockout bracket:</b> swipe left to see the full R32→Final draw update live as you pick</li>
-        <li><b>Clinched teams</b> (🔒) always show in the bracket, even with no picks</li>
+        <li><b>Bracket Picks:</b> tap any knockout match to pick a winner — cascades through to the Final</li>
+        <li><b>Probable Picks:</b> now fills the full bracket too (Polymarket odds)</li>
+        <li><b>My Picks:</b> save your picks and restore anytime</li>
+        <li><b>🏆 Bracket Overlay:</b> full-screen tournament tree with action buttons</li>
+        <li><b>Share</b> now includes bracket picks</li>
       </ul>
       <button id="wnewOk">Got it</button>`;
     wo.classList.add("open");
