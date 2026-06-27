@@ -272,6 +272,12 @@
   .match--locked .lk-sep{display:flex;align-items:center;justify-content:center;padding:0 4px}
   .match--locked .lk-sep hr{width:16px;border:none;border-top:2px solid var(--line);margin:0}
   .locked-badge{font:700 9px/1 ui-monospace,monospace;color:var(--pitch);text-transform:uppercase;letter-spacing:.04em;position:absolute;right:0;top:50%;transform:translateY(-50%)}
+  .live-badge{font:700 9px/1 ui-monospace,monospace;color:#e74c3c;text-transform:uppercase;letter-spacing:.04em;position:absolute;right:0;top:50%;transform:translateY(-50%);animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .match--live{border-color:#e74c3c;background:rgba(231,76,60,.06)}
+  .match--live .pick{pointer-events:none}
+  .match--live .side{cursor:default}
+  .match--live .lk-score{font:800 15px/1 ui-monospace,monospace;color:#e74c3c}
 
   /* ---------- knockout bracket ---------- */
   .ko-inner{max-width:560px;margin:0 auto;padding:4px 10px}
@@ -683,6 +689,23 @@ const fixByGroup = Object.fromEntries(GROUPS.map(g=>[g,allFix.filter(m=>m[1]===g
 
 /* locked = fixture IDs with confirmed real scores from scores.json */
 const locked = {};  // id -> {s1, s2}
+const liveScores = {}; // id -> {s1, s2, t1, t2} for in-progress matches
+
+/* ESPN API team name → our 3-letter code */
+const ESPN_TEAMS = {
+  "Mexico":"MEX","South Africa":"RSA","South Korea":"KOR","Czechia":"CZE",
+  "Canada":"CAN","Bosnia-Herzegovina":"BIH","Switzerland":"SUI","Qatar":"QAT",
+  "United States":"USA","Paraguay":"PAR","Australia":"AUS","Türkiye":"TUR",
+  "Brazil":"BRA","Morocco":"MAR","Scotland":"SCO","Haiti":"HAI",
+  "Germany":"GER","Curaçao":"CUW","Netherlands":"NED","Japan":"JPN",
+  "Ivory Coast":"CIV","Ecuador":"ECU","Sweden":"SWE","Tunisia":"TUN",
+  "Spain":"ESP","Cape Verde":"CPV","Belgium":"BEL","Egypt":"EGY",
+  "Saudi Arabia":"KSA","Uruguay":"URU","Iran":"IRN","New Zealand":"NZL",
+  "France":"FRA","Senegal":"SEN","Norway":"NOR","Iraq":"IRQ",
+  "Argentina":"ARG","Algeria":"ALG","Austria":"AUT","Jordan":"JOR",
+  "Portugal":"POR","Congo DR":"COD","Colombia":"COL","Uzbekistan":"UZB",
+  "England":"ENG","Croatia":"CRO","Ghana":"GHA","Panama":"PAN"
+};
 
 /* reverse lookup: "SUI|CAN" -> fixture id, so we can match scores.json to fixtures */
 const fixByTeams = {};
@@ -1433,7 +1456,35 @@ function renderFixtures(){
         const p=picks[id];
         const r=pickResult(p);
         const sc=pickScores(p);
-        const venueHtml = venue ? `<div class="match__venue"><span>${venue}</span>${lk?'<span class="locked-badge">Final</span>':''}</div>` : '';
+        const lv = liveScores[id];
+        const venueHtml = venue ? `<div class="match__venue"><span>${venue}</span>${lk?'<span class="locked-badge">Final</span>':lv?'<span class="live-badge">🔴 LIVE</span>':''}</div>` : '';
+        if(lv && !lk){
+          // live match — show current score, read-only
+          const isDraw = lv.s1===lv.s2;
+          const hWin = lv.s1>lv.s2, aWin = lv.s1<lv.s2;
+          const hCls = hWin?'lk-win':isDraw?'':'dim';
+          const aCls = aWin?'lk-win':isDraw?'':'dim';
+          const lvSide = (code,score,cls,pts,isAway)=>isAway
+            ? `<button class="side away ${cls}" data-pick="">
+              <span class="lk-score">${score}</span>
+              <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n} (${pts})</span></span>
+              ${flag(code)}
+            </button>`
+            : `<button class="side ${cls}" data-pick="">
+              ${flag(code)}
+              <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n} (${pts})</span></span>
+              <span class="lk-score">${score}</span>
+            </button>`;
+          return `<div class="match match--live" data-id="${id}">
+            ${venueHtml}
+            <div class="match__grp">${g}<span class="mn">${id}</span></div>
+            <div class="pick">
+              ${lvSide(h,lv.s1,hCls,s[h].pts,false)}
+              <div class="lk-sep"><hr></div>
+              ${lvSide(a,lv.s2,aCls,s[a].pts,true)}
+            </div>
+          </div>`;
+        }
         if(lk){
           // confirmed result — compact read-only display
           const isDraw = lk.s1===lk.s2;
@@ -2035,7 +2086,78 @@ async function fetchScores(){
     }
   }catch(e){/* file:// or network error — silent fallback */}
 }
-fetchScores().then(() => setTimeout(scrollToToday, 300));
+/* ── Fetch live scores from ESPN API ── */
+let liveInterval = null;
+async function fetchLiveScores(){
+  try{
+    const resp = await fetch("https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard");
+    if(!resp.ok) return;
+    const data = await resp.json();
+    let changed = false, hasLive = false;
+    for(const event of data.events){
+      const comp = event.competitions[0];
+      const status = comp.status.type.name;
+      const home = comp.competitors.find(c=>c.homeAway==="home");
+      const away = comp.competitors.find(c=>c.homeAway==="away");
+      if(!home||!away) continue;
+      const hCode = ESPN_TEAMS[home.team.displayName];
+      const aCode = ESPN_TEAMS[away.team.displayName];
+      if(!hCode||!aCode) continue;
+      const s1 = parseInt(home.score), s2 = parseInt(away.score);
+      const id = fixByTeams[hCode+"|"+aCode];
+      if(!id) continue;
+      if(status==="STATUS_FULL_TIME" && !locked[id]){
+        locked[id]={s1,s2};
+        PLAYED.push([TEAMS[hCode].g, hCode, s1, s2, aCode]);
+        picks[id]={r:s1>s2?"H":s1<s2?"A":"D", hs:s1, as:s2};
+        delete liveScores[id];
+        changed=true;
+        try{
+          const cache=JSON.parse(localStorage.getItem("fifa26_live_scores")||"{}");
+          cache[id]={s1,s2,t1:hCode,t2:aCode,g:TEAMS[hCode].g};
+          localStorage.setItem("fifa26_live_scores",JSON.stringify(cache));
+        }catch(e){}
+      } else if(status==="STATUS_IN_PROGRESS"){
+        hasLive=true;
+        liveScores[id]={s1,s2,t1:hCode,t2:aCode};
+        changed=true;
+      }
+    }
+    if(changed){
+      BASE=baseStats(); buildSeedIndex(); LOCKED=clinchedTop2();
+      savePicks(picks);
+      renderFixtures(); renderBoard(); renderBracket();
+    }
+    if(hasLive && !liveInterval){
+      liveInterval=setInterval(fetchLiveScores, 60000);
+    } else if(!hasLive && liveInterval){
+      clearInterval(liveInterval); liveInterval=null;
+    }
+  }catch(e){/* CORS/network — silent */}
+}
+
+/* Apply cached ESPN scores from localStorage (instant on reload) */
+try{
+  const cache=JSON.parse(localStorage.getItem("fifa26_live_scores")||"{}");
+  let cacheChanged=false;
+  for(const id in cache){
+    if(locked[id]) continue;
+    const m=cache[id];
+    locked[id]={s1:m.s1,s2:m.s2};
+    PLAYED.push([m.g, m.t1, m.s1, m.s2, m.t2]);
+    picks[id]={r:m.s1>m.s2?"H":m.s1<m.s2?"A":"D", hs:m.s1, as:m.s2};
+    cacheChanged=true;
+  }
+  if(cacheChanged){
+    BASE=baseStats(); buildSeedIndex(); LOCKED=clinchedTop2();
+    savePicks(picks); renderFixtures(); renderBoard(); renderBracket();
+  }
+}catch(e){}
+
+fetchScores().then(()=>{
+  fetchLiveScores();
+  setTimeout(scrollToToday, 300);
+});
 
 /* ── What's New popup (shows once per version) ── */
 const WNEW_VER="v6";
