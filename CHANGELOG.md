@@ -4,6 +4,18 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-27 · Early AM — ESPN Live Scores
+
+### Auto-Refresh from ESPN API
+- App now fetches live scores from ESPN's public API on page load.
+- Completed matches auto-lock without needing a scores.json update.
+- In-progress matches show a pulsing 🔴 LIVE badge and poll every 60 seconds.
+- ESPN scores cached in localStorage for instant display on reload.
+- `scores.json` remains as fallback (file:// and offline).
+- 48-team `ESPN_TEAMS` mapping handles all name conversions.
+
+---
+
 ## 2026-06-26 · Late Night — Probable KO Picks & Golden Winners
 
 ### Probable Picks → Full Bracket
