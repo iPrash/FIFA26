@@ -4,6 +4,34 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-27 · Morning — Scenario Locks, Live Picks & Bracket Fix
+
+### Scenario Locks (🟢)
+- New 🟢 icon on the board for teams mathematically locked **in your pick scenario** (not just confirmed results).
+- Same brute-force as 🔒 but treats your picks as settled, only enumerates unpicked matches.
+- Board counter shows "🔒 Qualified: N/32 + M🟢" when scenario locks exist.
+- Group card headers show 🟢🟢 when both top-2 teams are scenario-locked.
+
+### Live Match Picks
+- Users can now pick winners during live matches — no longer read-only.
+- Live score displayed as centered score card (like Final) with pickable buttons below.
+- Score steppers enforce live scores as a floor — can only add goals, never reduce below actual score.
+- Picking the losing side auto-sets their score above the leader. Picking draw auto-equalizes.
+- ESPN poll bumps your pick scores up if live scores increase during the match.
+
+### Third-Place Bracket Fix
+- Fixed premature locking of third-place R32 slots caused by proxy GD tiebreaking.
+- When third-place teams are tied on points at the 8th/9th qualifying cut, all possible subsets are now enumerated.
+- Prevents incorrect team assignments (e.g., ECU locked into match 79 when SCO could still shift the Annex C mapping).
+- Slots only lock when invariant across every possible combination.
+
+### ESPN API Fixes
+- Fixed live match detection: uses `status.type.state` ("in"/"post") instead of status name (handles STATUS_SECOND_HALF, STATUS_FIRST_HALF, etc.).
+- Fetches both default and today's dated scoreboard to catch cross-day matches.
+- Auto-scroll prioritizes live matches over today's date header.
+
+---
+
 ## 2026-06-27 · Early AM — ESPN Live Scores
 
 ### Auto-Refresh from ESPN API

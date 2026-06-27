@@ -275,8 +275,12 @@
   .live-badge{font:700 9px/1 ui-monospace,monospace;color:#e74c3c;text-transform:uppercase;letter-spacing:.04em;position:absolute;right:0;top:50%;transform:translateY(-50%);animation:pulse 1.5s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
   .match--live{border-color:#e74c3c;background:rgba(231,76,60,.06)}
-  .match--live .pick{pointer-events:none}
-  .match--live .side{cursor:default}
+  .match--live .side{cursor:pointer}
+  .lv-display{display:flex;align-items:center;justify-content:center;gap:0;padding:2px 6px}
+  .lv-display .side{flex:1;border:none;background:none;padding:4px 6px}
+  .lv-display .lk-sep{display:flex;align-items:center;padding:0 4px}
+  .lv-display .lk-sep hr{width:16px;border:none;border-top:2px solid var(--line);margin:0}
+  .lv-pick{border-top:1px dashed rgba(231,76,60,.3);margin-top:2px;padding-top:2px}
   .match--live .lk-score{font:800 15px/1 ui-monospace,monospace;color:#e74c3c}
   .match--live .side:first-child .lk-score{margin-left:auto;padding-right:2px}
   .match--live .side:last-child .lk-score{margin-right:auto;padding-left:2px}
@@ -770,7 +774,14 @@ function pickScores(p){
   return {hs:0,as:0};
 }
 function makePick(r,hs,as){ return {r,hs,as}; }
-function defaultPick(r){ return r==="H"?{r,hs:1,as:0}:r==="A"?{r,hs:0,as:1}:{r,hs:0,as:0}; }
+function defaultPick(r,lv){
+  if(!lv) return r==="H"?{r,hs:1,as:0}:r==="A"?{r,hs:0,as:1}:{r,hs:0,as:0};
+  // Live match: scores can only go up from live baseline
+  const ls1=lv.s1, ls2=lv.s2;
+  if(r==="D"){ const mx=Math.max(ls1,ls2); return {r,hs:mx,as:mx}; }
+  if(r==="H") return {r, hs:ls1>ls2?ls1:ls2+1, as:ls2};
+  /* A */ return {r, hs:ls1, as:ls2>ls1?ls2:ls1+1};
+}
 
 function standings(picks){
   const s=statsWith(picks), tables={};
@@ -820,6 +831,56 @@ function clinchedTop2(){
 }
 let LOCKED = clinchedTop2();
 
+/* ---- scenario-locked: top-2 guaranteed given current picks ----
+   Same brute-force as clinchedTop2 but treats picked matches as settled.
+   Only unpicked remaining matches are enumerated. Returns a Set of teams
+   that are mathematically locked in the user's scenario (shown as 🟢). */
+function scenarioLocked(picks){
+  const sl=new Set();
+  GROUPS.forEach(g=>{
+    const all=fixByGroup[g], teams=Object.keys(TEAMS).filter(c=>TEAMS[c].g===g);
+    // Start from BASE (confirmed results only)
+    const basePts=Object.fromEntries(teams.map(t=>[t,BASE[t].pts]));
+    // Apply picked matches as settled
+    const unpicked=[];
+    for(const [id,,h,a] of all){
+      if(locked[id]) continue; // already confirmed
+      const p=picks[id];
+      if(p && p.r){
+        if(p.r==="H") basePts[h]+=3;
+        else if(p.r==="A") basePts[a]+=3;
+        else { basePts[h]++; basePts[a]++; }
+      } else {
+        unpicked.push([h,a]);
+      }
+    }
+    if(unpicked.length===0){
+      // All matches settled (confirmed + picked) — top 2 are locked
+      const sorted=teams.slice().sort((a,b)=>(basePts[b]-basePts[a]));
+      sl.add(sorted[0]); sl.add(sorted[1]);
+      return;
+    }
+    const safe=Object.fromEntries(teams.map(t=>[t,true]));
+    const N=Math.pow(3,unpicked.length);
+    if(N>100000) return; // safety: skip if too many combos
+    for(let mask=0;mask<N;mask++){
+      const p=Object.fromEntries(teams.map(t=>[t,basePts[t]]));
+      let m=mask;
+      for(const [h,a] of unpicked){
+        const o=m%3; m=(m-o)/3;
+        if(o===0) p[h]+=3; else if(o===1) p[a]+=3; else {p[h]++; p[a]++;}
+      }
+      teams.forEach(t=>{
+        const above=teams.filter(u=>u!==t && p[u]>=p[t]).length;
+        if(above>1) safe[t]=false;
+      });
+    }
+    teams.forEach(t=>{ if(safe[t]) sl.add(t); });
+  });
+  return sl;
+}
+let SCENARIO_LOCKED = new Set();
+
 /* =================== KNOCKOUT BRACKET DATA =================== */
 /* Inlined from r32-bracket.js — FIFA Annex C */
 const R32_MATCHES = [
@@ -850,6 +911,16 @@ function assignThirds(qualifyingGroups){
   const out={};
   THIRD_COLS.forEach((host,i)=> out[host]=v[i]);
   return out;
+}
+
+function combinations(arr, k){
+  const result=[];
+  function go(start,chosen){
+    if(chosen.length===k){result.push([...chosen]);return;}
+    for(let i=start;i<=arr.length-(k-chosen.length);i++){chosen.push(arr[i]);go(i+1,chosen);chosen.pop();}
+  }
+  go(0,[]);
+  return result;
 }
 
 /* Map THIRD_COLS host positions to R32 match numbers */
@@ -1082,18 +1153,39 @@ function resolveKnockout(){
       }
       doneGroups.forEach(g => allThirds.push({g, ...doneThirds[g]}));
 
-      // Rank all 12 thirds by pts > gd > gf
-      allThirds.sort((a,b)=>(b.pts-a.pts)||(b.gd-a.gd)||(b.gf-a.gf));
-      const top8 = allThirds.slice(0,8).map(t=>t.g);
+      // Rank by points; at the 8/9 cut, if teams are tied on pts,
+      // enumerate all subsets (GD from proxy is unreliable across groups).
+      allThirds.sort((a,b) => b.pts - a.pts);
+      const cutPts = allThirds[7].pts;
+      const alwaysIn = allThirds.filter(t => t.pts > cutPts);
+      const tied = allThirds.filter(t => t.pts === cutPts);
+      const slotsToFill = 8 - alwaysIn.length;
 
-      const assignment = assignThirds(top8);
-      if(!assignment) continue;
-      THIRD_COLS.forEach(host => {
-        const originGroup = assignment[host];
-        const matchNum = THIRD_HOST_TO_MATCH[host];
-        const entry = allThirds.find(t=>t.g===originGroup);
-        slotResults[matchNum].add(entry.team);
-      });
+      if(slotsToFill <= 0 || slotsToFill >= tied.length){
+        // No ambiguity at the cut line
+        const top8 = allThirds.slice(0,8).map(t => t.g);
+        const assignment = assignThirds(top8);
+        if(assignment){
+          THIRD_COLS.forEach(host => {
+            const matchNum = THIRD_HOST_TO_MATCH[host];
+            slotResults[matchNum].add(allThirds.find(t => t.g === assignment[host]).team);
+          });
+        }
+      } else {
+        // Tied at cut: enumerate which tied teams fill remaining slots
+        const alwaysInG = alwaysIn.map(t => t.g);
+        const tiedG = tied.map(t => t.g);
+        const subsets = combinations(tiedG, slotsToFill);
+        for(const subset of subsets){
+          const top8 = alwaysInG.concat(subset);
+          const assignment = assignThirds(top8);
+          if(!assignment) continue;
+          THIRD_COLS.forEach(host => {
+            const matchNum = THIRD_HOST_TO_MATCH[host];
+            slotResults[matchNum].add(allThirds.find(t => t.g === assignment[host]).team);
+          });
+        }
+      }
     }
 
     // Slots where only ONE team appeared across ALL scenarios are locked
@@ -1400,6 +1492,7 @@ document.getElementById("viewToggle").addEventListener("click",()=>{
 });
 
 function renderBoard(){
+  SCENARIO_LOCKED = scenarioLocked(picks);
   const {tables,thirds,s}=standings(picks);
   const full=viewMode==="full";
   groupsEl.classList.toggle("full",full);
@@ -1410,7 +1503,7 @@ function renderBoard(){
       ? t.map((c,i)=>gteam(i+1,c,s,full)).join("")
       : gteam(1,t[0],s,false)+gteam(2,t[1],s,false);
     return `<div class="gcard" data-grp="${g}" style="--gc:${GC[g]}">
-        <div class="gcard__h"><span>${g}</span>${(LOCKED.has(t[0])&&LOCKED.has(t[1]))?'<span class="lkmark">🔒🔒</span>':''}</div>
+        <div class="gcard__h"><span>${g}</span>${(LOCKED.has(t[0])&&LOCKED.has(t[1]))?'<span class="lkmark">🔒🔒</span>':(SCENARIO_LOCKED.has(t[0])&&SCENARIO_LOCKED.has(t[1]))?'<span class="lkmark">🟢🟢</span>':''}</div>
         ${rows}
       </div>`;
   }).join("");
@@ -1423,20 +1516,23 @@ function renderBoard(){
       </div>`;
   }).join("");
 
-  document.getElementById("lockN").textContent=LOCKED.size;
+  const scenOnly=SCENARIO_LOCKED.size-LOCKED.size;
+  document.getElementById("lockN").textContent=LOCKED.size+(scenOnly>0?' + '+scenOnly+'🟢':'');
 }
 
 function gteam(rk,code,s,full){
   const lock=LOCKED.has(code);
-  const prov = !lock && rk<=2;
-  const elim = rk>2 && !lock;
+  const scenLock=!lock && SCENARIO_LOCKED.has(code);
+  const prov = !lock && !scenLock && rk<=2;
+  const elim = rk>2 && !lock && !scenLock;
   const gd=s[code].gd;
   const gdStr=gd>0?"+"+gd:gd===0?"0":""+gd;
+  const icon=lock?'🔒 ':scenLock?'🟢 ':'';
   return `<div class="gteam ${prov?'prov':''} ${elim&&full?'elim':''}">
       <span class="rk">${rk}</span>${flag(code)}
       <span class="cd">${code}</span>
       ${full?'<span class="gd">'+gdStr+'</span>':''}
-      <span class="pt">${lock?'🔒 ':''}${s[code].pts}</span>
+      <span class="pt">${icon}${s[code].pts}</span>
     </div>`;
 }
 
@@ -1462,30 +1558,46 @@ function renderFixtures(){
         const lv = liveScores[id];
         const venueHtml = venue ? `<div class="match__venue"><span>${venue}</span>${lk?'<span class="locked-badge">Final</span>':lv?'<span class="live-badge">🔴 LIVE</span>':''}</div>` : '';
         if(lv && !lk){
-          // live match — show current score, read-only
+          // live match — centered live score + pickable buttons below
           const isDraw = lv.s1===lv.s2;
           const hWin = lv.s1>lv.s2, aWin = lv.s1<lv.s2;
           const hCls = hWin?'lk-win':isDraw?'':'dim';
           const aCls = aWin?'lk-win':isDraw?'':'dim';
           const lvSide = (code,score,cls,pts,isAway)=>isAway
-            ? `<button class="side away ${cls}" data-pick="">
+            ? `<div class="side away ${cls}">
               <span class="lk-score">${score}</span>
               <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n} (${pts})</span></span>
               ${flag(code)}
-            </button>`
-            : `<button class="side ${cls}" data-pick="">
+            </div>`
+            : `<div class="side ${cls}">
               ${flag(code)}
               <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n} (${pts})</span></span>
               <span class="lk-score">${score}</span>
-            </button>`;
+            </div>`;
           return `<div class="match match--live" data-id="${id}">
             ${venueHtml}
             <div class="match__grp">${g}<span class="mn">${id}</span></div>
-            <div class="pick">
+            <div class="lv-display">
               ${lvSide(h,lv.s1,hCls,s[h].pts,false)}
               <div class="lk-sep"><hr></div>
               ${lvSide(a,lv.s2,aCls,s[a].pts,true)}
             </div>
+            <div class="pick lv-pick">
+              ${side(h,r,"H",s[h].pts)}
+              <button class="draw ${r==='D'?'sel':''} ${r&&r!=='D'?'dim':''}" data-pick="D">DRAW<small>tie</small></button>
+              ${side(a,r,"A",s[a].pts)}
+            </div>
+            ${r&&r!=='D'?`<div class="score-row">
+              <button class="sbtn" data-sc="hm">−</button><span class="sval">${sc.hs}</span>
+              <button class="sbtn" data-sc="hp">+</button>
+              <span class="sdash">–</span>
+              <button class="sbtn" data-sc="am">−</button><span class="sval">${sc.as}</span>
+              <button class="sbtn" data-sc="ap">+</button>
+            </div>`:''}${r==='D'?`<div class="score-row">
+              <button class="sbtn" data-sc="dm">−</button>
+              <span class="sval">${sc.hs}</span><span class="sdash">–</span><span class="sval">${sc.as}</span>
+              <button class="sbtn" data-sc="dp">+</button>
+            </div>`:''}
           </div>`;
         }
         if(lk){
@@ -1833,12 +1945,14 @@ fixturesEl.addEventListener("click",e=>{
     const p=picks[id]; if(!p) return;
     const act=sc.dataset.sc;
     let {r,hs,as}=p;
+    const lv=liveScores[id];
+    const floorH=lv?lv.s1:0, floorA=lv?lv.s2:0;
     if(act==="hp"&&hs<15) hs++;
-    else if(act==="hm"&&hs>0) hs--;
+    else if(act==="hm"&&hs>floorH) hs--;
     else if(act==="ap"&&as<15) as++;
-    else if(act==="am"&&as>0) as--;
+    else if(act==="am"&&as>floorA) as--;
     else if(act==="dp"&&hs<15){hs++;as++;}
-    else if(act==="dm"&&hs>0){hs--;as--;}
+    else if(act==="dm"&&hs>floorH&&as>floorA){hs--;as--;}
     // enforce win/draw constraints
     if(r==="H"&&hs<=as) hs=as+1;
     if(r==="A"&&as<=hs) as=hs+1;
@@ -1852,7 +1966,8 @@ fixturesEl.addEventListener("click",e=>{
   const id=e.target.closest(".match").dataset.id;
   const want=btn.dataset.pick;
   const cur=pickResult(picks[id]);
-  picks[id] = (cur===want) ? null : defaultPick(want);
+  const lv=liveScores[id]||null;
+  picks[id] = (cur===want) ? null : defaultPick(want,lv);
   savePicks(picks); saveMyPicks(picks, koPicks); renderFixtures(); renderBoard(); renderBracket();
   // #3: nudge toward bracket on first pick
   if(!pickPeekDone){ pickPeekDone=true; setTimeout(peekBracket, 400); }
@@ -2133,6 +2248,18 @@ function _processEspnEvents(events){
       hasLive=true;
       liveScores[id]={s1,s2,t1:hCode,t2:aCode};
       changed=true;
+      // Bump existing picks if live scores now exceed them
+      const p=picks[id];
+      if(p && p.r){
+        let bump=false;
+        if(p.hs<s1){p.hs=s1;bump=true;}
+        if(p.as<s2){p.as=s2;bump=true;}
+        if(bump){
+          if(p.r==="H"&&p.hs<=p.as) p.hs=p.as+1;
+          if(p.r==="A"&&p.as<=p.hs) p.as=p.hs+1;
+          if(p.r==="D"){const mx=Math.max(p.hs,p.as);p.hs=mx;p.as=mx;}
+        }
+      }
     }
   }
   return {changed, hasLive};
