@@ -1922,9 +1922,18 @@ fixturesEl.addEventListener("click",e=>{
     const lv=liveScores[id];
     const floorH=lv?lv.s1:0, floorA=lv?lv.s2:0;
     if(act==="hp"&&hs<15) hs++;
-    else if(act==="hm"&&hs>floorH) hs--;
+    else if(act==="hm"&&hs>floorH){
+      hs--;
+      // if winner's score dropped, pull loser down too (but respect floor)
+      if(r==="H"&&hs<=as) as=Math.max(hs-1,floorA);
+      if(r==="A"&&hs<as-1) {} // shrink gap is fine
+    }
     else if(act==="ap"&&as<15) as++;
-    else if(act==="am"&&as>floorA) as--;
+    else if(act==="am"&&as>floorA){
+      as--;
+      if(r==="A"&&as<=hs) hs=Math.max(as-1,floorH);
+      if(r==="H"&&as<hs-1) {} // shrink gap is fine
+    }
     else if(act==="dp"&&hs<15){hs++;as++;}
     else if(act==="dm"&&hs>floorH&&as>floorA){hs--;as--;}
     // enforce win/draw constraints
