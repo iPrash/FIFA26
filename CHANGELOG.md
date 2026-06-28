@@ -4,6 +4,28 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-27 · Evening — Live Card Fix, Scores & Bracket Alignment
+
+### Live Match Card
+- Simplified live match rendering: same layout as normal matches with red border + LIVE badge.
+- Live scores shown inline inside team buttons (home right-aligned, away left-aligned).
+- Reducing winner's score now pulls loser's score down correspondingly (respects live floor).
+- "Live score floor" flash message when stepper is blocked by actual score.
+
+### Score Updates
+- Groups K and L complete: PAN 0-2 ENG, CRO 2-1 GHA, COL 0-0 POR, COD 3-1 UZB.
+- Fixed day-of-week on all R32/QF/SF/Final bracket dates (were all one day behind).
+
+### Bracket Overlay
+- R16 and QF columns shifted up for better vertical centering with R32.
+- SF and Final column alignment improved.
+- Connector lines between rounds properly span from center of top match to center of bottom match.
+
+### Other
+- Shortened "Qualified" to "Qual" in board counter to prevent line wrapping with 🟢.
+
+---
+
 ## 2026-06-27 · Morning — Scenario Locks, Live Picks & Bracket Fix
 
 ### Scenario Locks (🟢)

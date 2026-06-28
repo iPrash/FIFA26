@@ -8,7 +8,7 @@ A single-file, phone-first "what-if" analyser for the 2026 FIFA World Cup group 
 
 Audience: football fans on phones. The single job of the page: let someone play out the rest of the group stage and instantly see who qualifies.
 
-**Current data state:** both group rounds complete (through June 23, 2026). Only the 24 Matchday-3 games remain in `FIXTURES`. Seven teams are already mathematically qualified (Mexico, USA, Germany, Argentina, France, Norway, Colombia) and render with a 🔒.
+**Current data state:** MD1 + MD2 results are hardcoded in `PLAYED`. MD3 results come from `scores.json` at runtime. Groups A–I and K, L MD3 are complete; only Group J MD3 remains (matches 71–72).
 
 ## Repo files
 
@@ -28,10 +28,11 @@ Audience: football fans on phones. The single job of the page: let someone play 
 ## Data model (top of the `<script>` block)
 
 - `TEAMS` — `{ CODE: { n: name, iso: flagcdn-code, g: groupLetter } }`. 48 teams. ISO is lowercase alpha-2, or `gb-eng` / `gb-sct` for England / Scotland.
-- `PLAYED` — finished matches: `["GROUP","HOME",homeGoals,awayGoals,"AWAY"]`. Source of all points + goal difference.
-- `FIXTURES` — remaining pickable matches, grouped by date: `{ date, note, ms:[ [id,group,homeCode,awayCode], ... ] }`.
+- `PLAYED` — finished matches: `["GROUP","HOME",homeGoals,awayGoals,"AWAY"]`. Hardcoded with MD1 + MD2 results. MD3 results are added dynamically at runtime by `fetchScores()`.
+- `FIXTURES` — all Matchday 3 matches, grouped by date: `{ date, note, ms:[ [id,group,homeCode,awayCode,venue], ... ] }`. These stay permanently — never delete entries. `fetchScores()` uses `fixByTeams` to map team codes to fixture IDs.
+- `scores.json` — the single source of truth for MD3 results. Contains all 24 MD3 matches with scores (`null` = not yet played).
 
-To finalize a match: move it from `FIXTURES` into `PLAYED` with the real score. Everything downstream recomputes.
+**To finalize a match: only update `scores.json` with the real score.** Do NOT modify `PLAYED` or `FIXTURES` in `index.html`. At runtime, `fetchScores()` reads `scores.json`, sets `locked[id]`, pushes into `PLAYED`, and recomputes standings.
 
 ## Engine
 
