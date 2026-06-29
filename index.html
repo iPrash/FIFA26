@@ -6,10 +6,11 @@
 <meta name="theme-color" content="#1f9d57">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>MyFIFA26 · World Cup 2026 What-If</title>
+<title>MyFIFA26 - World Cup 2026</title>
 <style>
   :root{
     --ink:#0d1b14;          /* near-black green ink */
@@ -145,10 +146,10 @@
   }
   .bar{
     display:flex;gap:6px;align-items:center;
-    padding:7px 6px;max-width:560px;margin:0 auto;
+    padding:7px 5px;max-width:560px;margin:0 auto;
   }
   .bar__left,.bar__right{flex:1;min-width:0}
-  .bar__left{display:flex;align-items:center;gap:4px}
+  .bar__left{display:flex;align-items:center;gap:2px}
   .bar__center{flex:none;display:flex;gap:4px;align-items:center}
   .bar__right{display:flex;justify-content:flex-end}
   .bar p{margin:0;font-size:11px;line-height:1.35;color:var(--muted)}
@@ -160,6 +161,13 @@
   .btn:active{transform:translateY(1px)}
   .btn--danger{border-color:#c0392b;color:#c0392b}
   .btn--pitch{border-color:#48a6f5;color:#2a6fad}
+  .btn--refresh{position:relative;overflow:hidden}
+  .btn--refresh.cooldown{opacity:.45}
+  .btn--refresh.cooldown::after{
+    content:"";position:absolute;bottom:0;left:0;height:2px;
+    background:#48a6f5;animation:refill 30s linear forwards
+  }
+  @keyframes refill{from{width:0}to{width:100%}}
   .btn--share{border-color:var(--silver);color:#3c5a70}
   .bar__btns{display:flex;gap:4px;flex-shrink:0}
   .btn-duo{display:flex}
@@ -595,8 +603,8 @@
 <div class="bar-wrap">
   <div class="bar">
     <div class="bar__left">
-      <p id="hint">Tap a Team to Choose.<br>Board Updates Live.</p>
-      <button class="btn btn--pitch" id="refreshBtn" title="Refresh">&#x21bb;<br>Refresh</button>
+      <p id="hint" style="margin-right:4px">Tap Team to Pick<br>Bracket Updates Live</p>
+      <button class="btn btn--pitch btn--refresh" id="refreshBtn" title="Refresh">&#x21bb;<br>Refresh</button>
     </div>
     <div class="bar__center">
       <button class="btn btn--bracket" id="bracketTreeBtn" title="View full tournament bracket"><span style="font-size:18px">🏆</span><br>Bracket</button>
@@ -2566,11 +2574,26 @@ try{
 }catch(e){}
 
 /* ── Refresh button ── */
-document.getElementById("refreshBtn").addEventListener("click",()=>{
-  if('serviceWorker' in navigator && navigator.serviceWorker.controller){
-    navigator.serviceWorker.getRegistration().then(reg=>{
-      if(reg) reg.update().then(()=>location.reload());
-      else location.reload();
+const refreshBtn = document.getElementById("refreshBtn");
+// Cooldown: disable for 30s after page load to prevent rapid reloads
+const lastRefresh = parseInt(localStorage.getItem("lastRefresh")||"0");
+const elapsed = Date.now() - lastRefresh;
+if(elapsed < 30000){
+  refreshBtn.classList.add("cooldown");
+  setTimeout(()=> refreshBtn.classList.remove("cooldown"), 30000 - elapsed);
+}
+refreshBtn.addEventListener("click",()=>{
+  if(refreshBtn.classList.contains("cooldown")){ toast("Wait 30s between refreshes"); return; }
+  try{ localStorage.setItem("lastRefresh", Date.now().toString()); }catch(e){}
+  refreshBtn.classList.add("cooldown");
+  if('caches' in window){
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(()=>{
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.getRegistration().then(reg=>{
+          if(reg) reg.update().then(()=>location.reload());
+          else location.reload();
+        });
+      } else { location.reload(); }
     });
   } else { location.reload(); }
 });
@@ -2675,7 +2698,7 @@ document.getElementById("refreshBtn").addEventListener("click",()=>{
 </script>
 <script>
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.register('sw.js', {updateViaCache:'none'});
   navigator.serviceWorker.addEventListener('message',e=>{
     if(e.data&&e.data.type==='SW_UPDATED') location.reload();
   });
