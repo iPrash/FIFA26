@@ -4,6 +4,13 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-29 — Fix iOS Phone Rendering Bug
+
+- Fix Jul 1 bracket matches rendering with oversized font on iOS Safari.
+- Root cause: missing `-webkit-text-size-adjust: 100%` — Safari was auto-inflating text in certain blocks.
+
+---
+
 ## 2026-06-28 · Late — Default to Bracket Tab & Scroll to Today
 
 - App now starts on the Knockout Bracket tab on mobile (group stage is complete).
