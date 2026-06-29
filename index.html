@@ -297,23 +297,23 @@
   .ko__round-h::after{content:"";flex:1;height:1px;background:var(--line)}
   .ko__grid{display:grid;grid-template-columns:1fr;gap:5px}
   .ko__match{
-    display:flex;flex-direction:column;
-    background:#fff;border:1px solid var(--line);border-radius:8px;
-    padding:2px 7px 5px;font:600 11px/1.2 ui-monospace,monospace;
-    gap:0
+    display:flex;flex-direction:column;position:relative;
+    background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:2px 9px 8px;font:600 11px/1.2 ui-monospace,monospace;
+    gap:0;margin-bottom:7px
   }
-  .ko__venue{font:600 9px/1 ui-monospace,monospace;color:var(--muted);text-align:center;padding:1px 0}
+  .ko__venue{font:600 10px/1 ui-monospace,monospace;color:var(--muted);text-align:center;padding:1px 0;position:relative}
   .ko__row{display:flex;align-items:center;gap:0}
   .ko__mn{color:var(--muted);font-size:9px;flex:none;width:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px}
   .ko__slot{
-    display:flex;align-items:center;gap:4px;flex:1;min-width:0;
-    padding:2px 4px;border-radius:4px
+    display:flex;align-items:center;gap:6px;flex:1;min-width:0;
+    padding:7px 8px;border-radius:8px;border:1.5px solid var(--line)
   }
-  .ko__slot .flag{width:22px;height:16px;flex:none}
+  .ko__slot .flag{width:26px;height:19px;flex:none}
   .ko__slot .cd{font:700 13px/1 ui-monospace,monospace;white-space:nowrap}
   .ko__slot .nm{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ko__grp{font:800 8px/1 ui-monospace,monospace;flex:none;opacity:.8}
-  .ko__vs{color:var(--muted);font-size:9px;flex:none;margin:0 3px}
+  .ko__grp{font:900 10px/1 ui-monospace,monospace;flex:none;background:#fff;padding:2px 4px;border-radius:3px;border:1px solid #000}
+  .ko__vs{color:var(--muted);font-size:10px;flex:none;margin:0 5px}
   .ko__slot--dual{opacity:.7}
   .ko__slot--tbd{opacity:.35}
   .ko__slot--tbd .cd{font-style:italic;font-weight:600}
@@ -447,24 +447,24 @@
     justify-content:center;overflow:visible;position:relative;
   }
   .bkt-mn{
-    font:600 7px/1 ui-monospace,monospace;color:rgba(255,255,255,.85);text-align:center;
-    padding:0 0 1px;white-space:nowrap;
+    font:600 8px/1 ui-monospace,monospace;color:rgba(255,255,255,.85);text-align:center;
+    padding:0 0 1px;white-space:nowrap;position:relative;
   }
   .bkt-dt{font-weight:400;color:rgba(255,255,255,.7)}
-  .bkt-dt-line{font:400 7px/1 ui-monospace,monospace;color:rgba(255,255,255,.7);text-align:center;padding:0 0 2px}
-  .bkt-venue{font:400 6px/1 ui-monospace,monospace;color:rgba(255,255,255,.5);text-align:center;white-space:nowrap;padding:1px 0 0}
+  .bkt-dt-line{font:400 8px/1 ui-monospace,monospace;color:rgba(255,255,255,.7);text-align:center;padding:0 0 2px}
+  .bkt-venue{font:400 7px/1 ui-monospace,monospace;color:rgba(255,255,255,.5);text-align:center;white-space:nowrap;padding:1px 0 0}
   .bkt-venue--abs{position:absolute;bottom:-8px;left:0;right:0;padding:0}
   .bkt-team{
     display:flex;align-items:center;gap:3px;
     background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-    padding:2px 4px;min-width:0;
-    font:600 10px/1.2 ui-monospace,monospace;
+    padding:3px 5px;min-width:0;
+    font:600 12px/1.2 ui-monospace,monospace;
   }
   .bkt-team:first-of-type{border-radius:4px 4px 0 0;border-bottom:none}
   .bkt-team:last-of-type{border-radius:0 0 4px 4px}
   .bkt-team--has{border-left:3px solid var(--gc,rgba(255,255,255,.15))}
   .bkt-team--tbd{opacity:.35}
-  .bkt-team .flag{width:18px;height:13px;flex:none}
+  .bkt-team .flag{width:20px;height:14px;flex:none}
   .bkt-team .cd{white-space:nowrap}
   /* connector lines */
   .bkt-conn{position:relative}
@@ -518,6 +518,29 @@
   .bkt-team--pickable:hover{background:rgba(255,255,255,.12)}
   .bkt-team--picked{background:rgba(218,165,32,.15)!important;border:2px solid var(--gold)!important}
   .bkt-team--picked .cd{color:var(--chalk)}
+  .bkt-team--winner{background:rgba(218,165,32,.12)!important;border-color:var(--gold)!important}
+  .bkt-team--winner .cd{font-weight:800}
+
+  /* bracket scores */
+  .bkt-sc{margin-left:auto;font:800 13px/1 ui-monospace,monospace;color:var(--chalk)}
+  .bkt-match--live{border:1px solid #e74c3c;border-radius:4px}
+  .bkt-match--live .bkt-sc{color:#e74c3c}
+  .bkt-match--live .bkt-mn{color:#e74c3c}
+  .bkt-match--done{background:rgba(31,157,87,.12);border-radius:4px}
+  .bkt-match--done .bkt-sc{color:var(--chalk)}
+  .bkt-badge{font:700 7px/1 ui-monospace,monospace;text-transform:uppercase;letter-spacing:.04em;position:absolute;right:-2px;top:0}
+  .bkt-badge--final{color:var(--pitch)}
+  .bkt-badge--live{color:#e74c3c;animation:pulse 1.5s infinite}
+  .bkt-final.bkt-match--live{border:1px solid #e74c3c;border-radius:6px}
+  .bkt-final.bkt-match--done{background:rgba(31,157,87,.12);border-radius:6px}
+
+  /* list view KO scores */
+  .ko__sc{font:800 14px/1 ui-monospace,monospace;color:var(--ink);margin-left:auto}
+  .ko__sc--live{color:#e74c3c}
+  .ko__slot--away .ko__sc{margin-left:0;margin-right:auto}
+  .ko__match--live{border-color:#e74c3c}
+  .ko__match--live .ko__mn{color:#e74c3c}
+  .ko__match--done{border-color:var(--pitch);background:rgba(31,157,87,.06)}
 </style>
 </head>
 <body>
@@ -595,9 +618,9 @@
   <div class="panel panel--fixtures">
     <div class="fix-inner" id="fixtures"></div>
     <footer>
-      <p class="asof">Matchday 3 underway: 6 groups complete. Pick the remaining 6 to see R32 matchups lock in live.</p>
-      <p><b>How it works:</b> win = 3, draw = 1, loss = 0. Pick a winner then adjust the scoreline with the steppers — goal difference updates live. Tied teams are ordered by points → GD → goals scored. The 8 best third-placed teams take the final 8 R32 slots. A <b>🔒</b> means a team is mathematically through regardless of remaining results.</p>
-      <p>Each group is colour-coded A–L; that colour follows a team into the third-place row so you can see where it came from. Edit the <code>TEAMS</code> / <code>PLAYED</code> / <code>FIXTURES</code> blocks in the source to correct any result.</p>
+      <p class="asof">Group stage complete. Round of 32 underway — pick bracket winners or tap Probable Picks to auto-fill.</p>
+      <p><b>How it works:</b> Group standings used points → GD → goals scored. The 8 best third-placed teams took the final 8 R32 slots. Tap a team in the bracket to pick the winner — your picks cascade through R16, QF, SF, and the Final.</p>
+      <p>Each group is colour-coded A–L; that colour follows a team into the bracket so you can see where it came from. Live scores update automatically from ESPN.</p>
     </footer>
   </div>
   <div class="panel panel--bracket">
@@ -694,6 +717,10 @@ const fixByGroup = Object.fromEntries(GROUPS.map(g=>[g,allFix.filter(m=>m[1]===g
 /* locked = fixture IDs with confirmed real scores from scores.json */
 const locked = {};  // id -> {s1, s2}
 const liveScores = {}; // id -> {s1, s2, t1, t2} for in-progress matches
+
+/* Knockout match results and live scores (match number → {s1, s2, t1, t2}) */
+const koResults = {};     // completed KO matches from scores.json
+const liveKoScores = {};  // in-progress KO matches from ESPN
 
 /* ESPN API team name → our 3-letter code */
 const ESPN_TEAMS = {
@@ -1411,10 +1438,16 @@ function computeProbableKoPicks(){
   KO_ORDER.forEach(m => {
     const r = resolved[m];
     if(!r || !r.home || !r.away) return;
-    const hi = PROBABLE_STRENGTH.indexOf(r.home);
-    const ai = PROBABLE_STRENGTH.indexOf(r.away);
-    if(hi < 0 && ai < 0) return;
-    const winner = (hi >= 0 && (ai < 0 || hi < ai)) ? r.home : r.away;
+    // Completed match — use actual winner, not probability
+    let winner;
+    if(koResults[m]){
+      winner = koResults[m].s1 > koResults[m].s2 ? koResults[m].t1 : koResults[m].t2;
+    } else {
+      const hi = PROBABLE_STRENGTH.indexOf(r.home);
+      const ai = PROBABLE_STRENGTH.indexOf(r.away);
+      if(hi < 0 && ai < 0) return;
+      winner = (hi >= 0 && (ai < 0 || hi < ai)) ? r.home : r.away;
+    }
     kp[m] = winner;
     const feeds = KO_FEEDS_INTO[m];
     if(!feeds) return;
@@ -1442,8 +1475,8 @@ if(!Object.keys(koPicks).length){
 
 /* 12 distinct hues, one per group (bright enough for the dark board) */
 const GC = {
-  A:"#ff5d5d", B:"#ff9838", C:"#ffcf3a", D:"#bfe04a", E:"#56d36b", F:"#37d3b0",
-  G:"#3fcfe6", H:"#48a6f5", I:"#6f86ff", J:"#a875ff", K:"#ee6ad6", L:"#ff6a9c"
+  A:"#e6194b", B:"#f58231", C:"#ffe119", D:"#3cb44b", E:"#42d4f4", F:"#4363d8",
+  G:"#911eb4", H:"#f032e6", I:"#bfef45", J:"#fabed4", K:"#9a6324", L:"#469990"
 };
 
 let viewMode="winners";  // "winners" or "full"
@@ -1457,6 +1490,7 @@ bracketEl.addEventListener("click",e=>{
   const slot = e.target.closest("[data-ko-team]");
   if(!slot) return;
   const matchNum = parseInt(slot.dataset.koMatch);
+  if(koResults[matchNum]) return; // completed — don't allow pick changes
   const team = slot.dataset.koTeam;
   if(koPicks[matchNum] === team) delete koPicks[matchNum];
   else koPicks[matchNum] = team;
@@ -1693,10 +1727,11 @@ function renderBracket(){
   let html = "";
 
   function mnTime(m){ return `<span class="ko__mn">${m}</span>`; }
-  function koVenue(m, time){
+  function koVenue(m, time, badge){
     const v = KO_VENUES[m];
     const t = time ? `${time} · ` : "";
-    return v ? `<div class="ko__venue">${t}${v}</div>` : (time ? `<div class="ko__venue">${time}</div>` : "");
+    const b = badge || "";
+    return v ? `<div class="ko__venue">${t}${v}${b}</div>` : (time ? `<div class="ko__venue">${time}${b}</div>` : "");
   }
 
   // Render a pickable KO slot — if both teams known, slot is tappable
@@ -1707,8 +1742,13 @@ function renderBracket(){
     const gc = groupLetter ? GC[groupLetter] : "var(--line)";
     const cls = `ko__slot ${isAway?"ko__slot--away":"ko__slot--home"} ko__slot--pickable${picked?" ko__slot--picked":""}`;
     const grpTag = groupLetter ? `<span class="ko__grp" style="color:${gc}">${groupLetter}</span>` : "";
-    if(isAway) return `<span class="${cls}" style="--gc:${gc}" data-ko-match="${matchNum}" data-ko-team="${code}"><span class="nm">${TEAMS[code].n}</span> <span class="cd">${code}</span> ${flag(code)}${grpTag}</span>`;
-    return `<span class="${cls}" style="--gc:${gc}" data-ko-match="${matchNum}" data-ko-team="${code}">${grpTag}${flag(code)} <span class="cd">${code}</span> <span class="nm">${TEAMS[code].n}</span></span>`;
+    // Show score if match has live or final result
+    const live = liveKoScores[matchNum], final_ = koResults[matchNum];
+    const src = live || final_;
+    const sc = src ? (src.t1===code ? src.s1 : src.s2) : null;
+    const scHtml = sc != null ? `<span class="ko__sc${live?" ko__sc--live":""}">${sc}</span>` : "";
+    if(isAway) return `<span class="${cls}" style="--gc:${gc}" data-ko-match="${matchNum}" data-ko-team="${code}">${scHtml}<span class="nm">${TEAMS[code].n}</span> <span class="cd">${code}</span> ${flag(code)}${grpTag}</span>`;
+    return `<span class="${cls}" style="--gc:${gc}" data-ko-match="${matchNum}" data-ko-team="${code}">${grpTag}${flag(code)} <span class="cd">${code}</span> <span class="nm">${TEAMS[code].n}</span>${scHtml}</span>`;
   }
 
   // Generic KO match renderer — works for all rounds
@@ -1718,7 +1758,47 @@ function renderBracket(){
     const hLabel = sl ? sl.home : (match.home||"TBD");
     const aLabel = sl ? sl.away : (match.away||"TBD");
     const bothKnown = r && r.home && r.away && !r.homeDual && !r.awayDual;
-    return `<div class="ko__match" data-ko-m="${match.m}">
+    const koLive = liveKoScores[match.m], koDone = koResults[match.m];
+    const src = koLive || koDone;
+
+    // Completed or live KO match — render like group locked matches
+    if(src && bothKnown){
+      const hCode = r.home, aCode = r.away;
+      const s1 = src.t1===hCode ? src.s1 : src.s2;
+      const s2 = src.t1===hCode ? src.s2 : src.s1;
+      const hWin = s1>s2, aWin = s1<s2;
+      const hCls = koLive ? (hWin?'lk-win':'') : (hWin?'lk-win':'dim');
+      const aCls = koLive ? (aWin?'lk-win':'') : (aWin?'lk-win':'dim');
+      const wrapCls = koLive ? 'match match--live' : 'match match--locked';
+      const badge = koLive ? '<span class="live-badge">🔴 LIVE</span>' : '<span class="locked-badge">Final</span>';
+      const v = KO_VENUES[match.m];
+      const t = time ? `${time} · ` : "";
+      const venueText = v ? `${t}${v}` : (time||"");
+      const venueHtml = `<div class="match__venue">${venueText}${badge}</div>`;
+      const hGrpTag = hg ? `<span class="ko__grp" style="color:${GC[hg]}">${hg}</span>` : "";
+      const aGrpTag = ag ? `<span class="ko__grp" style="color:${GC[ag]}">${ag}</span>` : "";
+      return `<div class="${wrapCls}" data-ko-m="${match.m}">
+        ${venueHtml}
+        <div class="match__grp" style="background:var(--muted)"><span class="mn">${match.m}</span></div>
+        <div class="pick">
+          <button class="side ${hCls}" data-pick="">
+            ${hGrpTag}${flag(hCode)}
+            <span class="stack"><span class="cd">${hCode}</span><span class="nm">${TEAMS[hCode].n}</span></span>
+            <span class="lk-score">${s1}</span>
+          </button>
+          <div class="lk-sep"><hr></div>
+          <button class="side away ${aCls}" data-pick="">
+            <span class="lk-score">${s2}</span>
+            <span class="stack"><span class="cd">${aCode}</span><span class="nm">${TEAMS[aCode].n}</span></span>
+            ${flag(aCode)}${aGrpTag}
+          </button>
+        </div>
+      </div>`;
+    }
+
+    // Future/unpicked KO match — keep existing ko__row style
+    const liveCls = koLive ? " ko__match--live" : koDone ? " ko__match--done" : "";
+    return `<div class="ko__match${liveCls}" data-ko-m="${match.m}">
       ${koVenue(match.m,time)}
       <div class="ko__row">${mnTime(match.m)}
       ${bothKnown ? koPickSlot(r.home, hg, hLabel, false, match.m) : koSlot(r?r.home:null, hg, hLabel, false, r?r.homeDual:null, r?r.homePartial:null)}
@@ -1752,16 +1832,18 @@ function renderBracket(){
 }
 
 /* ========== BRACKET TREE OVERLAY ========== */
-function bktTeamHtml(code, groupLetter, label, matchNum){
+function bktTeamHtml(code, groupLetter, label, matchNum, score){
   if(!code){
     return `<div class="bkt-team bkt-team--tbd"><span class="cd">${label||"TBD"}</span></div>`;
   }
   const gc = groupLetter ? GC[groupLetter] : "rgba(255,255,255,.15)";
+  const done = matchNum && koResults[matchNum];
   const picked = matchNum && koPicks[matchNum] === code;
-  const pickable = matchNum ? " bkt-team--pickable" : "";
-  const pickedCls = picked ? " bkt-team--picked" : "";
-  const dataAttr = matchNum ? ` data-ko-match="${matchNum}" data-ko-team="${code}"` : "";
-  return `<div class="bkt-team bkt-team--has${pickable}${pickedCls}" style="--gc:${gc}"${dataAttr}>${flag(code)} <span class="cd">${code}</span></div>`;
+  const pickable = matchNum && !done ? " bkt-team--pickable" : "";
+  const pickedCls = picked && !done ? " bkt-team--picked" : done && picked ? " bkt-team--winner" : "";
+  const dataAttr = matchNum && !done ? ` data-ko-match="${matchNum}" data-ko-team="${code}"` : "";
+  const scoreBadge = score != null ? ` <span class="bkt-sc">${score}</span>` : "";
+  return `<div class="bkt-team bkt-team--has${pickable}${pickedCls}" style="--gc:${gc}"${dataAttr}>${flag(code)} <span class="cd">${code}</span>${scoreBadge}</div>`;
 }
 
 function bktMatchCell(m, col, row, span, res, labels){
@@ -1779,10 +1861,23 @@ function bktMatchCell(m, col, row, span, res, labels){
   }
   const bothKnown = hCode && aCode;
   const venue = KO_VENUES[m] || "";
-  return `<div class="bkt-match" style="grid-column:${col};grid-row:${row}/span ${span}">
-    <div class="bkt-mn">${m} <span class="bkt-dt">${(KO_DATES[m]||"").replace(/^\w+ · /,"")}</span></div>
-    ${bktTeamHtml(hCode, hGrp, hLbl, bothKnown ? m : null)}
-    ${bktTeamHtml(aCode, aGrp, aLbl, bothKnown ? m : null)}
+  const live = liveKoScores[m];
+  const final_ = koResults[m];
+  // Align scores to resolved home/away (scores.json t1/t2 may differ from bracket order)
+  let hScore = null, aScore = null;
+  if(live){
+    if(live.t1===hCode){hScore=live.s1;aScore=live.s2;}
+    else{hScore=live.s2;aScore=live.s1;}
+  } else if(final_){
+    if(final_.t1===hCode){hScore=final_.s1;aScore=final_.s2;}
+    else{hScore=final_.s2;aScore=final_.s1;}
+  }
+  const liveCls = live ? " bkt-match--live" : final_ ? " bkt-match--done" : "";
+  const badge = live ? ' <span class="bkt-badge bkt-badge--live">LIVE</span>' : final_ ? ' <span class="bkt-badge bkt-badge--final">FINAL</span>' : '';
+  return `<div class="bkt-match${liveCls}" style="grid-column:${col};grid-row:${row}/span ${span}">
+    <div class="bkt-mn">${m} <span class="bkt-dt">${(KO_DATES[m]||"").replace(/^\w+ · /,"")}</span>${badge}</div>
+    ${bktTeamHtml(hCode, hGrp, hLbl, bothKnown ? m : null, hScore)}
+    ${bktTeamHtml(aCode, aGrp, aLbl, bothKnown ? m : null, aScore)}
     ${venue ? `<div class="bkt-venue${span<=3?" bkt-venue--abs":""}">${venue}</div>` : ""}
   </div>`;
 }
@@ -1855,26 +1950,34 @@ function renderBracketOverlay(){
   h += bktConn(8, 19, 1, 'bkt-hf');
 
   // FINAL (col 9)
-  h += `<div class="bkt-final" style="grid-column:9;grid-row:13/span 10">
+  const finalLive = liveKoScores[104] ? " bkt-match--live" : koResults[104] ? " bkt-match--done" : "";
+  h += `<div class="bkt-final${finalLive}" style="grid-column:9;grid-row:13/span 10">
     <div class="bkt-trophy">🏆</div>
     <div class="bkt-final-label">FINAL</div>
     ${(()=>{const r2=res[104],sl=labels[104];
       let hC=null,aC=null,hG=null,aG=null,hL=sl?sl.home:"TBD",aL=sl?sl.away:"TBD";
       if(r2){hC=r2.home;aC=r2.away;if(hC)hG=TEAMS[hC].g;if(aC)aG=TEAMS[aC].g;}
       const bk=hC&&aC?104:null;
-      return `<div class="bkt-mn">104</div><div class="bkt-dt-line">${(KO_DATES[104]||"").replace(/^\w+ · /,"")}</div>${bktTeamHtml(hC,hG,hL,bk)}${bktTeamHtml(aC,aG,aL,bk)}<div class="bkt-venue">${KO_VENUES[104]||""}</div>`;
+      const lv104=liveKoScores[104], fn104=koResults[104];
+      const src104=lv104||fn104; let hSc=null,aSc=null;
+      if(src104){if(src104.t1===hC){hSc=src104.s1;aSc=src104.s2;}else{hSc=src104.s2;aSc=src104.s1;}}
+      return `<div class="bkt-mn">104</div><div class="bkt-dt-line">${(KO_DATES[104]||"").replace(/^\w+ · /,"")}</div>${bktTeamHtml(hC,hG,hL,bk,hSc)}${bktTeamHtml(aC,aG,aL,bk,aSc)}<div class="bkt-venue">${KO_VENUES[104]||""}</div>`;
     })()}
   </div>`;
 
   // 3rd place (col 9, below final)
-  h += `<div class="bkt-match" style="grid-column:9;grid-row:27/span 5">
+  const thirdLive = liveKoScores[103] ? " bkt-match--live" : koResults[103] ? " bkt-match--done" : "";
+  h += `<div class="bkt-match${thirdLive}" style="grid-column:9;grid-row:27/span 5">
     <div class="bkt-mn" style="color:var(--bronze)">3rd · 103</div>
     <div class="bkt-dt-line">${(KO_DATES[103]||"").replace(/^\w+ · /,"")}</div>
     ${(()=>{const r2=res[103],sl=labels[103];
       let hC=null,aC=null,hG=null,aG=null,hL=sl?sl.home:"TBD",aL=sl?sl.away:"TBD";
       if(r2){hC=r2.home;aC=r2.away;if(hC)hG=TEAMS[hC].g;if(aC)aG=TEAMS[aC].g;}
       const bk=hC&&aC?103:null;
-      return `${bktTeamHtml(hC,hG,hL,bk)}${bktTeamHtml(aC,aG,aL,bk)}<div class="bkt-venue">${KO_VENUES[103]||""}</div>`;
+      const lv103=liveKoScores[103], fn103=koResults[103];
+      const src103=lv103||fn103; let hSc=null,aSc=null;
+      if(src103){if(src103.t1===hC){hSc=src103.s1;aSc=src103.s2;}else{hSc=src103.s2;aSc=src103.s1;}}
+      return `${bktTeamHtml(hC,hG,hL,bk,hSc)}${bktTeamHtml(aC,aG,aL,bk,aSc)}<div class="bkt-venue">${KO_VENUES[103]||""}</div>`;
     })()}
   </div>`;
 
@@ -1966,6 +2069,8 @@ document.getElementById("myPicks").addEventListener("click",()=>{
   const my = loadMyPicks();
   // Preserve locked match results
   for(const id in locked){ if(picks[id]) my.picks[id]=picks[id]; }
+  // Preserve completed KO match winners
+  for(const m in koResults){ my.koPicks[m] = koPicks[m]; }
   picks = my.picks; koPicks = my.koPicks;
   savePicks(picks); saveKoPicks(koPicks); renderFixtures(); renderBoard(); renderBracket();
   toast("Restored your picks");
@@ -1974,7 +2079,9 @@ document.getElementById("myPicks").addEventListener("click",()=>{
 document.getElementById("reset").addEventListener("click",()=>{
   if(!Object.values(picks).some(v=>v&&pickResult(v)) && !Object.keys(koPicks).length) return;
   const kept={}; for(const id in locked){ if(picks[id]) kept[id]=picks[id]; }
-  picks=kept; koPicks={}; savePicks(picks); saveKoPicks(koPicks); renderFixtures(); renderBoard(); renderBracket();
+  picks=kept;
+  const keptKo={}; for(const m in koResults){ if(koPicks[m]) keptKo[m]=koPicks[m]; }
+  koPicks=keptKo; savePicks(picks); saveKoPicks(koPicks); renderFixtures(); renderBoard(); renderBracket();
 });
 
 document.getElementById("share").addEventListener("click",()=>{
@@ -2169,6 +2276,17 @@ async function fetchScores(){
     let changed = false;
     for(const m of data.matches){
       if(m.s1===null || m.s2===null) continue;
+      // Knockout match (has match number >= 73)
+      if(m.m && m.m >= 73){
+        if(!koResults[m.m] || koResults[m.m].s1!==m.s1 || koResults[m.m].s2!==m.s2){
+          koResults[m.m] = {s1:m.s1, s2:m.s2, t1:m.t1, t2:m.t2};
+          // Lock the koPick to the actual winner
+          const winner = m.s1 > m.s2 ? m.t1 : m.t2;
+          koPicks[m.m] = winner;
+          changed = true;
+        }
+        continue;
+      }
       // find the fixture id by team pairing
       const id = fixByTeams[m.t1+"|"+m.t2];
       if(!id) continue; // not a Matchday 3 match (already in PLAYED)
@@ -2188,6 +2306,7 @@ async function fetchScores(){
       buildSeedIndex();
       LOCKED = clinchedTop2();
       savePicks(picks);
+      saveKoPicks(koPicks);
       renderFixtures();
       renderBoard();
       renderBracket();
@@ -2196,7 +2315,28 @@ async function fetchScores(){
 }
 /* ── Fetch live scores from ESPN API ── */
 let liveInterval = null;
+
+/* Find KO match number for a team pairing by checking resolved bracket */
+function findKoMatch(hCode, aCode, cachedResolved){
+  const resolved = cachedResolved || (()=>{
+    const {resolved: r} = resolveKnockout();
+    resolveKoWithPicks(r, koPicks);
+    return r;
+  })();
+  for(const m of KO_ORDER){
+    const r = resolved[m];
+    if(!r) continue;
+    if((r.home===hCode && r.away===aCode) || (r.home===aCode && r.away===hCode))
+      return {m, flipped: r.home===aCode};
+  }
+  return null;
+}
+
 function _processEspnEvents(events){
+  // Cache resolved bracket once for all KO lookups in this batch
+  const {resolved: _res} = resolveKnockout();
+  resolveKoWithPicks(_res, koPicks);
+  const cachedRes = _res;
   let changed = false, hasLive = false;
   const seen = new Set();
   for(const event of events){
@@ -2211,35 +2351,60 @@ function _processEspnEvents(events){
     const aCode = ESPN_TEAMS[away.team.displayName];
     if(!hCode||!aCode) continue;
     const s1 = parseInt(home.score), s2 = parseInt(away.score);
+
+    // Try group fixture first
     const id = fixByTeams[hCode+"|"+aCode];
-    if(!id) continue;
-    if(stState==="post" && stDone && !locked[id]){
-      locked[id]={s1,s2};
-      PLAYED.push([TEAMS[hCode].g, hCode, s1, s2, aCode]);
-      picks[id]={r:s1>s2?"H":s1<s2?"A":"D", hs:s1, as:s2};
-      delete liveScores[id];
-      changed=true;
-      try{
-        const cache=JSON.parse(localStorage.getItem("fifa26_live_scores")||"{}");
-        cache[id]={s1,s2,t1:hCode,t2:aCode,g:TEAMS[hCode].g};
-        localStorage.setItem("fifa26_live_scores",JSON.stringify(cache));
-      }catch(e){}
-    } else if(stState==="in"){
-      hasLive=true;
-      liveScores[id]={s1,s2,t1:hCode,t2:aCode};
-      changed=true;
-      // Bump existing picks if live scores now exceed them
-      const p=picks[id];
-      if(p && p.r){
-        let bump=false;
-        if(p.hs<s1){p.hs=s1;bump=true;}
-        if(p.as<s2){p.as=s2;bump=true;}
-        if(bump){
-          if(p.r==="H"&&p.hs<=p.as) p.hs=p.as+1;
-          if(p.r==="A"&&p.as<=p.hs) p.as=p.hs+1;
-          if(p.r==="D"){const mx=Math.max(p.hs,p.as);p.hs=mx;p.as=mx;}
+    if(id){
+      if(stState==="post" && stDone && !locked[id]){
+        locked[id]={s1,s2};
+        PLAYED.push([TEAMS[hCode].g, hCode, s1, s2, aCode]);
+        picks[id]={r:s1>s2?"H":s1<s2?"A":"D", hs:s1, as:s2};
+        delete liveScores[id];
+        changed=true;
+        try{
+          const cache=JSON.parse(localStorage.getItem("fifa26_live_scores")||"{}");
+          cache[id]={s1,s2,t1:hCode,t2:aCode,g:TEAMS[hCode].g};
+          localStorage.setItem("fifa26_live_scores",JSON.stringify(cache));
+        }catch(e){}
+      } else if(stState==="in"){
+        hasLive=true;
+        liveScores[id]={s1,s2,t1:hCode,t2:aCode};
+        changed=true;
+        const p=picks[id];
+        if(p && p.r){
+          let bump=false;
+          if(p.hs<s1){p.hs=s1;bump=true;}
+          if(p.as<s2){p.as=s2;bump=true;}
+          if(bump){
+            if(p.r==="H"&&p.hs<=p.as) p.hs=p.as+1;
+            if(p.r==="A"&&p.as<=p.hs) p.as=p.hs+1;
+            if(p.r==="D"){const mx=Math.max(p.hs,p.as);p.hs=mx;p.as=mx;}
+          }
         }
       }
+      continue;
+    }
+
+    // Try knockout match
+    const ko = findKoMatch(hCode, aCode, cachedRes);
+    if(!ko) continue;
+    const koM = ko.m;
+    const ks1 = ko.flipped ? s2 : s1;  // align scores to resolved home/away
+    const ks2 = ko.flipped ? s1 : s2;
+    const koH = ko.flipped ? aCode : hCode;
+    const koA = ko.flipped ? hCode : aCode;
+
+    if(stState==="post" && stDone && !koResults[koM]){
+      koResults[koM] = {s1:ks1, s2:ks2, t1:koH, t2:koA};
+      const winner = ks1 > ks2 ? koH : koA;
+      koPicks[koM] = winner;
+      delete liveKoScores[koM];
+      saveKoPicks(koPicks);
+      changed=true;
+    } else if(stState==="in"){
+      hasLive=true;
+      liveKoScores[koM] = {s1:ks1, s2:ks2, t1:koH, t2:koA};
+      changed=true;
     }
   }
   return {changed, hasLive};
@@ -2418,6 +2583,7 @@ document.getElementById("refreshBtn").addEventListener("click",()=>{
     const el = e.target.closest("[data-ko-team]");
     if(!el) return;
     const matchNum = parseInt(el.dataset.koMatch);
+    if(koResults[matchNum]) return; // completed — don't allow pick changes
     const team = el.dataset.koTeam;
     if(koPicks[matchNum] === team) delete koPicks[matchNum];
     else koPicks[matchNum] = team;

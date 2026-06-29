@@ -4,6 +4,33 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-28 · Evening — Bracket Scores, KO Match Display & Group Colours
+
+### Bracket Scores
+- Knockout match scores now display in both list view and bracket tree overlay.
+- Completed matches render identically to group stage locked matches: split team cards, big scores with separator, winner highlighted in gold, "Final" badge on venue line.
+- Live KO matches show red border + "🔴 LIVE" badge with live score, neither side dimmed during play.
+- Bracket tree overlay shows scores inline next to team codes; completed matches get green background.
+
+### Score Updates
+- R32: RSA 0-1 CAN (Match 73).
+
+### KO Match Integrity
+- Picks locked on completed matches — click handlers blocked, `bkt-team--pickable` suppressed.
+- Probable Picks uses actual winner for completed matches, only predicts remaining.
+- Clear Picks and My Picks restore both preserve completed match winners.
+- ESPN live score handler optimised: cached bracket resolution per batch.
+
+### Visual Improvements
+- 12 group colours redesigned for maximum distinctness (red, orange, yellow, green, cyan, blue, purple, magenta, lime, pink, brown, teal).
+- Group letter tags styled as small white cards with black border for readability.
+- Group letters added to completed KO match team cards.
+- Bracket tree font sizes increased: teams 10→12px, match info 7→8px, venue 6→7px.
+- Incomplete KO match cards enlarged to match group stage card sizing.
+- Footer text updated for knockout stage.
+
+---
+
 ## 2026-06-27 · Evening — Live Card Fix, Scores & Bracket Alignment
 
 ### Live Match Card
