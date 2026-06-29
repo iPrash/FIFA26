@@ -311,8 +311,10 @@
     padding:7px 8px;border-radius:8px;border:1.5px solid var(--line)
   }
   .ko__slot .flag{width:26px;height:19px;flex:none}
+  .ko__slot .stack{min-width:0;display:flex;flex-direction:column;gap:1px;align-items:flex-start}
+  .ko__slot--away .stack{align-items:flex-end}
   .ko__slot .cd{font:700 13px/1 ui-monospace,monospace;white-space:nowrap}
-  .ko__slot .nm{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ko__slot .nm{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
   .ko__grp{font:900 10px/1 ui-monospace,monospace;flex:none;background:#fff;padding:2px 4px;border-radius:3px;border:1px solid #000}
   .ko__vs{color:var(--muted);font-size:10px;flex:none;margin:0 5px}
   .ko__slot--dual{opacity:.7}
@@ -1667,8 +1669,8 @@ function koSlot(code, groupLetter, label, isAway, dual, partial){
   if(!code) return `<span class="ko__slot ko__slot--tbd"><span class="cd">${label||"TBD"}</span></span>`;
   const gc = groupLetter ? GC[groupLetter] : "var(--line)";
   const grpTag = groupLetter ? `<span class="ko__grp" style="color:${gc}">${groupLetter}</span>` : "";
-  if(isAway) return `<span class="ko__slot ko__slot--away" style="--gc:${gc}"><span class="nm">${TEAMS[code].n}</span> <span class="cd">${code}</span> ${flag(code)}${grpTag}</span>`;
-  return `<span class="ko__slot ko__slot--home" style="--gc:${gc}">${grpTag}${flag(code)} <span class="cd">${code}</span> <span class="nm">${TEAMS[code].n}</span></span>`;
+  if(isAway) return `<span class="ko__slot ko__slot--away" style="--gc:${gc}"><span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n}</span></span> ${flag(code)}${grpTag}</span>`;
+  return `<span class="ko__slot ko__slot--home" style="--gc:${gc}">${grpTag}${flag(code)} <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n}</span></span></span>`;
 }
 
 /* Parse "Jun 29 · 4:30 PM" into {date:"Jun 29", time:"4:30 PM", sortKey:1630} */
@@ -1748,8 +1750,8 @@ function renderBracket(){
     const src = live || final_;
     const sc = src ? (src.t1===code ? src.s1 : src.s2) : null;
     const scHtml = sc != null ? `<span class="ko__sc${live?" ko__sc--live":""}">${sc}</span>` : "";
-    if(isAway) return `<span class="${cls}" style="--gc:${gc}" data-ko-match="${matchNum}" data-ko-team="${code}">${scHtml}<span class="nm">${TEAMS[code].n}</span> <span class="cd">${code}</span> ${flag(code)}${grpTag}</span>`;
-    return `<span class="${cls}" style="--gc:${gc}" data-ko-match="${matchNum}" data-ko-team="${code}">${grpTag}${flag(code)} <span class="cd">${code}</span> <span class="nm">${TEAMS[code].n}</span>${scHtml}</span>`;
+    if(isAway) return `<span class="${cls}" style="--gc:${gc}" data-ko-match="${matchNum}" data-ko-team="${code}">${scHtml}<span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n}</span></span> ${flag(code)}${grpTag}</span>`;
+    return `<span class="${cls}" style="--gc:${gc}" data-ko-match="${matchNum}" data-ko-team="${code}">${grpTag}${flag(code)} <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n}</span></span>${scHtml}</span>`;
   }
 
   // Generic KO match renderer — works for all rounds
