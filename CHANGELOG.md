@@ -4,6 +4,16 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-28 · Late — Default to Bracket Tab & Scroll to Today
+
+- App now starts on the Knockout Bracket tab on mobile (group stage is complete).
+- Bracket panel scrolls to today's date header on load (live matches take priority).
+- Switching tabs scrolls to today's matches on both group and bracket sides.
+- Removed bracket peek animation (no longer needed).
+- README rewritten with comprehensive feature documentation.
+
+---
+
 ## 2026-06-28 · Evening — Bracket Scores, KO Match Display & Group Colours
 
 ### Bracket Scores

@@ -2054,8 +2054,6 @@ fixturesEl.addEventListener("click",e=>{
   const lv=liveScores[id]||null;
   picks[id] = (cur===want) ? null : defaultPick(want,lv);
   savePicks(picks); saveMyPicks(picks, koPicks); renderFixtures(); renderBoard(); renderBracket();
-  // #3: nudge toward bracket on first pick
-  if(!pickPeekDone){ pickPeekDone=true; setTimeout(peekBracket, 400); }
 });
 
 document.getElementById("probable").addEventListener("click",()=>{
@@ -2192,6 +2190,14 @@ tabBtns.forEach(btn=>{
 
 // Update active tab on scroll
 let lastActiveIdx = 0;
+
+// Start on bracket tab (knockout stage is active)
+if(window.innerWidth < 900){
+  panelsEl.scrollTo({left: panelsEl.offsetWidth, behavior:"instant"});
+  tabBtns.forEach((btn,i)=> btn.classList.toggle("active", i===1));
+  lastActiveIdx = 1;
+}
+
 panelsEl.addEventListener("scroll",()=>{
   const scrollLeft = panelsEl.scrollLeft;
   const panelWidth = panelsEl.offsetWidth;
@@ -2202,8 +2208,8 @@ panelsEl.addEventListener("scroll",()=>{
   // On mobile, scroll to appropriate position when switching tabs
   if(window.innerWidth < 900 && activeIdx !== lastActiveIdx){
     if(activeIdx === 1){
-      // Switched TO bracket tab: scroll to top
-      window.scrollTo({top: 0, behavior:"smooth"});
+      // Switched TO bracket tab: scroll to today's bracket match
+      setTimeout(scrollToTodayBracket, 50);
     } else if(activeIdx === 0){
       // Switched TO groups tab: scroll back to today
       setTimeout(scrollToToday, 50);
@@ -2216,16 +2222,6 @@ renderFixtures();
 renderBoard();
 renderBracket();
 
-/* ── Bracket peek hint (mobile only) ── */
-let peekDone = false, pickPeekDone = false;
-function peekBracket(){
-  if(window.innerWidth >= 900) return; // desktop shows both panels
-  const pw = panelsEl.offsetWidth;
-  panelsEl.scrollTo({left:60, behavior:"smooth"});
-  setTimeout(()=> panelsEl.scrollTo({left:0, behavior:"smooth"}), 500);
-}
-// #1: peek on first load
-setTimeout(peekBracket, 800);
 
 /* ── Scroll to today's fixtures on load ── */
 function scrollToToday(){
@@ -2261,6 +2257,42 @@ function scrollToToday(){
       const target = window.scrollY + rect.top - boardH - 10;
       window.scrollTo({top: target, behavior:"smooth"});
       break;
+    }
+  }
+}
+
+/* ── Scroll to today's bracket fixtures on load ── */
+function scrollToTodayBracket(){
+  const board = document.getElementById("board");
+  const boardH = board ? board.offsetHeight : 0;
+
+  // Priority: scroll to first live KO match
+  const bracketPanel = document.getElementById("bracket");
+  const liveKoMatch = bracketPanel && bracketPanel.querySelector(".match--live");
+  if(liveKoMatch){
+    const section = liveKoMatch.closest(".ko__grid") || liveKoMatch.parentElement;
+    const header = section && section.previousElementSibling;
+    const scrollEl = (header && header.classList.contains("ko__date-h")) ? header : liveKoMatch;
+    const rect = scrollEl.getBoundingClientRect();
+    const target = window.scrollY + rect.top - boardH - 10;
+    window.scrollTo({top: target, behavior:"smooth"});
+    return;
+  }
+
+  // Otherwise scroll to today's bracket date header
+  const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const etDate = new Date().toLocaleString('en-US', {timeZone:'America/New_York'});
+  const d = new Date(etDate);
+  const todayStr = `${days[d.getDay()]} · ${months[d.getMonth()]} ${d.getDate()}`;
+
+  const dateHeaders = bracketPanel ? bracketPanel.querySelectorAll(".ko__date-h") : [];
+  for(const h of dateHeaders){
+    if(h.textContent.trim() === todayStr){
+      const rect = h.getBoundingClientRect();
+      const target = window.scrollY + rect.top - boardH - 10;
+      window.scrollTo({top: target, behavior:"smooth"});
+      return;
     }
   }
 }
@@ -2453,7 +2485,10 @@ try{
 
 fetchScores().then(()=>{
   fetchLiveScores();
-  setTimeout(scrollToToday, 300);
+  setTimeout(()=>{
+    if(window.innerWidth < 900) scrollToTodayBracket();
+    else scrollToToday();
+  }, 300);
 });
 
 /* ── What's New popup (shows once per version) ── */
