@@ -120,11 +120,28 @@
   .board__legend i{font-style:normal}
   .dot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:3px;vertical-align:middle}
 
+  /* drawer toggle */
+  .board__drawer{
+    display:flex;align-items:center;justify-content:center;
+    width:44px;height:22px;margin:0 auto;
+    border:2px solid var(--pitch);border-top:none;
+    border-radius:0 0 10px 10px;
+    background:var(--pitch);color:#fff;
+    font-size:18px;cursor:pointer;line-height:1;
+    transition:transform .2s
+  }
+  .board__drawer.expanded{transform:rotate(180deg)}
+  .board__drawer:hover,.board__drawer:active{background:var(--pitch-dk)}
+  .board.collapsed .boardbody{max-height:68px;overflow:hidden;transition:max-height .3s ease}
+  .board:not(.collapsed) .boardbody{max-height:50vh;transition:max-height .3s ease}
+  .board.collapsed .board__legend{display:none}
+
   /* ---------- controls ---------- */
   .bar-wrap{
     background:var(--paper);
+    border-top:1px solid var(--line);
     border-bottom:1px solid var(--line);
-    margin:0 -8px -6px;padding:0 8px 2px;
+    margin-top:6px;padding:0 8px 2px;
   }
   .bar{
     display:flex;gap:6px;align-items:center;justify-content:space-between;
@@ -568,18 +585,19 @@
     <i>🔒 already qualified</i>
     <i>faded third = misses the cut</i>
   </div>
-  <div class="bar-wrap">
-    <div class="bar">
-      <p id="hint">Tap a Team to Choose.<br>Board Updates Live.</p>
-      <button class="btn btn--bracket" id="bracketTreeBtn" title="View full tournament bracket"><span style="font-size:18px">🏆</span><br>Bracket</button>
-      <div class="bar__btns">
-        <button class="btn btn--pitch" id="probable" title="Auto-fill with most likely outcomes">Probable<br>Picks</button>
-        <div class="btn-duo"><button class="btn btn--my" id="myPicks" title="Restore your saved picks">My<br>Picks</button><button class="btn btn--my btn--my-share" id="share" title="Share your picks via link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
-        <button class="btn btn--danger" id="reset" title="Clear all picks (My Picks are preserved)">Clear<br>Picks</button>
-      </div>
+</header>
+<button class="board__drawer" id="boardDrawer" aria-label="Toggle board"><svg width="18" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,2 9,8 16,2"/></svg></button>
+<div class="bar-wrap">
+  <div class="bar">
+    <p id="hint">Tap a Team to Choose.<br>Board Updates Live.</p>
+    <button class="btn btn--bracket" id="bracketTreeBtn" title="View full tournament bracket"><span style="font-size:18px">🏆</span><br>Bracket</button>
+    <div class="bar__btns">
+      <button class="btn btn--pitch" id="probable" title="Auto-fill with most likely outcomes">Probable<br>Picks</button>
+      <div class="btn-duo"><button class="btn btn--my" id="myPicks" title="Restore your saved picks">My<br>Picks</button><button class="btn btn--my btn--my-share" id="share" title="Share your picks via link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
+      <button class="btn btn--danger" id="reset" title="Clear all picks (My Picks are preserved)">Clear<br>Picks</button>
     </div>
   </div>
-</header>
+</div>
 <div class="toast" id="toast"></div>
 <div class="wnew-overlay" id="wnewOverlay">
   <div class="wnew" id="wnew"></div>
@@ -2193,6 +2211,15 @@ tabBtns.forEach(btn=>{
 
 // Update active tab on scroll
 let lastActiveIdx = 0;
+
+// Board drawer toggle
+const drawerBtn = document.getElementById("boardDrawer");
+const boardEl = document.getElementById("board");
+boardEl.classList.add("collapsed");
+drawerBtn.addEventListener("click", () => {
+  boardEl.classList.toggle("collapsed");
+  drawerBtn.classList.toggle("expanded");
+});
 
 // Start on bracket tab (knockout stage is active)
 if(window.innerWidth < 900){

@@ -4,10 +4,11 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
-## 2026-06-29 — Fix iOS Phone Rendering Bug
+## 2026-06-29 · Evening — Collapsible Board & Bracket Layout Polish
 
-- Fix Jul 1 bracket matches rendering with oversized font on iOS Safari.
-- Root cause: missing `-webkit-text-size-adjust: 100%` — Safari was auto-inflating text in certain blocks.
+- **Collapsible board drawer**: board starts collapsed showing one row of group cards. Green chevron tab below the board expands/collapses the full view.
+- **Bracket match layout**: match number box, team name stacking, and grid structure now match group stage cards exactly.
+- Fix iOS Safari text inflation on Jul 1 bracket matches (`-webkit-text-size-adjust`).
 
 ---
 
