@@ -253,7 +253,7 @@
     transition:border-color .12s,background .12s;
   }
   .side.away{flex-direction:row-reverse;text-align:right}
-  .match--locked .side.away{flex-direction:row}
+  .match--locked .side.away,.match--live .side.away{flex-direction:row}
   .flag{display:inline-block;border-radius:2px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.14)}
   .side .flag{width:26px;height:19px;flex:none}
   .side .cd{font:700 13px/1 ui-monospace,monospace;letter-spacing:.02em}
@@ -293,18 +293,21 @@
   .match--locked{opacity:1;border-color:var(--pitch);background:rgba(31,157,87,.06)}
   .match--locked .pick{pointer-events:none}
   .match--locked .side{cursor:default;border-color:var(--line)}
-  .match--locked .side.lk-win{background:rgba(218,165,32,.10);border-color:var(--gold);font-weight:800}
-  .match--locked .side.lk-win .cd{font-weight:800}
-  .match--locked .side.lk-draw{background:rgba(31,157,87,.08)}
-  .match--locked .lk-score{font:800 15px/1 ui-monospace,monospace;color:var(--pitch-dk)}
-  .match--locked .side:first-child .lk-score{margin-left:auto;padding-right:2px}
-  .match--locked .side:last-child .lk-score{margin-right:auto;padding-left:2px}
-  .match--locked .lk-sep{display:flex;align-items:center;justify-content:center;padding:0 4px}
-  .match--locked .lk-sep hr{width:16px;border:none;border-top:2px solid var(--line);margin:0}
+  .match--locked .side.lk-win,.match--live .side.lk-win{background:rgba(218,165,32,.10);border-color:var(--gold);font-weight:800}
+  .match--locked .side.lk-win .cd,.match--live .side.lk-win .cd{font-weight:800}
+  .match--locked .side.lk-draw,.match--live .side.lk-draw{background:rgba(31,157,87,.08)}
+  .match--locked .lk-score,.match--live .lk-score{font:800 15px/1 ui-monospace,monospace;color:var(--pitch-dk)}
+  .match--locked .side:first-child .lk-score,.match--live .side:first-child .lk-score{margin-left:auto;padding-right:2px}
+  .match--locked .side:last-child .lk-score,.match--live .side:last-child .lk-score{margin-right:auto;padding-left:2px}
+  .match--locked .lk-sep,.match--live .lk-sep{display:flex;align-items:center;justify-content:center;padding:0 4px}
+  .match--locked .lk-sep hr,.match--live .lk-sep hr{width:16px;border:none;border-top:2px solid var(--line);margin:0}
   .locked-badge{font:700 9px/1 ui-monospace,monospace;color:var(--pitch);text-transform:uppercase;letter-spacing:.04em;position:absolute;right:0;top:50%;transform:translateY(-50%)}
   .live-badge{font:700 9px/1 ui-monospace,monospace;color:#e74c3c;text-transform:uppercase;letter-spacing:.04em;position:absolute;right:0;top:50%;transform:translateY(-50%);animation:pulse 1.5s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
   .match--live{border-color:#e74c3c}
+  .match__goals{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 8px 4px;font:400 9px/1.3 system-ui;color:var(--muted)}
+  .match__goals-away{text-align:right}
+  .pen-score{font-size:12px;opacity:.7;margin:0 1px}
   .floor-flash{position:absolute;left:50%;transform:translateX(-50%);bottom:100%;
     font:600 9px/1 ui-monospace,monospace;color:#e74c3c;white-space:nowrap;
     background:rgba(231,76,60,.1);padding:2px 6px;border-radius:4px;
@@ -1617,7 +1620,7 @@ function renderFixtures(){
         const r=pickResult(p);
         const sc=pickScores(p);
         const lv = liveScores[id];
-        const venueHtml = venue ? `<div class="match__venue"><span>${venue}</span>${lk?'<span class="locked-badge">Final</span>':lv?'<span class="live-badge">🔴 LIVE</span>':''}</div>` : '';
+        const venueHtml = venue ? `<div class="match__venue"><span>${venue}</span>${lk?'<span class="locked-badge">Final</span>':lv?`<span class="live-badge">🔴 LIVE${lv.clock?" · "+lv.clock:""}</span>`:''}</div>` : '';
         if(lv && !lk){
           // live match — identical to normal match, just red border + LIVE badge
           return `<div class="match match--live" data-id="${id}">
@@ -1658,6 +1661,12 @@ function renderFixtures(){
               <span class="stack"><span class="cd">${code}</span><span class="nm">${TEAMS[code].n} (${pts})</span></span>
               <span class="lk-score">${score}</span>
             </button>`;
+          let grpGoalsHtml = "";
+          if(lk.goals && lk.goals.length){
+            const hG = lk.goals.filter(gl=>gl.team===h).map(gl=>`${gl.player} ${gl.min}`).join(", ");
+            const aG = lk.goals.filter(gl=>gl.team===a).map(gl=>`${gl.player} ${gl.min}`).join(", ");
+            grpGoalsHtml = `<div class="match__goals"><span class="match__goals-side">${hG}</span><span class="match__goals-side match__goals-away">${aG}</span></div>`;
+          }
           return `<div class="match match--locked" data-id="${id}">
             ${venueHtml}
             <div class="match__grp">${g}<span class="mn">${id}</span></div>
@@ -1666,6 +1675,7 @@ function renderFixtures(){
               <div class="lk-sep"><hr></div>
               ${lkSide(a,lk.s2,aCls,s[a].pts,true)}
             </div>
+            ${grpGoalsHtml}
           </div>`;
         }
         return `<div class="match" data-id="${id}">
@@ -1812,13 +1822,25 @@ function renderBracket(){
       const hCls = koLive ? (hWin?'lk-win':'') : (hWin?'lk-win':'dim');
       const aCls = koLive ? (aWin?'lk-win':'') : (aWin?'lk-win':'dim');
       const wrapCls = koLive ? 'match match--live' : 'match match--locked';
-      const badge = koLive ? '<span class="live-badge">🔴 LIVE</span>' : '<span class="locked-badge">Final</span>';
+      const badge = koLive
+        ? `<span class="live-badge">🔴 LIVE${src.clock ? " · "+src.clock : ""}</span>`
+        : src.pen ? '<span class="locked-badge">Pens</span>'
+        : src.et ? '<span class="locked-badge">AET</span>'
+        : '<span class="locked-badge">Final</span>';
+      const penH = src.pen ? `<span class="pen-score">(${src.t1===hCode ? src.pen[0] : src.pen[1]})</span>` : "";
+      const penA = src.pen ? `<span class="pen-score">(${src.t1===hCode ? src.pen[1] : src.pen[0]})</span>` : "";
       const v = KO_VENUES[match.m];
       const t = time ? `${time} · ` : "";
       const venueText = v ? `${t}${v}` : (time||"");
       const venueHtml = `<div class="match__venue">${venueText}${badge}</div>`;
       const hGrpTag = hg ? `<span class="ko__grp" style="color:${GC[hg]}">${hg}</span>` : "";
       const aGrpTag = ag ? `<span class="ko__grp" style="color:${GC[ag]}">${ag}</span>` : "";
+      let goalsHtml = "";
+      if(src.goals && src.goals.length){
+        const hGoals = src.goals.filter(g=>g.team===hCode).map(g=>`${g.player} ${g.min}`).join(", ");
+        const aGoals = src.goals.filter(g=>g.team===aCode).map(g=>`${g.player} ${g.min}`).join(", ");
+        goalsHtml = `<div class="match__goals"><span class="match__goals-side">${hGoals}</span><span class="match__goals-side match__goals-away">${aGoals}</span></div>`;
+      }
       return `<div class="${wrapCls}" data-ko-m="${match.m}">
         ${venueHtml}
         <div class="match__grp" style="background:var(--muted)"><span class="mn">${match.m}</span></div>
@@ -1826,15 +1848,16 @@ function renderBracket(){
           <button class="side ${hCls}" data-pick="">
             ${hGrpTag}${flag(hCode)}
             <span class="stack"><span class="cd">${hCode}</span><span class="nm">${TEAMS[hCode].n}</span></span>
-            <span class="lk-score">${s1}</span>
+            <span class="lk-score">${s1}${penH}</span>
           </button>
           <div class="lk-sep"><hr></div>
           <button class="side away ${aCls}" data-pick="">
-            <span class="lk-score">${s2}</span>
+            <span class="lk-score">${s2}${penA}</span>
             <span class="stack"><span class="cd">${aCode}</span><span class="nm">${TEAMS[aCode].n}</span></span>
             ${flag(aCode)}${aGrpTag}
           </button>
         </div>
+        ${goalsHtml}
       </div>`;
     }
 
@@ -2364,7 +2387,7 @@ async function fetchScores(){
       // Knockout match (has match number >= 73)
       if(m.m && m.m >= 73){
         if(!koResults[m.m] || koResults[m.m].s1!==m.s1 || koResults[m.m].s2!==m.s2){
-          koResults[m.m] = {s1:m.s1, s2:m.s2, t1:m.t1, t2:m.t2};
+          koResults[m.m] = {s1:m.s1, s2:m.s2, t1:m.t1, t2:m.t2, et:m.et, pen:m.pen, goals:m.goals};
           // Lock the koPick to the actual winner
           const winner = m.s1 > m.s2 ? m.t1 : m.t2;
           koPicks[m.m] = winner;
@@ -2377,7 +2400,7 @@ async function fetchScores(){
       if(!id) continue; // not a Matchday 3 match (already in PLAYED)
       if(locked[id]) continue; // already locked
       // lock this match with confirmed score
-      locked[id] = {s1:m.s1, s2:m.s2};
+      locked[id] = {s1:m.s1, s2:m.s2, goals:m.goals};
       // add to PLAYED so baseStats picks it up
       PLAYED.push([m.g, m.t1, m.s1, m.s2, m.t2]);
       // override user's pick with the real result
@@ -2436,6 +2459,18 @@ function _processEspnEvents(events){
     const aCode = ESPN_TEAMS[away.team.displayName];
     if(!hCode||!aCode) continue;
     const s1 = parseInt(home.score), s2 = parseInt(away.score);
+    const shortDetail = comp.status.type.shortDetail || "";
+    const espnDetails = comp.details || [];
+    const teamIdMap = {};
+    teamIdMap[home.team.id] = hCode;
+    teamIdMap[away.team.id] = aCode;
+    const espnGoals = espnDetails
+      .filter(d => d.scoringPlay)
+      .map(d => ({
+        min: d.clock?.displayValue || "",
+        team: teamIdMap[d.team?.id] || "",
+        player: d.athletesInvolved?.[0]?.displayName || ""
+      }));
 
     // Try group fixture first
     const id = fixByTeams[hCode+"|"+aCode];
@@ -2453,7 +2488,7 @@ function _processEspnEvents(events){
         }catch(e){}
       } else if(stState==="in"){
         hasLive=true;
-        liveScores[id]={s1,s2,t1:hCode,t2:aCode};
+        liveScores[id]={s1,s2,t1:hCode,t2:aCode,clock:shortDetail,goals:espnGoals};
         changed=true;
         const p=picks[id];
         if(p && p.r){
@@ -2488,7 +2523,7 @@ function _processEspnEvents(events){
       changed=true;
     } else if(stState==="in"){
       hasLive=true;
-      liveKoScores[koM] = {s1:ks1, s2:ks2, t1:koH, t2:koA};
+      liveKoScores[koM] = {s1:ks1, s2:ks2, t1:koH, t2:koA, clock:shortDetail, goals:espnGoals};
       changed=true;
     }
   }

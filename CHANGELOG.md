@@ -4,6 +4,13 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-29 · Night — Live Match Parity & Goal Scorers
+
+- **Live KO matches now look identical to completed ones**: score alignment, win/draw highlights, separator styling all apply to both.
+- **Fix ESPN goal scorer extraction**: use team ID mapping and `scoringPlay` flag instead of broken `displayName` lookup — live goal scorers now display correctly.
+
+---
+
 ## 2026-06-29 · Evening — Collapsible Board & Bracket Layout Polish
 
 - **Collapsible board drawer**: board starts collapsed showing one row of group cards. Green chevron tab below the board expands/collapses the full view.
