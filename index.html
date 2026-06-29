@@ -144,13 +144,17 @@
     margin-top:6px;padding:0 8px 2px;
   }
   .bar{
-    display:flex;gap:6px;align-items:center;justify-content:space-between;
+    display:flex;gap:6px;align-items:center;
     padding:7px 6px;max-width:560px;margin:0 auto;
   }
+  .bar__left,.bar__right{flex:1;min-width:0}
+  .bar__left{display:flex;align-items:center;gap:4px}
+  .bar__center{flex:none;display:flex;gap:4px;align-items:center}
+  .bar__right{display:flex;justify-content:flex-end}
   .bar p{margin:0;font-size:11px;line-height:1.35;color:var(--muted)}
   .btn{
     font:600 9px/1.15 system-ui;border:1px solid var(--line);background:#fff;
-    color:var(--ink);padding:5px 5px;border-radius:6px;cursor:pointer;
+    color:var(--ink);padding:4px 4px;border-radius:6px;cursor:pointer;
     text-align:center;white-space:nowrap
   }
   .btn:active{transform:translateY(1px)}
@@ -567,7 +571,7 @@
 
 <header class="board" id="board">
   <div class="board__head">
-    <div class="board__title">My<b>FIFA26</b> <button class="help-btn" id="refreshBtn" aria-label="Refresh" title="Refresh">&#x21bb;</button><button class="help-btn" id="helpBtn" aria-label="Help" title="Help">?</button></div>
+    <div class="board__title">My<b>FIFA26</b> <button class="help-btn" id="helpBtn" aria-label="Help" title="Help">?</button></div>
     <div class="toggle" id="viewToggle">
       <span class="toggle__lbl active" id="tLblW">Winners</span>
       <div class="toggle__track" id="tTrack"><div class="toggle__knob"></div></div>
@@ -589,12 +593,19 @@
 <button class="board__drawer" id="boardDrawer" aria-label="Toggle board"><svg width="18" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,2 9,8 16,2"/></svg></button>
 <div class="bar-wrap">
   <div class="bar">
-    <p id="hint">Tap a Team to Choose.<br>Board Updates Live.</p>
-    <button class="btn btn--bracket" id="bracketTreeBtn" title="View full tournament bracket"><span style="font-size:18px">🏆</span><br>Bracket</button>
-    <div class="bar__btns">
-      <button class="btn btn--pitch" id="probable" title="Auto-fill with most likely outcomes">Probable<br>Picks</button>
-      <div class="btn-duo"><button class="btn btn--my" id="myPicks" title="Restore your saved picks">My<br>Picks</button><button class="btn btn--my btn--my-share" id="share" title="Share your picks via link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
-      <button class="btn btn--danger" id="reset" title="Clear all picks (My Picks are preserved)">Clear<br>Picks</button>
+    <div class="bar__left">
+      <p id="hint">Tap a Team to Choose.<br>Board Updates Live.</p>
+      <button class="btn btn--pitch" id="refreshBtn" title="Refresh">&#x21bb;<br>Refresh</button>
+    </div>
+    <div class="bar__center">
+      <button class="btn btn--bracket" id="bracketTreeBtn" title="View full tournament bracket"><span style="font-size:18px">🏆</span><br>Bracket</button>
+    </div>
+    <div class="bar__right">
+      <div class="bar__btns">
+        <button class="btn btn--pitch" id="probable" title="Auto-fill with most likely outcomes">Likely<br>Picks</button>
+        <div class="btn-duo"><button class="btn btn--my" id="myPicks" title="Restore your saved picks">My<br>Picks</button><button class="btn btn--my btn--my-share" id="share" title="Share your picks via link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
+        <button class="btn btn--danger" id="reset" title="Clear all picks (My Picks are preserved)">Clear<br>Picks</button>
+      </div>
     </div>
   </div>
 </div>
