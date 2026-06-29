@@ -38,8 +38,8 @@
   .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
 
   /* ---------- sticky qualification board ---------- */
+  .top-sticky{position:sticky;top:0;z-index:50;background:var(--paper)}
   .board{
-    position:sticky;top:0;z-index:50;
     background:
       repeating-linear-gradient(90deg,var(--board) 0 14px,var(--board-stripe) 14px 28px);
     color:var(--chalk);
@@ -569,6 +569,7 @@
 </head>
 <body>
 
+<div class="top-sticky">
 <header class="board" id="board">
   <div class="board__head">
     <div class="board__title">My<b>FIFA26</b> <button class="help-btn" id="helpBtn" aria-label="Help" title="Help">?</button></div>
@@ -644,6 +645,7 @@
   <button class="tab active" data-panel="0">Group Matches</button>
   <button class="tab" data-panel="1">Knockout Bracket</button>
 </div>
+</div><!-- /top-sticky -->
 
 <!-- Two-panel container -->
 <div class="panels" id="panels">
@@ -2266,8 +2268,8 @@ renderBracket();
 
 /* ── Scroll to today's fixtures on load ── */
 function scrollToToday(){
-  const board = document.getElementById("board");
-  const boardH = board ? board.offsetHeight : 0;
+  const topSticky = document.querySelector(".top-sticky");
+  const boardH = topSticky ? topSticky.offsetHeight : 0;
 
   // Priority: scroll to first live match's date header if any are in progress
   const liveMatch = document.querySelector(".match--live");
@@ -2297,15 +2299,17 @@ function scrollToToday(){
       const rect = h.getBoundingClientRect();
       const target = window.scrollY + rect.top - boardH - 10;
       window.scrollTo({top: target, behavior:"smooth"});
-      break;
+      return;
     }
   }
+  // No matching date — scroll to top
+  window.scrollTo({top: 0, behavior:"smooth"});
 }
 
 /* ── Scroll to today's bracket fixtures on load ── */
 function scrollToTodayBracket(){
-  const board = document.getElementById("board");
-  const boardH = board ? board.offsetHeight : 0;
+  const topSticky = document.querySelector(".top-sticky");
+  const boardH = topSticky ? topSticky.offsetHeight : 0;
 
   // Priority: scroll to first live KO match
   const bracketPanel = document.getElementById("bracket");
