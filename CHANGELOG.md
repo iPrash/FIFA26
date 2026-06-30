@@ -4,6 +4,17 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-30 · Early — Penalties, Pick Mode Highlights & Rename
+
+- **Penalty support from ESPN**: live and completed KO matches now extract shootout scores and determine winner correctly.
+- **Pick mode indicator**: Likely Picks and My Picks buttons highlight gold when active. Confirmation dialog protects against accidental overwrites.
+- **Rename Probable → Likely**: all code, IDs, comments, and user-facing text unified.
+- **Uniform button styling**: pick buttons share one consistent style on both main page and overlay.
+- **Live match picking**: can now pick winners from live KO matches in brackets tab with visual feedback.
+- Scores updated for GER-PAR (pens 3-4) and NED-MAR (pens 2-3).
+
+---
+
 ## 2026-06-29 · Night — Goal Scorers, Scroll & Live Match Fixes
 
 - **Goal scorers for every match**: all 74 completed matches (MD1–MD3 + KO) now have scorer names and minutes in `scores.json`.

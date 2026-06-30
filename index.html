@@ -170,11 +170,11 @@
   @keyframes refill{from{width:0}to{width:100%}}
   .btn--share{border-color:var(--silver);color:#3c5a70}
   .bar__btns{display:flex;gap:4px;flex-shrink:0}
-  .btn-duo{display:flex}
+  .btn-duo{display:flex;border-radius:6px;border:1px solid transparent}
   .btn-duo .btn:first-child{border-radius:6px 0 0 6px;border-right:none}
   .btn-duo .btn:last-child{border-radius:0 6px 6px 0;padding:5px 6px}
-  .btn--my{border-color:var(--pitch)!important;color:var(--pitch-dk)!important}
-  .btn--my-share{font-size:13px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(31,157,87,.3)!important}
+  .btn--active{border:2px solid var(--gold)!important;font-weight:700}
+  .btn--my-share{font-size:13px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(72,166,245,.3)!important}
   .toast{
     position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
     background:var(--ink);color:#fff;padding:8px 16px;border-radius:8px;
@@ -447,13 +447,11 @@
   }
   .bkt-header h3{margin:0;font:800 14px/1.2 ui-monospace,monospace;color:var(--pitch)}
   .bkt-actions{display:flex;gap:4px;align-items:center;justify-content:flex-start;padding:4px 12px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0}
-  .btn--ov{font:600 10px/1.2 system-ui;padding:4px 8px;border-radius:6px;background:transparent;cursor:pointer;white-space:nowrap}
-  .btn--ov-pitch{border:1px solid #48a6f5;color:#6dbcff}
-  .btn--ov-my{border:1px solid var(--pitch)!important;color:#5ee09a!important}
-  .btn--ov-danger{border:1px solid #c0392b;color:#e86054}
+  .btn--ov{font:600 10px/1.2 system-ui;padding:4px 8px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,.35);color:rgba(255,255,255,.8);cursor:pointer;white-space:nowrap}
+  .btn--ov.btn--active{border:2px solid var(--gold);color:var(--gold);font-weight:700}
   .btn-duo--ov{display:flex}
   .btn-duo--ov .btn:first-child{border-radius:6px 0 0 6px;border-right:none}
-  .btn-duo--ov .btn:last-child{border-radius:0 6px 6px 0;padding:4px 6px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(94,224,154,.3)!important}
+  .btn-duo--ov .btn:last-child{border-radius:0 6px 6px 0;padding:4px 6px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(255,255,255,.2)!important}
   .btn--ov-my-share svg{display:block}
   .bkt-close{
     background:none;border:none;color:#9fb3a7;font-size:22px;cursor:pointer;padding:0 4px;line-height:1
@@ -614,8 +612,8 @@
     </div>
     <div class="bar__right">
       <div class="bar__btns">
-        <button class="btn btn--pitch" id="probable" title="Auto-fill with most likely outcomes">Likely<br>Picks</button>
-        <div class="btn-duo"><button class="btn btn--my" id="myPicks" title="Restore your saved picks">My<br>Picks</button><button class="btn btn--my btn--my-share" id="share" title="Share your picks via link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
+        <button class="btn btn--pitch" id="likely" title="Auto-fill with most likely outcomes">Likely<br>Picks</button>
+        <div class="btn-duo"><button class="btn btn--pitch" id="myPicks" title="Restore your saved picks">My<br>Picks</button><button class="btn btn--pitch btn--my-share" id="share" title="Share your picks via link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
         <button class="btn btn--danger" id="reset" title="Clear all picks (My Picks are preserved)">Clear<br>Picks</button>
       </div>
     </div>
@@ -641,9 +639,9 @@
       <button class="bkt-close" id="bktClose">&times;</button>
     </div>
     <div class="bkt-actions">
-      <button class="btn btn--ov btn--ov-pitch" id="ovProbable" title="Auto-fill with most likely outcomes">Likely Picks</button>
-      <div class="btn-duo btn-duo--ov"><button class="btn btn--ov btn--ov-my" id="ovMyPicks" title="Restore your saved picks">My Picks</button><button class="btn btn--ov btn--ov-my btn--ov-my-share" id="ovShare" title="Share your picks via link"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
-      <button class="btn btn--ov btn--ov-danger" id="ovReset" title="Clear all picks (My Picks are preserved)">Clear Picks</button>
+      <button class="btn btn--ov" id="ovLikely" title="Auto-fill with most likely outcomes">Likely Picks</button>
+      <div class="btn-duo btn-duo--ov"><button class="btn btn--ov" id="ovMyPicks" title="Restore your saved picks">My Picks</button><button class="btn btn--ov btn--ov-my-share" id="ovShare" title="Share your picks via link"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
+      <button class="btn btn--ov" id="ovReset" title="Clear all picks (My Picks are preserved)">Clear Picks</button>
     </div>
     <div class="bkt-scroll">
       <div class="bkt-tree" id="bktTree"></div>
@@ -1463,12 +1461,12 @@ function initPicks(){
   return loadPicks();
 }
 
-/* Group stage complete — PROBABLE no longer needed for group picks.
-   Bracket probable picks are computed by computeProbableKoPicks() using PROBABLE_STRENGTH. */
-const PROBABLE = {};
+/* Group stage complete — LIKELY no longer needed for group picks.
+   Bracket likely picks are computed by computeLikelyKoPicks() using LIKELY_STRENGTH. */
+const LIKELY = {};
 
-/* Strength ranking for probable KO picks (Polymarket odds, Jun 26 2026) */
-const PROBABLE_STRENGTH = [
+/* Strength ranking for likely KO picks (Polymarket odds, Jun 26 2026) */
+const LIKELY_STRENGTH = [
   "FRA","ARG","ESP","ENG","POR","NED","BRA","GER",
   "NOR","USA","MAR","COL","JPN","MEX","BEL","SUI",
   "ECU","CRO","AUT","CIV","EGY","CAN","SEN","SWE",
@@ -1477,7 +1475,7 @@ const PROBABLE_STRENGTH = [
   "HAI","JOR","TUR","CUW","QAT","TUN","PAN","CZE"
 ];
 
-function computeProbableKoPicks(){
+function computeLikelyKoPicks(){
   const {resolved} = resolveKnockout(picks);
   const kp = {};
   KO_ORDER.forEach(m => {
@@ -1488,8 +1486,8 @@ function computeProbableKoPicks(){
     if(koResults[m]){
       winner = koResults[m].s1 > koResults[m].s2 ? koResults[m].t1 : koResults[m].t2;
     } else {
-      const hi = PROBABLE_STRENGTH.indexOf(r.home);
-      const ai = PROBABLE_STRENGTH.indexOf(r.away);
+      const hi = LIKELY_STRENGTH.indexOf(r.home);
+      const ai = LIKELY_STRENGTH.indexOf(r.away);
       if(hi < 0 && ai < 0) return;
       winner = (hi >= 0 && (ai < 0 || hi < ai)) ? r.home : r.away;
     }
@@ -1512,9 +1510,9 @@ function computeProbableKoPicks(){
 let picks=initPicks();
 let koPicks = _sharedKoPicks || loadKoPicks();
 if(_sharedKoPicks){ saveKoPicks(koPicks); _sharedKoPicks=null; }
-// first visit: start with probable bracket picks so the bracket is populated
+// first visit: start with likely bracket picks so the bracket is populated
 if(!Object.keys(koPicks).length){
-  koPicks = computeProbableKoPicks();
+  koPicks = computeLikelyKoPicks();
   saveKoPicks(koPicks);
 }
 
@@ -1536,6 +1534,7 @@ bracketEl.addEventListener("click",e=>{
   if(!slot) return;
   const matchNum = parseInt(slot.dataset.koMatch);
   if(koResults[matchNum]) return; // completed — don't allow pick changes
+  if(!confirmPickOverwrite()) return;
   const team = slot.dataset.koTeam;
   if(koPicks[matchNum] === team) delete koPicks[matchNum];
   else koPicks[matchNum] = team;
@@ -1818,9 +1817,14 @@ function renderBracket(){
       const hCode = r.home, aCode = r.away;
       const s1 = src.t1===hCode ? src.s1 : src.s2;
       const s2 = src.t1===hCode ? src.s2 : src.s1;
-      const hWin = s1>s2, aWin = s1<s2;
-      const hCls = koLive ? (hWin?'lk-win':'') : (hWin?'lk-win':'dim');
-      const aCls = koLive ? (aWin?'lk-win':'') : (aWin?'lk-win':'dim');
+      const hPenWin = src.pen ? (src.t1===hCode ? src.pen[0]>src.pen[1] : src.pen[1]>src.pen[0]) : false;
+      const aPenWin = src.pen ? !hPenWin : false;
+      const hWin = s1>s2 || hPenWin, aWin = s1<s2 || aPenWin;
+      const koPick = koPicks[match.m];
+      const hSel = koLive && koPick===hCode ? ' sel' : '';
+      const aSel = koLive && koPick===aCode ? ' sel' : '';
+      const hCls = koLive ? (hWin?'lk-win':'') + hSel : (hWin?'lk-win':'dim');
+      const aCls = koLive ? (aWin?'lk-win':'') + aSel : (aWin?'lk-win':'dim');
       const wrapCls = koLive ? 'match match--live' : 'match match--locked';
       const badge = koLive
         ? `<span class="live-badge">🔴 LIVE${src.clock ? " · "+src.clock : ""}</span>`
@@ -1841,17 +1845,18 @@ function renderBracket(){
         const aGoals = src.goals.filter(g=>g.team===aCode).map(g=>`${g.player} ${g.min}`).join(", ");
         goalsHtml = `<div class="match__goals"><span class="match__goals-side">${hGoals}</span><span class="match__goals-side match__goals-away">${aGoals}</span></div>`;
       }
+      const pickAttr = koLive ? ` data-ko-match="${match.m}" data-ko-team=` : '';
       return `<div class="${wrapCls}" data-ko-m="${match.m}">
         ${venueHtml}
         <div class="match__grp" style="background:var(--muted)"><span class="mn">${match.m}</span></div>
         <div class="pick">
-          <button class="side ${hCls}" data-pick="">
+          <button class="side ${hCls}"${koLive ? ` data-ko-match="${match.m}" data-ko-team="${hCode}"` : ' data-pick=""'}>
             ${hGrpTag}${flag(hCode)}
             <span class="stack"><span class="cd">${hCode}</span><span class="nm">${TEAMS[hCode].n}</span></span>
             <span class="lk-score">${s1}${penH}</span>
           </button>
           <div class="lk-sep"><hr></div>
-          <button class="side away ${aCls}" data-pick="">
+          <button class="side away ${aCls}"${koLive ? ` data-ko-match="${match.m}" data-ko-team="${aCode}"` : ' data-pick=""'}>
             <span class="lk-score">${s2}${penA}</span>
             <span class="stack"><span class="cd">${aCode}</span><span class="nm">${TEAMS[aCode].n}</span></span>
             ${flag(aCode)}${aGrpTag}
@@ -2107,12 +2112,14 @@ fixturesEl.addEventListener("click",e=>{
     if(r==="A"&&as<=hs) as=hs+1;
     if(r==="D") as=hs;
     if(blocked){ flashFloor(sc); return; }
+    if(!confirmPickOverwrite()) return;
     picks[id]={r,hs,as};
     savePicks(picks); saveMyPicks(picks, koPicks); renderFixtures(); renderBoard(); renderBracket();
     return;
   }
   // result pick buttons
   const btn=e.target.closest("[data-pick]"); if(!btn) return;
+  if(!confirmPickOverwrite()) return;
   const id=e.target.closest(".match").dataset.id;
   const want=btn.dataset.pick;
   const cur=pickResult(picks[id]);
@@ -2121,10 +2128,36 @@ fixturesEl.addEventListener("click",e=>{
   savePicks(picks); saveMyPicks(picks, koPicks); renderFixtures(); renderBoard(); renderBracket();
 });
 
-document.getElementById("probable").addEventListener("click",()=>{
-  koPicks = computeProbableKoPicks();
+let pickMode = null; // null | "likely" | "my"
+function setPickMode(mode){
+  pickMode = mode;
+  const likelyBtn = document.getElementById("likely");
+  const myBtn = document.getElementById("myPicks");
+  const ovLikelyBtn = document.getElementById("ovLikely");
+  const ovMyBtn = document.getElementById("ovMyPicks");
+  likelyBtn.classList.toggle("btn--active", mode==="likely");
+  myBtn.classList.toggle("btn--active", mode==="my");
+  const shareBtn = document.getElementById("share");
+  if(shareBtn) shareBtn.classList.toggle("btn--active", mode==="my");
+  ovLikelyBtn.classList.toggle("btn--active", mode==="likely");
+  ovMyBtn.classList.toggle("btn--active", mode==="my");
+  const ovShareBtn = document.getElementById("ovShare");
+  if(ovShareBtn) ovShareBtn.classList.toggle("btn--active", mode==="my");
+}
+function confirmPickOverwrite(){
+  if(pickMode === "my") return true; // silent auto-save
+  const msg = pickMode === "likely"
+    ? "Overwrite your picks using Likely Picks as a baseline?"
+    : "Overwrite your saved picks and start afresh?";
+  if(confirm(msg)){ setPickMode("my"); return true; }
+  return false;
+}
+
+document.getElementById("likely").addEventListener("click",()=>{
+  koPicks = computeLikelyKoPicks();
   saveKoPicks(koPicks); renderFixtures(); renderBoard(); renderBracket();
-  toast("Loaded probable bracket picks");
+  setPickMode("likely");
+  toast("Loaded likely bracket picks");
 });
 
 document.getElementById("myPicks").addEventListener("click",()=>{
@@ -2136,6 +2169,7 @@ document.getElementById("myPicks").addEventListener("click",()=>{
   for(const m in koResults){ my.koPicks[m] = koPicks[m]; }
   picks = my.picks; koPicks = my.koPicks;
   savePicks(picks); saveKoPicks(koPicks); renderFixtures(); renderBoard(); renderBracket();
+  setPickMode("my");
   toast("Restored your picks");
 });
 
@@ -2145,6 +2179,7 @@ document.getElementById("reset").addEventListener("click",()=>{
   picks=kept;
   const keptKo={}; for(const m in koResults){ if(koPicks[m]) keptKo[m]=koPicks[m]; }
   koPicks=keptKo; savePicks(picks); saveKoPicks(koPicks); renderFixtures(); renderBoard(); renderBracket();
+  setPickMode(null);
 });
 
 document.getElementById("share").addEventListener("click",()=>{
@@ -2174,8 +2209,8 @@ document.getElementById("share").addEventListener("click",()=>{
 });
 
 /* overlay action buttons — mirror main buttons + re-render overlay */
-document.getElementById("ovProbable").addEventListener("click",()=>{
-  document.getElementById("probable").click();
+document.getElementById("ovLikely").addEventListener("click",()=>{
+  document.getElementById("likely").click();
   renderBracketOverlay();
 });
 document.getElementById("ovMyPicks").addEventListener("click",()=>{
@@ -2295,6 +2330,8 @@ panelsEl.addEventListener("scroll",()=>{
 renderFixtures();
 renderBoard();
 renderBracket();
+// Highlight the active pick mode on load
+setPickMode(hasMyPicks() ? "my" : "likely");
 
 
 /* ── Scroll up in groups panel ── */
@@ -2383,10 +2420,13 @@ async function fetchScores(){
       if(m.s1===null || m.s2===null) continue;
       // Knockout match (has match number >= 73)
       if(m.m && m.m >= 73){
-        if(!koResults[m.m] || koResults[m.m].s1!==m.s1 || koResults[m.m].s2!==m.s2){
+        const kr = koResults[m.m];
+        const penChanged = m.pen && (!kr || !kr.pen || kr.pen[0]!==m.pen[0] || kr.pen[1]!==m.pen[1]);
+        const goalsChanged = m.goals && (!kr || !kr.goals);
+        if(!kr || kr.s1!==m.s1 || kr.s2!==m.s2 || penChanged || goalsChanged){
           koResults[m.m] = {s1:m.s1, s2:m.s2, t1:m.t1, t2:m.t2, et:m.et, pen:m.pen, goals:m.goals};
-          // Lock the koPick to the actual winner
-          const winner = m.s1 > m.s2 ? m.t1 : m.t2;
+          // Lock the koPick to the actual winner (check penalty shootout first)
+          const winner = m.pen ? (m.pen[0] > m.pen[1] ? m.t1 : m.t2) : (m.s1 > m.s2 ? m.t1 : m.t2);
           koPicks[m.m] = winner;
           changed = true;
         }
@@ -2461,6 +2501,10 @@ function _processEspnEvents(events){
     if(!hCode||!aCode) continue;
     const s1 = parseInt(home.score), s2 = parseInt(away.score);
     const shortDetail = comp.status.type.shortDetail || "";
+    const hShootout = home.shootoutScore != null ? parseInt(home.shootoutScore) : null;
+    const aShootout = away.shootoutScore != null ? parseInt(away.shootoutScore) : null;
+    const hasPen = hShootout != null && aShootout != null;
+    const hasET = comp.status.period >= 3; // period 3+ = extra time or pens
     const espnDetails = comp.details || [];
     const teamIdMap = {};
     teamIdMap[home.team.id] = hCode;
@@ -2516,15 +2560,17 @@ function _processEspnEvents(events){
     const koA = ko.flipped ? hCode : aCode;
 
     if(stState==="post" && stDone && !koResults[koM]){
-      koResults[koM] = {s1:ks1, s2:ks2, t1:koH, t2:koA};
-      const winner = ks1 > ks2 ? koH : koA;
+      const penArr = hasPen ? [ko.flipped ? aShootout : hShootout, ko.flipped ? hShootout : aShootout] : null;
+      koResults[koM] = {s1:ks1, s2:ks2, t1:koH, t2:koA, et:hasET||undefined, pen:penArr||undefined, goals:espnGoals};
+      const winner = hasPen ? (hShootout > aShootout ? hCode : aCode) : (ks1 > ks2 ? koH : koA);
       koPicks[koM] = winner;
       delete liveKoScores[koM];
       saveKoPicks(koPicks);
       changed=true;
     } else if(stState==="in"){
       hasLive=true;
-      liveKoScores[koM] = {s1:ks1, s2:ks2, t1:koH, t2:koA, clock:shortDetail, goals:espnGoals};
+      const livePen = hasPen ? [ko.flipped ? aShootout : hShootout, ko.flipped ? hShootout : aShootout] : null;
+      liveKoScores[koM] = {s1:ks1, s2:ks2, t1:koH, t2:koA, clock:shortDetail, goals:espnGoals, et:hasET||undefined, pen:livePen||undefined};
       changed=true;
     }
   }
@@ -2732,6 +2778,7 @@ refreshBtn.addEventListener("click",()=>{
     if(!el) return;
     const matchNum = parseInt(el.dataset.koMatch);
     if(koResults[matchNum]) return; // completed — don't allow pick changes
+    if(!confirmPickOverwrite()) return;
     const team = el.dataset.koTeam;
     if(koPicks[matchNum] === team) delete koPicks[matchNum];
     else koPicks[matchNum] = team;

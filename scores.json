@@ -76,6 +76,8 @@
     {"m":72,"g":"J","t1":"JOR","s1":1,"s2":3,"t2":"ARG","goals":[{"min":"19'","team":"ARG","player":"Lo Celso"},{"min":"31'","team":"ARG","player":"Martínez"},{"min":"55'","team":"JOR","player":"Al-Tamari"},{"min":"80'","team":"ARG","player":"Messi"}]},
 
     {"m":73,"t1":"RSA","s1":0,"s2":1,"t2":"CAN","goals":[{"min":"90'+2'","team":"CAN","player":"Eustáquio"}]},
-    {"m":76,"t1":"JPN","s1":1,"s2":2,"t2":"BRA","goals":[{"min":"29'","team":"JPN","player":"Sano"},{"min":"56'","team":"BRA","player":"Casemiro"},{"min":"90'+5'","team":"BRA","player":"Martinelli"}]}
+    {"m":76,"t1":"JPN","s1":1,"s2":2,"t2":"BRA","goals":[{"min":"29'","team":"JPN","player":"Sano"},{"min":"56'","team":"BRA","player":"Casemiro"},{"min":"90'+5'","team":"BRA","player":"Martinelli"}]},
+    {"m":74,"t1":"GER","s1":1,"s2":1,"t2":"PAR","et":true,"pen":[3,4],"goals":[{"min":"42'","team":"PAR","player":"Enciso"},{"min":"54'","team":"GER","player":"Havertz"}]},
+    {"m":75,"t1":"NED","s1":1,"s2":1,"t2":"MAR","et":true,"pen":[2,3],"goals":[{"min":"72'","team":"NED","player":"Gakpo"},{"min":"90'+1'","team":"MAR","player":"Diop"}]}
   ]
 }
