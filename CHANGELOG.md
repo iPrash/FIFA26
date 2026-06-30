@@ -4,6 +4,18 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-30 · Morning — Code Review Cleanup
+
+- **Qualified counter fixed**: now shows 32/32 once all groups are complete (counts top-2 locked teams + 8 best thirds). Future-proof — only adds thirds when all groups are done.
+- **ESPN XSS protection**: added `esc()` sanitizer for player names, minutes, and clock text from ESPN API.
+- **CSS consolidation**: extracted `.overlay` base class (4 overlays shared identical positioning), `.badge` base class (locked/live badges shared 95% CSS).
+- **Removed unused CSS**: `--pick` variable (duplicate of `--pitch`), `.mono` class (never applied).
+- **Moved inline styles to CSS**: `.dot` background, `#hint` margin, bracket button emoji font-size.
+- **Memoized `resolveKnockout()`**: caches expensive third-place brute-force computation, returns deep copies since callers mutate results.
+- **Extracted `getTodayStr()`**: shared helper for scroll functions, removing duplicate date-string construction.
+
+---
+
 ## 2026-06-30 · Morning — Documentation Audit
 
 - **README overhauled**: added penalty support, goal scorers, pick mode indicators, collapsible board, scroll-to-live, refresh cooldown, updated `scores.json` format examples.
