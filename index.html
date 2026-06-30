@@ -304,7 +304,7 @@
   .locked-badge{font:700 9px/1 ui-monospace,monospace;color:var(--pitch);text-transform:uppercase;letter-spacing:.04em;position:absolute;right:0;top:50%;transform:translateY(-50%)}
   .live-badge{font:700 9px/1 ui-monospace,monospace;color:#e74c3c;text-transform:uppercase;letter-spacing:.04em;position:absolute;right:0;top:50%;transform:translateY(-50%);animation:pulse 1.5s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-  .match--live{border-color:#e74c3c}
+  .match--live{border:2px solid #e74c3c}
   .match__goals{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 8px 4px;font:400 9px/1.3 system-ui;color:var(--muted)}
   .match__goals-away{text-align:right}
   .pen-score{font-size:12px;opacity:.7;margin:0 1px}
@@ -606,7 +606,7 @@
 <div class="bar-wrap">
   <div class="bar">
     <div class="bar__left">
-      <p id="hint" style="margin-right:4px">Tap Team to Pick<br>Bracket Updates Live</p>
+      <p id="hint" style="margin-right:4px">Tap team to pick.<br>Bracket updates Live.</p>
       <button class="btn btn--pitch btn--refresh" id="refreshBtn" title="Refresh">&#x21bb;<br>Refresh</button>
     </div>
     <div class="bar__center">
@@ -2283,10 +2283,10 @@ panelsEl.addEventListener("scroll",()=>{
   if(window.innerWidth < 900 && activeIdx !== lastActiveIdx){
     if(activeIdx === 1){
       // Switched TO bracket tab: scroll to today's bracket match
-      setTimeout(scrollToTodayBracket, 50);
+      setTimeout(scrollUpBracket, 50);
     } else if(activeIdx === 0){
-      // Switched TO groups tab: scroll back to today
-      setTimeout(scrollToToday, 50);
+      // Switched TO groups tab: scroll up
+      setTimeout(scrollUpGroup, 50);
     }
     lastActiveIdx = activeIdx;
   }
@@ -2297,15 +2297,15 @@ renderBoard();
 renderBracket();
 
 
-/* ── Scroll to today's fixtures on load ── */
-function scrollToToday(){
+/* ── Scroll up in groups panel ── */
+function scrollUpGroup(){
   const topSticky = document.querySelector(".top-sticky");
   const boardH = topSticky ? topSticky.offsetHeight : 0;
+  const groupsPanel = document.getElementById("groups");
 
-  // Priority: scroll to first live match's date header if any are in progress
-  const liveMatch = document.querySelector(".match--live");
+  // Priority: scroll to first live GROUP match's date header
+  const liveMatch = groupsPanel && groupsPanel.querySelector(".match--live");
   if(liveMatch){
-    // Walk up to find the .day__h header for this match's section
     const section = liveMatch.closest(".day") || liveMatch.parentElement;
     const header = section && section.querySelector(".day__h");
     const scrollEl = header || liveMatch;
@@ -2315,14 +2315,14 @@ function scrollToToday(){
     return;
   }
 
-  // Otherwise scroll to today's first fixture
+  // Otherwise scroll to today's first group fixture
   const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const etDate = new Date().toLocaleString('en-US', {timeZone:'America/New_York'});
   const d = new Date(etDate);
   const todayStr = `${days[d.getDay()]} · ${months[d.getMonth()]} ${d.getDate()}`;
 
-  const dayHeaders = document.querySelectorAll(".day__h");
+  const dayHeaders = groupsPanel ? groupsPanel.querySelectorAll(".day__h") : document.querySelectorAll(".day__h");
   for(const h of dayHeaders){
     const parts = h.textContent.split(" · ");
     const dateText = parts.slice(0, 2).join(" · ");
@@ -2337,19 +2337,16 @@ function scrollToToday(){
   window.scrollTo({top: 0, behavior:"smooth"});
 }
 
-/* ── Scroll to today's bracket fixtures on load ── */
-function scrollToTodayBracket(){
+/* ── Scroll up in bracket panel ── */
+function scrollUpBracket(){
   const topSticky = document.querySelector(".top-sticky");
   const boardH = topSticky ? topSticky.offsetHeight : 0;
 
-  // Priority: scroll to first live KO match
+  // Priority: scroll to first live KO match (directly to the match, not date header)
   const bracketPanel = document.getElementById("bracket");
-  const liveKoMatch = bracketPanel && bracketPanel.querySelector(".match--live");
+  const liveKoMatch = bracketPanel && (bracketPanel.querySelector(".match--live") || bracketPanel.querySelector(".ko__match--live"));
   if(liveKoMatch){
-    const section = liveKoMatch.closest(".ko__grid") || liveKoMatch.parentElement;
-    const header = section && section.previousElementSibling;
-    const scrollEl = (header && header.classList.contains("ko__date-h")) ? header : liveKoMatch;
-    const rect = scrollEl.getBoundingClientRect();
+    const rect = liveKoMatch.getBoundingClientRect();
     const target = window.scrollY + rect.top - boardH - 10;
     window.scrollTo({top: target, behavior:"smooth"});
     return;
@@ -2398,7 +2395,11 @@ async function fetchScores(){
       // find the fixture id by team pairing
       const id = fixByTeams[m.t1+"|"+m.t2];
       if(!id) continue; // not a Matchday 3 match (already in PLAYED)
-      if(locked[id]) continue; // already locked
+      if(locked[id]){
+        // already locked — but update goals if scores.json has them
+        if(m.goals && !locked[id].goals) { locked[id].goals = m.goals; changed = true; }
+        continue;
+      }
       // lock this match with confirmed score
       locked[id] = {s1:m.s1, s2:m.s2, goals:m.goals};
       // add to PLAYED so baseStats picks it up
@@ -2551,6 +2552,7 @@ async function fetchLiveScores(){
       clearInterval(liveInterval); liveInterval=null;
     }
   }catch(e){/* CORS/network — silent */}
+  return {hasLive: Object.keys(liveKoScores).length > 0 || Object.keys(liveScores).length > 0};
 }
 
 /* Apply cached ESPN scores from localStorage (instant on reload) */
@@ -2572,11 +2574,19 @@ try{
 }catch(e){}
 
 fetchScores().then(()=>{
-  fetchLiveScores();
-  setTimeout(()=>{
-    if(window.innerWidth < 900) scrollToTodayBracket();
-    else scrollToToday();
-  }, 300);
+  fetchLiveScores().then(()=>{
+    // Wait for DOM to paint live match elements, then scroll
+    function scrollWhenReady(tries){
+      const bp = document.getElementById("bracket");
+      const live = bp && (bp.querySelector(".match--live") || bp.querySelector(".ko__match--live"));
+      if(live || tries <= 0){
+        scrollUpBracket();
+      } else {
+        requestAnimationFrame(()=> setTimeout(()=> scrollWhenReady(tries-1), 100));
+      }
+    }
+    scrollWhenReady(10);
+  });
 });
 
 /* ── What's New popup (shows once per version) ── */

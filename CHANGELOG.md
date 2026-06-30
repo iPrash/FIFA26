@@ -4,10 +4,14 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
-## 2026-06-29 · Night — Live Match Parity & Goal Scorers
+## 2026-06-29 · Night — Goal Scorers, Scroll & Live Match Fixes
 
-- **Live KO matches now look identical to completed ones**: score alignment, win/draw highlights, separator styling all apply to both.
-- **Fix ESPN goal scorer extraction**: use team ID mapping and `scoringPlay` flag instead of broken `displayName` lookup — live goal scorers now display correctly.
+- **Goal scorers for every match**: all 74 completed matches (MD1–MD3 + KO) now have scorer names and minutes in `scores.json`.
+- **Fix goal display for late-locked matches**: matches locked via ESPN cache before `fetchScores` ran would miss goals — now backfills goals from `scores.json`.
+- **Live KO matches now look identical to completed ones**: score alignment, win/draw highlights, separator styling, thicker red border all apply to both.
+- **Fix ESPN goal scorer extraction**: use team ID mapping and `scoringPlay` flag instead of broken `displayName` lookup.
+- **Scroll-to-live-match**: refresh now scrolls directly to the live match card (not just today's date header), awaiting ESPN data before scrolling.
+- **Scroll functions preserved**: renamed `scrollToToday`/`scrollToTodayBracket` → `scrollUpGroup`/`scrollUpBracket`, scoped group search to groups panel only.
 
 ---
 
