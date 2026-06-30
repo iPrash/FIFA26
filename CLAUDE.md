@@ -4,16 +4,17 @@ Persistent context for Claude Code. Read this before editing.
 
 ## What this is
 
-A single-file, phone-first "what-if" analyser for the 2026 FIFA World Cup group stage. The user picks outcomes for the remaining group matches; a sticky board fills in live — 12 colour-coded group cards (each showing the group's winner + runner-up) plus a row of the 8 best third-placed teams.
+A single-file, phone-first World Cup 2026 predictor — group stage results, knockout bracket picks, and live score tracking. 12 colour-coded group cards show qualification standings; a full bracket from R32 to the Final lets users pick winners and see cascading results.
 
-Audience: football fans on phones. The single job of the page: let someone play out the rest of the group stage and instantly see who qualifies.
+Audience: football fans on phones. Pick match outcomes, track live scores, and predict the tournament winner.
 
-**Current data state:** MD1 + MD2 results are hardcoded in `PLAYED`. MD3 results come from `scores.json` at runtime. Groups A–I and K, L MD3 are complete; only Group J MD3 remains (matches 71–72).
+**Current data state:** All group stage matches (MD1–MD3) are complete. Knockout stage is in progress — results come from `scores.json` at runtime. ESPN API provides live scores, goal scorers, and penalty shootout data.
 
 ## Repo files
 
 - `index.html` — the entire app (HTML + CSS + JS in one file).
-- `r32-bracket.js` — phase-2 data: the official Round-of-32 mapping (16 fixed matches, third-place pools, all 495 Annex C combinations, `assignThirds()`). Not yet imported by `index.html`.
+- `scores.json` — match results: group + knockout scores, goal scorers, ET/penalty data.
+- `CHANGELOG.md` — reverse-chronological feature log with date+time headers.
 - `README.md` — human-facing overview + deploy steps.
 - `CLAUDE.md` — this file.
 - `LICENSE` — MIT.
@@ -21,7 +22,7 @@ Audience: football fans on phones. The single job of the page: let someone play 
 ## Hard constraints (do not break without asking)
 
 - **One file, zero build, zero dependencies.** Everything (HTML + CSS + JS) lives in `index.html`. No frameworks, no bundler, no npm. It must run by opening the file directly.
-- **No browser storage yet.** State is in-memory only. (localStorage is a planned feature — see roadmap — but keep it optional and guarded so the file still runs from `file://`.)
+- **localStorage for picks.** Group picks, bracket picks, My Picks, ESPN score cache, and What's New version all use localStorage (guarded with try/catch so `file://` still works).
 - **Phone-first.** Layout targets ~380px width. The board stays sticky at the top and must not push the fixtures off-screen.
 - Flags are **images** from `https://flagcdn.com/<iso>.svg`, NOT emoji. (Flag emoji don't render on Windows — they degrade to two-letter codes. That's the bug we already fixed; don't reintroduce emoji flags.)
 
@@ -30,7 +31,7 @@ Audience: football fans on phones. The single job of the page: let someone play 
 - `TEAMS` — `{ CODE: { n: name, iso: flagcdn-code, g: groupLetter } }`. 48 teams. ISO is lowercase alpha-2, or `gb-eng` / `gb-sct` for England / Scotland.
 - `PLAYED` — finished matches: `["GROUP","HOME",homeGoals,awayGoals,"AWAY"]`. Hardcoded with MD1 + MD2 results. MD3 results are added dynamically at runtime by `fetchScores()`.
 - `FIXTURES` — all Matchday 3 matches, grouped by date: `{ date, note, ms:[ [id,group,homeCode,awayCode,venue], ... ] }`. These stay permanently — never delete entries. `fetchScores()` uses `fixByTeams` to map team codes to fixture IDs.
-- `scores.json` — the single source of truth for MD3 results. Contains all 24 MD3 matches with scores (`null` = not yet played).
+- `scores.json` — the single source of truth for match results. Contains all MD3 group matches and knockout matches. Each entry can include: scores, goal scorers (`goals`), extra time flag (`et`), penalty shootout scores (`pen`).
 
 **To finalize a match: only update `scores.json` with the real score.** Do NOT modify `PLAYED` or `FIXTURES` in `index.html`. At runtime, `fetchScores()` reads `scores.json`, sets `locked[id]`, pushes into `PLAYED`, and recomputes standings.
 
@@ -49,12 +50,22 @@ Audience: football fans on phones. The single job of the page: let someone play 
 - Type: system sans for UI, `ui-monospace` for codes/points/labels (scoreboard feel).
 - Spend boldness on the board; keep fixtures quiet and dense.
 
+## What's built (features already implemented)
+
+- Score steppers with +/− buttons for exact scorelines and live GD tiebreakers.
+- Full knockout bracket: R32 → R16 → QF → SF → Third Place → Final, with cascading picks.
+- Bracket Tree overlay with match numbers, dates, venues, and connector lines.
+- localStorage persistence for all picks (group, bracket, My Picks).
+- ESPN live score integration with 60-second polling, goal scorers, and penalty support.
+- Likely Picks auto-fill from `LIKELY_STRENGTH` rankings.
+- Pick mode system with gold border indicators and confirmation dialogs.
+- Collapsible board drawer, scroll-to-live-match, refresh cooldown with cache busting.
+- PWA with service worker, offline support, and What's New overlay.
+
 ## Roadmap (planned, not yet built)
 
-1. **Optional score steppers** per match so goal-difference tiebreakers are real (removes the current simplification).
-2. **Round-of-32 knockout pairings** rendered below the board once 32 are decided. The official mapping is already captured in `r32-bracket.js` (exported `R32_MATCHES`, `THIRD_COLS`, `THIRD_MAP` = all 495 Annex C combinations, and `assignThirds()`). Wire the board's group winners/runners-up into the 16 fixed match slots, then call `assignThirds(qualifyingThirdGroups)` to place the 8 third-placed teams.
-3. **Persist picks** to `localStorage`, guarded with try/catch so `file://` still works.
-4. A small "results last updated" note + easy data-refresh path.
+1. Fox Sports match highlights integration (CORS-blocked from browser — needs proxy or server).
+2. "Results last updated" timestamp note.
 
 ## Deploy (GitHub Pages, branch root)
 

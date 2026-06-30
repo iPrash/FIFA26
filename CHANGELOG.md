@@ -4,6 +4,14 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-06-30 · Morning — Documentation Audit
+
+- **README overhauled**: added penalty support, goal scorers, pick mode indicators, collapsible board, scroll-to-live, refresh cooldown, updated `scores.json` format examples.
+- **CLAUDE.md updated**: reflects current project state (all groups complete, KO in progress), lists built features, updated repo files and data model.
+- **Probable → Likely**: all remaining doc references updated.
+
+---
+
 ## 2026-06-30 · Early — Penalties, Pick Mode Highlights & Rename
 
 - **Penalty support from ESPN**: live and completed KO matches now extract shootout scores and determine winner correctly.

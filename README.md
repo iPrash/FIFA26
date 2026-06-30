@@ -14,6 +14,7 @@ A phone-first, zero-dependency web app for tracking and predicting the 2026 FIFA
 - **12 colour-coded group cards** (A–L), each showing the group's winner and runner-up.
 - **Best 8 third-placed teams** row below the group cards — each team carries its group colour so you can see which group it came from.
 - **Winners / Full Group toggle** — switch between showing just the top 2 or the full 4-team table per group.
+- **Collapsible board drawer** — tap the chevron to collapse or expand the board, saving screen space on phones.
 - **Tap any group card** to open a detailed standings popup (Pts, GD, GF for every team).
 - **Qualified counter** tracks how many of the 32 knockout spots are filled.
 
@@ -23,7 +24,8 @@ A phone-first, zero-dependency web app for tracking and predicting the 2026 FIFA
 - **Tap to pick**: choose Home win, Draw, or Away win for each match.
 - **Score steppers**: +/− buttons to set exact scorelines — goal difference updates live for tiebreaker accuracy.
 - **Confirmed results** from `scores.json` are locked with a green border, "Final" badge, and large score display. Winner highlighted in gold, loser dimmed.
-- **Live matches** show a red border, pulsing "LIVE" badge, and real-time scores from ESPN. Users can still pick outcomes, with live scores as the floor (can't go below actual score).
+- **Goal scorers** displayed below each confirmed match — scorer name and minute (e.g. "Mbappé 23'").
+- **Live matches** show a thick red border, pulsing "LIVE" badge, and real-time scores from ESPN. Users can still pick outcomes, with live scores as the floor (can't go below actual score).
 - **Standings engine**: Points → GD → Goals Scored → Seed Index. The 8 best third-placed teams are computed via full brute-force across all group combinations.
 
 ### Knockout Bracket
@@ -32,22 +34,26 @@ A phone-first, zero-dependency web app for tracking and predicting the 2026 FIFA
 - **Tap a team to pick the winner** — picks cascade automatically through R16, QF, SF, and Final.
 - **Bracket Tree overlay** — tap the trophy button to open a full-screen bracket visualisation with match numbers, dates, times, venues, and connector lines.
 - **Completed KO matches** display identically to group locked matches: split team cards, large scores with separator, winner in gold, "Final" badge. Picks are locked — users cannot override real results.
-- **Live KO matches** show red border, live scores, and "LIVE" badge. Neither side is dimmed during play.
+- **Penalty support** — matches decided by penalties show scores as "1(4) - 1(3)" with the penalty shootout scores in parentheses. Extra time is indicated. The correct winner is determined from penalty scores, not the draw scoreline.
+- **Live KO matches** show thick red border, live scores, and "LIVE" badge. Users can pick a winner from live matches. Neither side is dimmed during play.
 - **Group colour tags** appear next to each team in the bracket (white card with black border) so you can trace which group every team came from.
 - **Third-place resolution** — the 8 qualifying third-placed groups are determined, and Annex C (all 495 valid combinations) maps them to the correct R32 slots.
 
 ### Live Scores
 
-- **ESPN API integration** — automatically fetches live scores for both group and knockout matches.
+- **ESPN API integration** — automatically fetches live scores, goal scorers, and penalty shootout results for both group and knockout matches.
 - **60-second polling** while any match is in progress; stops when no matches are live.
+- **Scroll to live match** — on page load and tab switch, the app scrolls directly to the first live match for immediate visibility.
 - **Scores from `scores.json`** — confirmed final results loaded on page init. To update a result, only edit `scores.json` — never touch `index.html` data.
 - **Score caching** — ESPN results cached in localStorage for instant display on reload.
 
 ### Picks & Persistence
 
 - **Auto-save** — all group picks and bracket picks saved to localStorage.
+- **Pick mode indicators** — active pick mode (Likely Picks or My Picks) is highlighted with a gold border on the button.
 - **My Picks** — permanently save your current picks. Restore them anytime, even after experimenting with other scenarios. Completed match results are always preserved.
-- **Probable Picks** — auto-fill the bracket with most likely winners based on pre-tournament strength rankings (Polymarket odds). Completed matches always use the real result.
+- **Likely Picks** — auto-fill the bracket with most likely winners based on pre-tournament strength rankings (Polymarket odds). Completed matches always use the real result.
+- **Confirmation dialogs** — switching between pick modes prompts for confirmation to prevent accidental overwrites. Manual picks while in My Picks mode auto-save silently.
 - **Clear Picks** — wipe all picks back to blank. Completed match results are preserved. My Picks remain saved separately.
 - **Share** — generates a URL encoding both group and bracket picks. Uses native share on mobile, falls back to copy-to-clipboard. Shared links load picks automatically on open.
 
@@ -63,7 +69,7 @@ A phone-first, zero-dependency web app for tracking and predicting the 2026 FIFA
 
 - **Progressive Web App** — installable on iOS (Add to Home Screen) and Android (Install App prompt).
 - **Service Worker** for offline support and update detection.
-- **Refresh button** checks for app updates.
+- **Refresh button** with 30-second cooldown timer — checks for app updates and busts caches.
 - **What's New overlay** shows feature updates once per version.
 
 ---
@@ -80,12 +86,26 @@ Flag images load from [flagcdn.com](https://flagcdn.com). Live scores require an
 
 All match results are managed through `scores.json`. To record a finished match:
 
+**Group match:**
 ```json
-{"m": 73, "t1": "RSA", "s1": 0, "s2": 1, "t2": "CAN"}
+{"g": "A", "t1": "QAT", "s1": 0, "s2": 3, "t2": "ECU", "goals": [{"p":"Enner Valencia","m":"16'","t":"ECU"},{"p":"Enner Valencia","m":"31'","t":"ECU"}]}
+```
+
+**Knockout match:**
+```json
+{"m": 73, "t1": "RSA", "s1": 0, "s2": 1, "t2": "CAN", "goals": [{"p":"Eustáquio","m":"90'+2'","t":"CAN"}]}
+```
+
+**Knockout match with penalties:**
+```json
+{"m": 74, "t1": "GER", "s1": 1, "s2": 1, "t2": "PAR", "et": true, "pen": [3, 4], "goals": [{"p":"Havertz","m":"55'","t":"GER"},{"p":"Enciso","m":"72'","t":"PAR"}]}
 ```
 
 - Group matches: use `"g"` for the group letter, `"t1"`/`"t2"` for team codes, `"s1"`/`"s2"` for scores.
 - Knockout matches: add `"m"` for the match number (73–104).
+- `"goals"`: array of `{p: player, m: minute, t: team}` for goal scorers.
+- `"et": true`: match went to extra time.
+- `"pen": [h, a]`: penalty shootout scores (home, away).
 - Set scores to `null` for matches not yet played.
 
 **Do not** modify `PLAYED` or `FIXTURES` in `index.html`. The app reads `scores.json` at runtime and updates everything automatically.
@@ -101,7 +121,7 @@ All data lives in `index.html`:
 - **`FIXTURES`** — all Matchday 3 matches (permanent, never deleted).
 - **`R32_MATCHES` / `R16_MATCHES` / `QF_MATCHES` / `SF_MATCHES` / `FINAL_MATCH` / `THIRD_PLACE`** — knockout bracket structure.
 - **`THIRD_MAP`** — all 495 Annex C combinations mapping 8 qualifying third-placed groups to R32 slots.
-- **`PROBABLE_STRENGTH`** — team ranking for auto-fill bracket predictions.
+- **`LIKELY_STRENGTH`** — team ranking for auto-fill bracket predictions.
 
 ---
 
