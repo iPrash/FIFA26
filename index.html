@@ -26,6 +26,8 @@
     --silver:#9fb6c9;       /* runner-up */
     --bronze:#cf915a;       /* third place */
     --pickdraw:#5b6e7e;
+    --pick-clr:var(--gold);   /* changes per pick mode: blue=likely, green=my, gold=default */
+    --pick-bg:rgba(218,165,32,.12);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0}
@@ -156,7 +158,12 @@
     text-align:center;white-space:nowrap
   }
   .btn:active{transform:translateY(1px)}
-  .btn--danger{border-color:#c0392b;color:#c0392b}
+  .btn--likely{border-color:rgba(74,144,217,.45);color:rgba(74,144,217,.7)}
+  .btn--likely.btn--active{border-color:#4a90d9;color:#4a90d9}
+  .btn--my{border-color:rgba(46,204,113,.45);color:rgba(46,204,113,.7)}
+  .btn--my.btn--active{border-color:#2ecc71;color:#2ecc71}
+  .btn--danger{border-color:rgba(192,57,43,.45);color:rgba(192,57,43,.7)}
+  .btn--danger.btn--active{border-color:#c0392b;color:#c0392b}
   .btn--pitch{border-color:#48a6f5;color:#2a6fad}
   .btn--refresh{position:relative;overflow:hidden;padding:4px 6px}
   .btn--refresh.cooldown{opacity:.45}
@@ -170,8 +177,8 @@
   .btn-duo{display:flex;border-radius:6px;border:1px solid transparent}
   .btn-duo .btn:first-child{border-radius:6px 0 0 6px;border-right:none}
   .btn-duo .btn:last-child{border-radius:0 6px 6px 0;padding:5px 6px}
-  .btn--active{border:2px solid var(--gold)!important;font-weight:700}
-  .btn--my-share{font-size:13px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(72,166,245,.3)!important}
+  .btn--active{border-width:2px!important;font-weight:700}
+  .btn--my-share{font-size:13px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(46,204,113,.3)!important}
   .toast{
     position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
     background:var(--ink);color:#fff;padding:8px 16px;border-radius:8px;
@@ -264,7 +271,7 @@
     font:700 10px/1.1 ui-monospace,monospace
   }
   .draw small{font-size:8px;font-weight:600;opacity:.8}
-  .side.sel{border-color:var(--gold);background:rgba(218,165,32,.10)}
+  .side.sel{border-color:var(--pick-clr);background:var(--pick-bg)}
   .side.sel .cd{color:var(--pitch-dk)}
   .draw.sel{border-color:var(--pickdraw);background:rgba(91,110,126,.12);color:#3c4a55}
   .side.dim,.draw.dim{opacity:.5}
@@ -290,7 +297,7 @@
   .match--locked{opacity:1;border-color:var(--pitch);background:rgba(31,157,87,.06)}
   .match--locked .pick{pointer-events:none}
   .match--locked .side{cursor:default;border-color:var(--line)}
-  .match--locked .side.lk-win,.match--live .side.lk-win{background:rgba(218,165,32,.10);border-color:var(--gold);font-weight:800}
+  .match--locked .side.lk-win,.match--live .side.lk-win{background:rgba(218,165,32,.10);border:2px solid var(--gold);font-weight:800}
   .match--locked .side.lk-win .cd,.match--live .side.lk-win .cd{font-weight:800}
   .match--locked .side.lk-draw,.match--live .side.lk-draw{background:rgba(31,157,87,.08)}
   .match--locked .lk-score,.match--live .lk-score{font:800 15px/1 ui-monospace,monospace;color:var(--pitch-dk)}
@@ -431,11 +438,17 @@
   }
   .bkt-header h3{margin:0;font:800 14px/1.2 ui-monospace,monospace;color:var(--pitch)}
   .bkt-actions{display:flex;gap:4px;align-items:center;justify-content:flex-start;padding:4px 12px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0}
-  .btn--ov{font:600 10px/1.2 system-ui;padding:4px 8px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,.35);color:rgba(255,255,255,.8);cursor:pointer;white-space:nowrap}
-  .btn--ov.btn--active{border:2px solid var(--gold);color:var(--gold);font-weight:700}
+  .btn--ov{font:600 10px/1.2 system-ui;padding:4px 8px;border-radius:6px;background:var(--paper);border:1px solid var(--line);color:var(--ink);cursor:pointer;white-space:nowrap}
+  .btn--ov-likely{border-color:rgba(74,144,217,.4);color:rgba(74,144,217,.7);background:rgba(74,144,217,.08)}
+  .btn--ov-likely.btn--active{border-color:#4a90d9;color:#4a90d9;background:rgba(74,144,217,.15)}
+  .btn--ov-my{border-color:rgba(46,204,113,.4);color:rgba(46,204,113,.7);background:rgba(46,204,113,.08)}
+  .btn--ov-my.btn--active{border-color:#2ecc71;color:#2ecc71;background:rgba(46,204,113,.15)}
+  .btn--ov-danger{border-color:rgba(192,57,43,.4);color:rgba(192,57,43,.7);background:rgba(192,57,43,.08)}
+  .btn--ov-danger.btn--active{border-color:#c0392b;color:#c0392b;background:rgba(192,57,43,.15)}
+  .btn--ov.btn--active{border-width:2px;font-weight:700}
   .btn-duo--ov{display:flex}
   .btn-duo--ov .btn:first-child{border-radius:6px 0 0 6px;border-right:none}
-  .btn-duo--ov .btn:last-child{border-radius:0 6px 6px 0;padding:4px 6px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(255,255,255,.2)!important}
+  .btn-duo--ov .btn:last-child{border-radius:0 6px 6px 0;padding:4px 6px;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(46,204,113,.3)!important}
   .btn--ov-my-share svg{display:block}
   .bkt-close{
     background:none;border:none;color:#9fb3a7;font-size:22px;cursor:pointer;padding:0 4px;line-height:1
@@ -530,13 +543,13 @@
   /* knockout pickable/picked states */
   .ko__slot--pickable{cursor:pointer;transition:background .15s,border-color .15s}
   @media(hover:hover){.ko__slot--pickable:hover{background:rgba(31,157,87,.08)}}
-  .ko__slot--picked{background:rgba(218,165,32,.12)!important;border:2px solid var(--gold)!important}
+  .ko__slot--picked{background:var(--pick-bg)!important;border:2px solid var(--pick-clr)!important}
   .ko__slot--picked .cd{color:var(--pitch-dk)}
   .bkt-team--pickable{cursor:pointer;transition:background .15s}
   @media(hover:hover){.bkt-team--pickable:hover{background:rgba(255,255,255,.12)}}
-  .bkt-team--picked{background:rgba(218,165,32,.15)!important;border:2px solid var(--gold)!important}
+  .bkt-team--picked{background:var(--pick-bg)!important;border:2px solid var(--pick-clr)!important}
   .bkt-team--picked .cd{color:var(--chalk)}
-  .bkt-team--winner{background:rgba(218,165,32,.12)!important;border-color:var(--gold)!important}
+  .bkt-team--winner{background:rgba(218,165,32,.12)!important;border:2px solid var(--gold)!important}
   .bkt-team--winner .cd{font-weight:800}
 
   /* bracket scores */
@@ -597,8 +610,8 @@
     </div>
     <div class="bar__right">
       <div class="bar__btns">
-        <button class="btn btn--pitch" id="likely" title="Auto-fill with most likely outcomes">Likely<br>Picks</button>
-        <div class="btn-duo"><button class="btn btn--pitch" id="myPicks" title="Restore your saved picks">My<br>Picks</button><button class="btn btn--pitch btn--my-share" id="share" title="Share your picks via link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
+        <button class="btn btn--likely" id="likely" title="Auto-fill with most likely outcomes">Likely<br>Picks</button>
+        <div class="btn-duo"><button class="btn btn--my" id="myPicks" title="Restore your saved picks">My<br>Picks</button><button class="btn btn--my btn--my-share" id="share" title="Share your picks via link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
         <button class="btn btn--danger" id="reset" title="Clear all picks (My Picks are preserved)">Clear<br>Picks</button>
       </div>
     </div>
@@ -624,9 +637,9 @@
       <button class="bkt-close" id="bktClose">&times;</button>
     </div>
     <div class="bkt-actions">
-      <button class="btn btn--ov" id="ovLikely" title="Auto-fill with most likely outcomes">Likely Picks</button>
-      <div class="btn-duo btn-duo--ov"><button class="btn btn--ov" id="ovMyPicks" title="Restore your saved picks">My Picks</button><button class="btn btn--ov btn--ov-my-share" id="ovShare" title="Share your picks via link"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
-      <button class="btn btn--ov" id="ovReset" title="Clear all picks (My Picks are preserved)">Clear Picks</button>
+      <button class="btn btn--ov btn--ov-likely" id="ovLikely" title="Auto-fill with most likely outcomes">Likely Picks</button>
+      <div class="btn-duo btn-duo--ov"><button class="btn btn--ov btn--ov-my" id="ovMyPicks" title="Restore your saved picks">My Picks</button><button class="btn btn--ov btn--ov-my btn--ov-my-share" id="ovShare" title="Share your picks via link"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div>
+      <button class="btn btn--ov btn--ov-danger" id="ovReset" title="Clear all picks (My Picks are preserved)">Clear Picks</button>
     </div>
     <div class="bkt-scroll">
       <div class="bkt-tree" id="bktTree"></div>
@@ -2129,6 +2142,11 @@ fixturesEl.addEventListener("click",e=>{
 let pickMode = null; // null | "likely" | "my"
 function setPickMode(mode){
   pickMode = mode;
+  // Pick-mode colors: blue=likely, green=my, gold=default
+  const s = document.documentElement.style;
+  if(mode==="likely"){ s.setProperty("--pick-clr","#4a90d9"); s.setProperty("--pick-bg","rgba(74,144,217,.12)"); }
+  else if(mode==="my"){ s.setProperty("--pick-clr","#2ecc71"); s.setProperty("--pick-bg","rgba(46,204,113,.12)"); }
+  else { s.removeProperty("--pick-clr"); s.removeProperty("--pick-bg"); }
   const likelyBtn = document.getElementById("likely");
   const myBtn = document.getElementById("myPicks");
   const ovLikelyBtn = document.getElementById("ovLikely");
@@ -2137,10 +2155,14 @@ function setPickMode(mode){
   myBtn.classList.toggle("btn--active", mode==="my");
   const shareBtn = document.getElementById("share");
   if(shareBtn) shareBtn.classList.toggle("btn--active", mode==="my");
+  const resetBtn = document.getElementById("reset");
+  resetBtn.classList.toggle("btn--active", mode===null);
   ovLikelyBtn.classList.toggle("btn--active", mode==="likely");
   ovMyBtn.classList.toggle("btn--active", mode==="my");
   const ovShareBtn = document.getElementById("ovShare");
   if(ovShareBtn) ovShareBtn.classList.toggle("btn--active", mode==="my");
+  const ovResetBtn = document.getElementById("ovReset");
+  ovResetBtn.classList.toggle("btn--active", mode===null);
 }
 function confirmPickOverwrite(){
   if(pickMode === "my") return true; // silent auto-save
