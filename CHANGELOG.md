@@ -4,6 +4,14 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-07-01 · Afternoon — KO Cache & Pick Mode Colors
+
+- **ESPN KO results now cached in localStorage**: completed knockout matches from ESPN are persisted across page reloads, mirroring existing group match caching. Eliminates data loss when scores.json isn't updated and ESPN no longer returns past match days.
+- **Color-coded pick mode buttons**: Likely Picks (blue), My Picks (green), Clear Picks (red) with distinct borders and backgrounds. Completed matches keep gold. Overlay buttons get matching tinted backgrounds.
+- **scores.json updated**: added R32 matches 77-80 (FRA-SWE, CIV-NOR, MEX-ECU, ENG-COD).
+
+---
+
 ## 2026-07-01 · Morning — Bug Fixes
 
 - **Overlay Clear Picks fix**: memoized `resolveKnockout()` cache hit was returning a direct reference instead of a deep copy, allowing `resolveKoWithPicks()` to permanently mutate cached data. After Likely Picks → Clear Picks, stale teams remained visible in QF/SF/Final. Fixed cache hit to return deep copies consistently.

@@ -439,11 +439,11 @@
   .bkt-header h3{margin:0;font:800 14px/1.2 ui-monospace,monospace;color:var(--pitch)}
   .bkt-actions{display:flex;gap:4px;align-items:center;justify-content:flex-start;padding:4px 12px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0}
   .btn--ov{font:600 10px/1.2 system-ui;padding:4px 8px;border-radius:6px;background:var(--paper);border:1px solid var(--line);color:var(--ink);cursor:pointer;white-space:nowrap}
-  .btn--ov-likely{border-color:rgba(74,144,217,.4);color:rgba(74,144,217,.7);background:rgba(74,144,217,.08)}
+  .btn--ov-likely{border-color:rgba(74,144,217,.45);color:rgba(74,144,217,.7);background:rgba(74,144,217,.08)}
   .btn--ov-likely.btn--active{border-color:#4a90d9;color:#4a90d9;background:rgba(74,144,217,.15)}
-  .btn--ov-my{border-color:rgba(46,204,113,.4);color:rgba(46,204,113,.7);background:rgba(46,204,113,.08)}
+  .btn--ov-my{border-color:rgba(46,204,113,.45);color:rgba(46,204,113,.7);background:rgba(46,204,113,.08)}
   .btn--ov-my.btn--active{border-color:#2ecc71;color:#2ecc71;background:rgba(46,204,113,.15)}
-  .btn--ov-danger{border-color:rgba(192,57,43,.4);color:rgba(192,57,43,.7);background:rgba(192,57,43,.08)}
+  .btn--ov-danger{border-color:rgba(192,57,43,.45);color:rgba(192,57,43,.7);background:rgba(192,57,43,.08)}
   .btn--ov-danger.btn--active{border-color:#c0392b;color:#c0392b;background:rgba(192,57,43,.15)}
   .btn--ov.btn--active{border-width:2px;font-weight:700}
   .btn-duo--ov{display:flex}
@@ -1076,6 +1076,7 @@ const KO_DATES = {
 let _koCache = null, _koCacheKey = "";
 function resolveKnockout(){
   const cacheKey = JSON.stringify(picks) + "|" + Object.keys(locked).length;
+  // Deep copy: callers mutate resolved/slotLabels via resolveKoWithPicks
   if(_koCache && _koCacheKey === cacheKey) return {resolved: JSON.parse(JSON.stringify(_koCache.resolved)), nPicked: _koCache.nPicked, slotLabels: JSON.parse(JSON.stringify(_koCache.slotLabels)), allDone: _koCache.allDone};
   const {tables, thirds, s} = standings(picks);
   const nPicked = Object.values(picks).filter(v=>v&&pickResult(v)).length;
@@ -2584,6 +2585,11 @@ function _processEspnEvents(events){
       koPicks[koM] = winner;
       delete liveKoScores[koM];
       saveKoPicks(koPicks);
+      try{
+        const cache=JSON.parse(localStorage.getItem("fifa26_live_scores")||"{}");
+        cache["ko_"+koM]=koResults[koM];
+        localStorage.setItem("fifa26_live_scores",JSON.stringify(cache));
+      }catch(e){}
       changed=true;
     } else if(stState==="in"){
       hasLive=true;
@@ -2622,8 +2628,19 @@ async function fetchLiveScores(){
 /* Apply cached ESPN scores from localStorage (instant on reload) */
 try{
   const cache=JSON.parse(localStorage.getItem("fifa26_live_scores")||"{}");
-  let cacheChanged=false;
+  let cacheChanged=false, koCacheChanged=false;
   for(const id in cache){
+    if(id.startsWith("ko_")){
+      const koM=parseInt(id.slice(3));
+      if(!koResults[koM]){
+        koResults[koM]=cache[id];
+        const r=cache[id];
+        const winner=r.pen?(r.pen[0]>r.pen[1]?r.t1:r.t2):(r.s1>r.s2?r.t1:r.t2);
+        koPicks[koM]=winner;
+        koCacheChanged=true;
+      }
+      continue;
+    }
     if(locked[id]) continue;
     const m=cache[id];
     locked[id]={s1:m.s1,s2:m.s2};
@@ -2634,6 +2651,9 @@ try{
   if(cacheChanged){
     BASE=baseStats(); buildSeedIndex(); LOCKED=clinchedTop2();
     savePicks(picks); renderFixtures(); renderBoard(); renderBracket();
+  }
+  if(koCacheChanged){
+    saveKoPicks(koPicks); renderBracket();
   }
 }catch(e){}
 

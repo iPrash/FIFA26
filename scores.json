@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-29T12:00:00Z",
+  "updated": "2026-07-01T15:00:00Z",
   "matches": [
     {"g":"A","t1":"MEX","s1":2,"s2":0,"t2":"RSA","goals":[{"min":"9'","team":"MEX","player":"Quiñones"},{"min":"67'","team":"MEX","player":"Jiménez"}]},
     {"g":"A","t1":"KOR","s1":2,"s2":1,"t2":"CZE","goals":[{"min":"59'","team":"CZE","player":"Krejcí"},{"min":"67'","team":"KOR","player":"Hwang In-Beom"},{"min":"80'","team":"KOR","player":"Oh Hyeon-Gyu"}]},
@@ -78,6 +78,10 @@
     {"m":73,"t1":"RSA","s1":0,"s2":1,"t2":"CAN","goals":[{"min":"90'+2'","team":"CAN","player":"Eustáquio"}]},
     {"m":76,"t1":"JPN","s1":1,"s2":2,"t2":"BRA","goals":[{"min":"29'","team":"JPN","player":"Sano"},{"min":"56'","team":"BRA","player":"Casemiro"},{"min":"90'+5'","team":"BRA","player":"Martinelli"}]},
     {"m":74,"t1":"GER","s1":1,"s2":1,"t2":"PAR","et":true,"pen":[3,4],"goals":[{"min":"42'","team":"PAR","player":"Enciso"},{"min":"54'","team":"GER","player":"Havertz"}]},
-    {"m":75,"t1":"NED","s1":1,"s2":1,"t2":"MAR","et":true,"pen":[2,3],"goals":[{"min":"72'","team":"NED","player":"Gakpo"},{"min":"90'+1'","team":"MAR","player":"Diop"}]}
+    {"m":75,"t1":"NED","s1":1,"s2":1,"t2":"MAR","et":true,"pen":[2,3],"goals":[{"min":"72'","team":"NED","player":"Gakpo"},{"min":"90'+1'","team":"MAR","player":"Diop"}]},
+    {"m":77,"t1":"FRA","s1":3,"s2":0,"t2":"SWE","goals":[{"min":"45'","team":"FRA","player":"Mbappé"},{"min":"53'","team":"FRA","player":"Barcola"},{"min":"74'","team":"FRA","player":"Mbappé"}]},
+    {"m":78,"t1":"CIV","s1":1,"s2":2,"t2":"NOR","goals":[{"min":"74'","team":"CIV","player":"Diallo"},{"min":"39'","team":"NOR","player":"Nusa"},{"min":"86'","team":"NOR","player":"Haaland"}]},
+    {"m":79,"t1":"MEX","s1":2,"s2":0,"t2":"ECU","goals":[{"min":"22'","team":"MEX","player":"Quiñones"},{"min":"31'","team":"MEX","player":"Jiménez"}]},
+    {"m":80,"t1":"ENG","s1":2,"s2":1,"t2":"COD","goals":[{"min":"7'","team":"COD","player":"Cipenga"},{"min":"75'","team":"ENG","player":"Kane"},{"min":"86'","team":"ENG","player":"Kane"}]}
   ]
 }
