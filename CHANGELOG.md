@@ -4,6 +4,12 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-07-01 · Evening — Live Match Gold Fix
+
+- **No gold winner styling during live matches**: leading team in a live KO match no longer gets gold `lk-win` border/background — gold is reserved for completed results only. Prevents misleading "winner" appearance at halftime.
+
+---
+
 ## 2026-07-01 · Afternoon — KO Cache & Pick Mode Colors
 
 - **ESPN KO results now cached in localStorage**: completed knockout matches from ESPN are persisted across page reloads, mirroring existing group match caching. Eliminates data loss when scores.json isn't updated and ESPN no longer returns past match days.

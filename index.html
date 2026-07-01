@@ -1835,8 +1835,8 @@ function renderBracket(){
       const koPick = koPicks[match.m];
       const hSel = koLive && koPick===hCode ? ' sel' : '';
       const aSel = koLive && koPick===aCode ? ' sel' : '';
-      const hCls = koLive ? (hWin?'lk-win':'') + hSel : (hWin?'lk-win':'dim');
-      const aCls = koLive ? (aWin?'lk-win':'') + aSel : (aWin?'lk-win':'dim');
+      const hCls = koLive ? '' + hSel : (hWin?'lk-win':'dim');
+      const aCls = koLive ? '' + aSel : (aWin?'lk-win':'dim');
       const wrapCls = koLive ? 'match match--live' : 'match match--locked';
       const badge = koLive
         ? `<span class="badge live-badge">🔴 LIVE${src.clock ? " · "+esc(src.clock) : ""}</span>`
