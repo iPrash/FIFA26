@@ -4,6 +4,13 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-07-01 · Morning — Bug Fixes
+
+- **Overlay Clear Picks fix**: memoized `resolveKnockout()` cache hit was returning a direct reference instead of a deep copy, allowing `resolveKoWithPicks()` to permanently mutate cached data. After Likely Picks → Clear Picks, stale teams remained visible in QF/SF/Final. Fixed cache hit to return deep copies consistently.
+- **Touch hover fix**: wrapped `.ko__slot--pickable:hover` and `.bkt-team--pickable:hover` in `@media(hover:hover)` to prevent sticky green highlight on phones after selecting/deselecting bracket teams.
+
+---
+
 ## 2026-06-30 · Morning — Code Review Cleanup
 
 - **Qualified counter fixed**: now shows 32/32 once all groups are complete (counts top-2 locked teams + 8 best thirds). Future-proof — only adds thirds when all groups are done.

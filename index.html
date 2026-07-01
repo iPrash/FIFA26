@@ -529,11 +529,11 @@
 
   /* knockout pickable/picked states */
   .ko__slot--pickable{cursor:pointer;transition:background .15s,border-color .15s}
-  .ko__slot--pickable:hover{background:rgba(31,157,87,.08)}
+  @media(hover:hover){.ko__slot--pickable:hover{background:rgba(31,157,87,.08)}}
   .ko__slot--picked{background:rgba(218,165,32,.12)!important;border:2px solid var(--gold)!important}
   .ko__slot--picked .cd{color:var(--pitch-dk)}
   .bkt-team--pickable{cursor:pointer;transition:background .15s}
-  .bkt-team--pickable:hover{background:rgba(255,255,255,.12)}
+  @media(hover:hover){.bkt-team--pickable:hover{background:rgba(255,255,255,.12)}}
   .bkt-team--picked{background:rgba(218,165,32,.15)!important;border:2px solid var(--gold)!important}
   .bkt-team--picked .cd{color:var(--chalk)}
   .bkt-team--winner{background:rgba(218,165,32,.12)!important;border-color:var(--gold)!important}
@@ -1063,7 +1063,7 @@ const KO_DATES = {
 let _koCache = null, _koCacheKey = "";
 function resolveKnockout(){
   const cacheKey = JSON.stringify(picks) + "|" + Object.keys(locked).length;
-  if(_koCache && _koCacheKey === cacheKey) return _koCache;
+  if(_koCache && _koCacheKey === cacheKey) return {resolved: JSON.parse(JSON.stringify(_koCache.resolved)), nPicked: _koCache.nPicked, slotLabels: JSON.parse(JSON.stringify(_koCache.slotLabels)), allDone: _koCache.allDone};
   const {tables, thirds, s} = standings(picks);
   const nPicked = Object.values(picks).filter(v=>v&&pickResult(v)).length;
 
