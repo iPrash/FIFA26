@@ -1840,8 +1840,8 @@ function renderBracket(){
       const wrapCls = koLive ? 'match match--live' : 'match match--locked';
       const badge = koLive
         ? `<span class="badge live-badge">🔴 LIVE${src.clock ? " · "+esc(src.clock) : ""}</span>`
-        : src.pen ? '<span class="badge locked-badge">Pens</span>'
-        : src.et ? '<span class="badge locked-badge">AET</span>'
+        : src.pen ? '<span class="badge locked-badge">FINAL (PENS)</span>'
+        : src.et ? '<span class="badge locked-badge">FINAL (AET)</span>'
         : '<span class="badge locked-badge">Final</span>';
       const penH = src.pen ? `<span class="pen-score">(${src.t1===hCode ? src.pen[0] : src.pen[1]})</span>` : "";
       const penA = src.pen ? `<span class="pen-score">(${src.t1===hCode ? src.pen[1] : src.pen[0]})</span>` : "";
@@ -1955,7 +1955,7 @@ function bktMatchCell(m, col, row, span, res, labels){
     else{hScore=final_.s2;aScore=final_.s1;}
   }
   const liveCls = live ? " bkt-match--live" : final_ ? " bkt-match--done" : "";
-  const badge = live ? ' <span class="bkt-badge bkt-badge--live">LIVE</span>' : final_ ? ' <span class="bkt-badge bkt-badge--final">FINAL</span>' : '';
+  const badge = live ? ' <span class="bkt-badge bkt-badge--live">LIVE</span>' : final_ ? ` <span class="bkt-badge bkt-badge--final">${final_.pen?"FINAL (PENS)":final_.et?"FINAL (AET)":"FINAL"}</span>` : '';
   return `<div class="bkt-match${liveCls}" style="grid-column:${col};grid-row:${row}/span ${span}">
     <div class="bkt-mn">${m} <span class="bkt-dt">${(KO_DATES[m]||"").replace(/^\w+ · /,"")}</span>${badge}</div>
     ${bktTeamHtml(hCode, hGrp, hLbl, bothKnown ? m : null, hScore)}
