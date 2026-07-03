@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-01T15:00:00Z",
+  "updated": "2026-07-03T20:00:00Z",
   "matches": [
     {"g":"A","t1":"MEX","s1":2,"s2":0,"t2":"RSA","goals":[{"min":"9'","team":"MEX","player":"Quiñones"},{"min":"67'","team":"MEX","player":"Jiménez"}]},
     {"g":"A","t1":"KOR","s1":2,"s2":1,"t2":"CZE","goals":[{"min":"59'","team":"CZE","player":"Krejcí"},{"min":"67'","team":"KOR","player":"Hwang In-Beom"},{"min":"80'","team":"KOR","player":"Oh Hyeon-Gyu"}]},
@@ -82,6 +82,7 @@
     {"m":77,"t1":"FRA","s1":3,"s2":0,"t2":"SWE","goals":[{"min":"45'","team":"FRA","player":"Mbappé"},{"min":"53'","team":"FRA","player":"Barcola"},{"min":"74'","team":"FRA","player":"Mbappé"}]},
     {"m":78,"t1":"CIV","s1":1,"s2":2,"t2":"NOR","goals":[{"min":"74'","team":"CIV","player":"Diallo"},{"min":"39'","team":"NOR","player":"Nusa"},{"min":"86'","team":"NOR","player":"Haaland"}]},
     {"m":79,"t1":"MEX","s1":2,"s2":0,"t2":"ECU","goals":[{"min":"22'","team":"MEX","player":"Quiñones"},{"min":"31'","team":"MEX","player":"Jiménez"}]},
-    {"m":80,"t1":"ENG","s1":2,"s2":1,"t2":"COD","goals":[{"min":"7'","team":"COD","player":"Cipenga"},{"min":"75'","team":"ENG","player":"Kane"},{"min":"86'","team":"ENG","player":"Kane"}]}
+    {"m":80,"t1":"ENG","s1":2,"s2":1,"t2":"COD","goals":[{"min":"7'","team":"COD","player":"Cipenga"},{"min":"75'","team":"ENG","player":"Kane"},{"min":"86'","team":"ENG","player":"Kane"}]},
+    {"m":88,"t1":"AUS","s1":1,"s2":1,"t2":"EGY","et":true,"pen":[2,4],"goals":[{"min":"13'","team":"EGY","player":"Ashour"},{"min":"55'","team":"AUS","player":"Hany (OG)"}]}
   ]
 }

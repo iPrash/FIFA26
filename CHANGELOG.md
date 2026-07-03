@@ -4,6 +4,13 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-07-03 · Evening — Live Gold Fix & Scores Update
+
+- **No gold winner styling during live matches**: leading team in a live KO match no longer gets gold `lk-win` border/background — gold is reserved for completed results only.
+- **scores.json updated**: added R32 match 88 (AUS 1-1 EGY, Egypt wins 4-2 on pens).
+
+---
+
 ## 2026-07-01 · Evening — Live Match Gold Fix
 
 - **No gold winner styling during live matches**: leading team in a live KO match no longer gets gold `lk-win` border/background — gold is reserved for completed results only. Prevents misleading "winner" appearance at halftime.
