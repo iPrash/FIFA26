@@ -2604,7 +2604,8 @@ async function fetchLiveScores(){
   try{
     const base = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
     const today = new Date().toISOString().slice(0,10).replace(/-/g,"");
-    const urls = [base, base+"?dates="+today];
+    const yest = new Date(Date.now()-864e5).toISOString().slice(0,10).replace(/-/g,"");
+    const urls = [base, base+"?dates="+today, base+"?dates="+yest];
     const results = await Promise.allSettled(urls.map(u=>fetch(u).then(r=>r.ok?r.json():null)));
     const allEvents = [];
     for(const r of results){

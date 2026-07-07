@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-03T20:00:00Z",
+  "updated": "2026-07-06T12:00:00Z",
   "matches": [
     {"g":"A","t1":"MEX","s1":2,"s2":0,"t2":"RSA","goals":[{"min":"9'","team":"MEX","player":"Quiñones"},{"min":"67'","team":"MEX","player":"Jiménez"}]},
     {"g":"A","t1":"KOR","s1":2,"s2":1,"t2":"CZE","goals":[{"min":"59'","team":"CZE","player":"Krejcí"},{"min":"67'","team":"KOR","player":"Hwang In-Beom"},{"min":"80'","team":"KOR","player":"Oh Hyeon-Gyu"}]},
@@ -88,6 +88,12 @@
     {"m":83,"t1":"POR","s1":2,"s2":1,"t2":"CRO","goals":[{"min":"53'","team":"CRO","player":"Perisic"},{"min":"68'","team":"POR","player":"Ronaldo"},{"min":"90'+4'","team":"POR","player":"Ramos"}]},
     {"m":84,"t1":"ESP","s1":3,"s2":0,"t2":"AUT","goals":[{"min":"36'","team":"ESP","player":"Oyarzabal"},{"min":"66'","team":"ESP","player":"Porro"},{"min":"89'","team":"ESP","player":"Oyarzabal"}]},
     {"m":85,"t1":"SUI","s1":2,"s2":0,"t2":"ALG","goals":[{"min":"10'","team":"SUI","player":"Embolo"},{"min":"46'","team":"SUI","player":"Ndoye"}]},
-    {"m":88,"t1":"AUS","s1":1,"s2":1,"t2":"EGY","et":true,"pen":[2,4],"goals":[{"min":"13'","team":"EGY","player":"Ashour"},{"min":"55'","team":"AUS","player":"Hany (OG)"}]}
+    {"m":86,"t1":"ARG","s1":3,"s2":2,"t2":"CPV","et":true,"goals":[{"min":"29'","team":"ARG","player":"Messi"},{"min":"59'","team":"CPV","player":"Duarte"},{"min":"92'","team":"ARG","player":"Martínez"},{"min":"103'","team":"CPV","player":"Cabral"},{"min":"111'","team":"ARG","player":"Borges (OG)"}]},
+    {"m":87,"t1":"COL","s1":1,"s2":0,"t2":"GHA","goals":[{"min":"14'","team":"COL","player":"Arias"}]},
+    {"m":88,"t1":"AUS","s1":1,"s2":1,"t2":"EGY","et":true,"pen":[2,4],"goals":[{"min":"13'","team":"EGY","player":"Ashour"},{"min":"55'","team":"AUS","player":"Hany (OG)"}]},
+    {"m":89,"t1":"PAR","s1":0,"s2":1,"t2":"FRA","goals":[{"min":"70'","team":"FRA","player":"Mbappé"}]},
+    {"m":90,"t1":"CAN","s1":0,"s2":3,"t2":"MAR","goals":[{"min":"50'","team":"MAR","player":"Ounahi"},{"min":"82'","team":"MAR","player":"Ounahi"},{"min":"90'+8'","team":"MAR","player":"Rahimi"}]},
+    {"m":91,"t1":"BRA","s1":1,"s2":2,"t2":"NOR","goals":[{"min":"79'","team":"NOR","player":"Haaland"},{"min":"90'","team":"NOR","player":"Haaland"},{"min":"90'+10'","team":"BRA","player":"Neymar"}]},
+    {"m":92,"t1":"MEX","s1":2,"s2":3,"t2":"ENG","goals":[{"min":"36'","team":"ENG","player":"Bellingham"},{"min":"38'","team":"ENG","player":"Bellingham"},{"min":"42'","team":"MEX","player":"Quiñones"},{"min":"60'","team":"ENG","player":"Kane"},{"min":"69'","team":"MEX","player":"Jiménez"}]}
   ]
 }

@@ -4,6 +4,13 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-07-06 · Afternoon — ESPN Yesterday Fetch & Scores Catchup
+
+- **ESPN now fetches yesterday's matches too**: previously only polled today's date, so matches completed after the user's last visit were invisible. Now fetches today + yesterday to fill gaps automatically.
+- **scores.json updated**: added R32 matches 86-87, R16 matches 89-92. All completed matches through Jul 6 now present.
+
+---
+
 ## 2026-07-03 · Evening — Live Gold Fix & Scores Update
 
 - **No gold winner styling during live matches**: leading team in a live KO match no longer gets gold `lk-win` border/background — gold is reserved for completed results only.
