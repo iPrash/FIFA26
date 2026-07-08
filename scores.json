@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-06T12:00:00Z",
+  "updated": "2026-07-07T18:00:00Z",
   "matches": [
     {"g":"A","t1":"MEX","s1":2,"s2":0,"t2":"RSA","goals":[{"min":"9'","team":"MEX","player":"Quiñones"},{"min":"67'","team":"MEX","player":"Jiménez"}]},
     {"g":"A","t1":"KOR","s1":2,"s2":1,"t2":"CZE","goals":[{"min":"59'","team":"CZE","player":"Krejcí"},{"min":"67'","team":"KOR","player":"Hwang In-Beom"},{"min":"80'","team":"KOR","player":"Oh Hyeon-Gyu"}]},
@@ -94,6 +94,10 @@
     {"m":89,"t1":"PAR","s1":0,"s2":1,"t2":"FRA","goals":[{"min":"70'","team":"FRA","player":"Mbappé"}]},
     {"m":90,"t1":"CAN","s1":0,"s2":3,"t2":"MAR","goals":[{"min":"50'","team":"MAR","player":"Ounahi"},{"min":"82'","team":"MAR","player":"Ounahi"},{"min":"90'+8'","team":"MAR","player":"Rahimi"}]},
     {"m":91,"t1":"BRA","s1":1,"s2":2,"t2":"NOR","goals":[{"min":"79'","team":"NOR","player":"Haaland"},{"min":"90'","team":"NOR","player":"Haaland"},{"min":"90'+10'","team":"BRA","player":"Neymar"}]},
-    {"m":92,"t1":"MEX","s1":2,"s2":3,"t2":"ENG","goals":[{"min":"36'","team":"ENG","player":"Bellingham"},{"min":"38'","team":"ENG","player":"Bellingham"},{"min":"42'","team":"MEX","player":"Quiñones"},{"min":"60'","team":"ENG","player":"Kane"},{"min":"69'","team":"MEX","player":"Jiménez"}]}
+    {"m":92,"t1":"MEX","s1":2,"s2":3,"t2":"ENG","goals":[{"min":"36'","team":"ENG","player":"Bellingham"},{"min":"38'","team":"ENG","player":"Bellingham"},{"min":"42'","team":"MEX","player":"Quiñones"},{"min":"60'","team":"ENG","player":"Kane"},{"min":"69'","team":"MEX","player":"Jiménez"}]},
+    {"m":93,"t1":"POR","s1":0,"s2":1,"t2":"ESP","goals":[{"min":"90'+1'","team":"ESP","player":"Merino"}]},
+    {"m":94,"t1":"USA","s1":1,"s2":4,"t2":"BEL","goals":[{"min":"9'","team":"BEL","player":"De Ketelaere"},{"min":"31'","team":"USA","player":"Tillman"},{"min":"33'","team":"BEL","player":"De Ketelaere"},{"min":"57'","team":"BEL","player":"Vanaken"},{"min":"90'+3'","team":"BEL","player":"Lukaku"}]},
+    {"m":95,"t1":"ARG","s1":3,"s2":2,"t2":"EGY","goals":[{"min":"15'","team":"EGY","player":"Ibrahim"},{"min":"67'","team":"EGY","player":"Zico"},{"min":"79'","team":"ARG","player":"Romero"},{"min":"83'","team":"ARG","player":"Messi"},{"min":"90'+2'","team":"ARG","player":"Fernández"}]},
+    {"m":96,"t1":"SUI","s1":0,"s2":0,"t2":"COL","et":true,"pen":[4,3]}
   ]
 }
