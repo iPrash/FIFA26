@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-07T18:00:00Z",
+  "updated": "2026-07-11T22:00:00Z",
   "matches": [
     {"g":"A","t1":"MEX","s1":2,"s2":0,"t2":"RSA","goals":[{"min":"9'","team":"MEX","player":"Quiñones"},{"min":"67'","team":"MEX","player":"Jiménez"}]},
     {"g":"A","t1":"KOR","s1":2,"s2":1,"t2":"CZE","goals":[{"min":"59'","team":"CZE","player":"Krejcí"},{"min":"67'","team":"KOR","player":"Hwang In-Beom"},{"min":"80'","team":"KOR","player":"Oh Hyeon-Gyu"}]},
@@ -98,6 +98,10 @@
     {"m":93,"t1":"POR","s1":0,"s2":1,"t2":"ESP","goals":[{"min":"90'+1'","team":"ESP","player":"Merino"}]},
     {"m":94,"t1":"USA","s1":1,"s2":4,"t2":"BEL","goals":[{"min":"9'","team":"BEL","player":"De Ketelaere"},{"min":"31'","team":"USA","player":"Tillman"},{"min":"33'","team":"BEL","player":"De Ketelaere"},{"min":"57'","team":"BEL","player":"Vanaken"},{"min":"90'+3'","team":"BEL","player":"Lukaku"}]},
     {"m":95,"t1":"ARG","s1":3,"s2":2,"t2":"EGY","goals":[{"min":"15'","team":"EGY","player":"Ibrahim"},{"min":"67'","team":"EGY","player":"Zico"},{"min":"79'","team":"ARG","player":"Romero"},{"min":"83'","team":"ARG","player":"Messi"},{"min":"90'+2'","team":"ARG","player":"Fernández"}]},
-    {"m":96,"t1":"SUI","s1":0,"s2":0,"t2":"COL","et":true,"pen":[4,3]}
+    {"m":96,"t1":"SUI","s1":0,"s2":0,"t2":"COL","et":true,"pen":[4,3]},
+    {"m":97,"t1":"FRA","s1":2,"s2":0,"t2":"MAR","goals":[{"min":"60'","team":"FRA","player":"Mbappé"},{"min":"66'","team":"FRA","player":"Dembélé"}]},
+    {"m":98,"t1":"ESP","s1":2,"s2":1,"t2":"BEL","goals":[{"min":"30'","team":"ESP","player":"Fabián Ruiz"},{"min":"41'","team":"BEL","player":"De Ketelaere"},{"min":"88'","team":"ESP","player":"Merino"}]},
+    {"m":99,"t1":"NOR","s1":1,"s2":2,"t2":"ENG","et":true,"goals":[{"min":"36'","team":"NOR","player":"Schjelderup"},{"min":"45'+2'","team":"ENG","player":"Bellingham"},{"min":"93'","team":"ENG","player":"Bellingham"}]},
+    {"m":100,"t1":"ARG","s1":3,"s2":1,"t2":"SUI","et":true,"goals":[{"min":"10'","team":"ARG","player":"Mac Allister"},{"min":"67'","team":"SUI","player":"Ndoye"},{"min":"112'","team":"ARG","player":"Álvarez"},{"min":"120'+1'","team":"ARG","player":"Martínez"}]}
   ]
 }

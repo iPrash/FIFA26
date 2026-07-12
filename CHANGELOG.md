@@ -4,6 +4,12 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-07-11 · Evening — QF Results
+
+- **scores.json updated**: added all 4 Quarter-Final results (matches 97-100): FRA 2-0 MAR, ESP 2-1 BEL, ENG 2-1 NOR (AET), ARG 3-1 SUI (AET).
+
+---
+
 ## 2026-07-06 · Afternoon — ESPN Yesterday Fetch & Scores Catchup
 
 - **ESPN now fetches yesterday's matches too**: previously only polled today's date, so matches completed after the user's last visit were invisible. Now fetches today + yesterday to fill gaps automatically.
