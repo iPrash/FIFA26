@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-11T22:00:00Z",
+  "updated": "2026-08-24T12:00:00Z",
   "matches": [
     {"g":"A","t1":"MEX","s1":2,"s2":0,"t2":"RSA","goals":[{"min":"9'","team":"MEX","player":"Quiñones"},{"min":"67'","team":"MEX","player":"Jiménez"}]},
     {"g":"A","t1":"KOR","s1":2,"s2":1,"t2":"CZE","goals":[{"min":"59'","team":"CZE","player":"Krejcí"},{"min":"67'","team":"KOR","player":"Hwang In-Beom"},{"min":"80'","team":"KOR","player":"Oh Hyeon-Gyu"}]},
@@ -102,6 +102,10 @@
     {"m":97,"t1":"FRA","s1":2,"s2":0,"t2":"MAR","goals":[{"min":"60'","team":"FRA","player":"Mbappé"},{"min":"66'","team":"FRA","player":"Dembélé"}]},
     {"m":98,"t1":"ESP","s1":2,"s2":1,"t2":"BEL","goals":[{"min":"30'","team":"ESP","player":"Fabián Ruiz"},{"min":"41'","team":"BEL","player":"De Ketelaere"},{"min":"88'","team":"ESP","player":"Merino"}]},
     {"m":99,"t1":"NOR","s1":1,"s2":2,"t2":"ENG","et":true,"goals":[{"min":"36'","team":"NOR","player":"Schjelderup"},{"min":"45'+2'","team":"ENG","player":"Bellingham"},{"min":"93'","team":"ENG","player":"Bellingham"}]},
-    {"m":100,"t1":"ARG","s1":3,"s2":1,"t2":"SUI","et":true,"goals":[{"min":"10'","team":"ARG","player":"Mac Allister"},{"min":"67'","team":"SUI","player":"Ndoye"},{"min":"112'","team":"ARG","player":"Álvarez"},{"min":"120'+1'","team":"ARG","player":"Martínez"}]}
+    {"m":100,"t1":"ARG","s1":3,"s2":1,"t2":"SUI","et":true,"goals":[{"min":"10'","team":"ARG","player":"Mac Allister"},{"min":"67'","team":"SUI","player":"Ndoye"},{"min":"112'","team":"ARG","player":"Álvarez"},{"min":"120'+1'","team":"ARG","player":"Martínez"}]},
+    {"m":101,"t1":"FRA","s1":0,"s2":2,"t2":"ESP","goals":[{"min":"22'","team":"ESP","player":"Oyarzabal (pen)"},{"min":"58'","team":"ESP","player":"Porro"}]},
+    {"m":102,"t1":"ENG","s1":1,"s2":2,"t2":"ARG","goals":[{"min":"55'","team":"ENG","player":"Gordon"},{"min":"85'","team":"ARG","player":"Fernández"},{"min":"90'+2'","team":"ARG","player":"Martínez"}]},
+    {"m":103,"t1":"FRA","s1":4,"s2":6,"t2":"ENG","goals":[{"min":"3'","team":"ENG","player":"Rice"},{"min":"18'","team":"ENG","player":"Konsa"},{"min":"37'","team":"ENG","player":"Saka"},{"min":"45'+1'","team":"ENG","player":"Saka"},{"min":"48'","team":"FRA","player":"Mbappé"},{"min":"54'","team":"FRA","player":"Barcola"},{"min":"66'","team":"FRA","player":"Mbappé"},{"min":"87'","team":"ENG","player":"Saka (pen)"},{"min":"90'+6'","team":"FRA","player":"Dembélé"},{"min":"90'+8'","team":"ENG","player":"Bellingham"}]},
+    {"m":104,"t1":"ESP","s1":1,"s2":0,"t2":"ARG","et":true,"goals":[{"min":"106'","team":"ESP","player":"Torres"}]}
   ]
 }

@@ -4,6 +4,17 @@ All notable changes to this project, in reverse chronological order.
 
 ---
 
+## 2026-08-24 · Afternoon — Tournament Complete: SF, 3rd Place & Final Results
+
+- **scores.json updated**: added all remaining matches to complete the tournament:
+  - SF1 (m101): Spain 2-0 France — Oyarzabal (pen 22'), Porro (58')
+  - SF2 (m102): Argentina 2-1 England — Gordon (55'); Fernández (85'), Martínez (90'+2')
+  - 3rd Place (m103): England 6-4 France — Rice, Konsa, Saka ×3, Bellingham; Mbappé ×2, Barcola, Dembélé
+  - Final (m104): Spain 1-0 Argentina (AET) — Torres (106')
+- **Spain win the 2026 FIFA World Cup** 🏆
+
+---
+
 ## 2026-07-11 · Evening — QF Results
 
 - **scores.json updated**: added all 4 Quarter-Final results (matches 97-100): FRA 2-0 MAR, ESP 2-1 BEL, ENG 2-1 NOR (AET), ARG 3-1 SUI (AET).
